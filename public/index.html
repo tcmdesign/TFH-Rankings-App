@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TFH Rookie Rankings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0d0d0d;
+  --sidebar:   #111111;
+  --surface:   #181818;
+  --border:    #222222;
+  --accent:    #e05c2a;
+  --accent2:   #ff7a45;
+  --text:      #f0f0f0;
+  --muted:     #666666;
+  --pos-qb:    #e05c2a;
+  --pos-rb:    #00cc66;
+  --pos-wr:    #00bfff;
+  --pos-te:    #ff8c00;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .tfh {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text);
+  text-transform: uppercase;
+}
+.sidebar-logo .tfh span {
+  color: var(--accent);
+}
+.sidebar-logo .sub {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.sidebar-section {
+  padding: 16px 0 8px;
+}
+.sidebar-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 0 18px 8px;
+}
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #aaa;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+  user-select: none;
+}
+.sidebar-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.sidebar-item.active {
+  color: var(--text);
+  border-left-color: var(--accent);
+  background: rgba(224, 92, 42, 0.08);
+}
+.sidebar-item .dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+}
+.sidebar-item.active .dot { background: var(--accent); }
+.sidebar-item .coming-soon {
+  font-size: 9px;
+  color: var(--muted);
+  margin-left: auto;
+  letter-spacing: 0.5px;
+}
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.topbar-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.topbar-title span { color: var(--accent); }
+
+.pos-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.pos-tab {
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: transparent;
+  transition: all 0.15s;
+  user-select: none;
+}
+.pos-tab:hover:not(.disabled) { color: var(--text); border-color: #444; }
+.pos-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.pos-tab.disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Table area ── */
+.table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 24px;
+}
+
+.coming-soon-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-size: 14px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+thead th {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 12px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 1;
+}
+thead th.rank-col { width: 50px; text-align: center; }
+thead th.check-col { width: 36px; }
+thead th.photo-col { width: 44px; }
+
+tbody tr {
+  border-bottom: 1px solid #1a1a1a;
+  transition: background 0.1s;
+  cursor: grab;
+}
+tbody tr:hover { background: rgba(255,255,255,0.025); }
+tbody tr.dragging { opacity: 0.4; }
+tbody tr.drag-over { background: rgba(224,92,42,0.08); border-bottom-color: var(--accent); }
+tbody tr.checked td { opacity: 0.45; }
+tbody tr.checked td.check-cell { opacity: 1; }
+
+td {
+  padding: 10px 12px;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.rank-cell {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  width: 50px;
+}
+
+.check-cell { width: 36px; }
+.check-cell input[type=checkbox] {
+  width: 15px; height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.photo-cell { width: 44px; }
+.player-photo {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  background: #222;
+  display: block;
+}
+.photo-initials {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #252525;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #555;
+}
+
+.player-cell { min-width: 180px; }
+.player-name { font-weight: 600; font-size: 14px; }
+.player-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+.team-cell { width: 120px; }
+.team-inner { display: flex; align-items: center; gap: 8px; }
+.team-logo {
+  width: 24px; height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.team-abbrev { font-size: 12px; font-weight: 600; color: #bbb; }
+
+.pos-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  color: #000;
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.btn {
+  padding: 7px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: #bbb;
+  transition: all 0.15s;
+}
+.btn:hover { color: var(--text); border-color: #444; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: var(--accent2); border-color: var(--accent2); }
+.copy-feedback {
+  font-size: 11px;
+  color: var(--pos-rb);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.copy-feedback.show { opacity: 1; }
+.spacer { flex: 1; }
+.player-count { font-size: 11px; color: var(--muted); }
+
+/* ── Print styles ── */
+@media print {
+  body { background: #fff; color: #000; display: block; height: auto; }
+  .sidebar, .topbar, .pos-tabs, .toolbar { display: none; }
+  .main { overflow: visible; }
+  .table-wrap { overflow: visible; padding: 0; }
+  table { font-size: 11px; }
+  tbody tr.checked { text-decoration: line-through; opacity: 0.4; }
+  .check-cell { display: none; }
+  thead th { background: #fff; color: #333; }
+  .rank-cell { color: #c0392b; }
+  .team-logo { width: 18px; height: 18px; }
+  .player-photo, .photo-initials { width: 0; height: 0; display: none; }
+  .photo-cell { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="tfh">TFH <span>·</span> Rankings</div>
+    <div class="sub">2026 Rookie Season</div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Redraft</div>
+    <div class="sidebar-item active" data-mode="redraft" data-label="Redraft Rankings">
+      <span class="dot"></span> Rookie Rankings
+    </div>
+    <div class="sidebar-item disabled" data-mode="redraft-bestball" data-label="Best Ball">
+      <span class="dot"></span> Best Ball
+      <span class="coming-soon">Soon</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Dynasty</div>
+    <div class="sidebar-item" data-mode="dynasty" data-label="Dynasty Rankings">
+      <span class="dot"></span> Rookie Rankings
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Redraft <span>Rankings</span></div>
+  </div>
+
+  <div class="pos-tabs">
+    <div class="pos-tab active" data-pos="QB">QB</div>
+    <div class="pos-tab" data-pos="RB">RB</div>
+    <div class="pos-tab" data-pos="WR">WR</div>
+    <div class="pos-tab" data-pos="TE">TE</div>
+    <div class="pos-tab" data-pos="Overall">Overall</div>
+    <div class="pos-tab" data-pos="SF">SF Overall</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn primary" onclick="printCheatSheet()">Print Cheat Sheet</button>
+    <button class="btn" onclick="resetOrder()">Reset Order</button>
+    <button class="btn" onclick="copyLink()">Copy Shareable Link</button>
+    <span class="copy-feedback" id="copyFeedback">Link copied!</span>
+    <span class="spacer"></span>
+    <span class="player-count" id="playerCount"></span>
+  </div>
+
+  <div class="table-wrap">
+    <div id="tableContainer"></div>
+  </div>
+</div>
+
+<script>
+const POPULATED = {
+  redraft: { QB: true, RB: true, WR: false, TE: false, Overall: false, SF: false },
+  dynasty: { QB: true, RB: true, WR: false, TE: false, Overall: false, SF: false },
+};
+
+const POS_COLORS = { QB: '#e05c2a', RB: '#00cc66', WR: '#00bfff', TE: '#ff8c00' };
+
+let state = {
+  mode: 'redraft',
+  pos:  'QB',
+  data: [],           // original from API
+  order: [],          // current display order (indices into data[])
+  checked: new Set(),
+  custom: false,
+};
+
+// ── Init from URL ────────────────────────────────────────────────────────────
+function loadFromURL() {
+  const p = new URLSearchParams(location.search);
+  if (p.has('mode'))    state.mode    = p.get('mode');
+  if (p.has('pos'))     state.pos     = p.get('pos');
+  if (p.has('order'))   try { state.order   = JSON.parse(atob(p.get('order'))); state.custom = true; } catch {}
+  if (p.has('checked')) try { state.checked = new Set(JSON.parse(atob(p.get('checked')))); } catch {}
+}
+
+// ── Sidebar / tab nav ────────────────────────────────────────────────────────
+document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    state.mode    = el.dataset.mode;
+    state.custom  = false;
+    state.checked = new Set();
+    document.querySelector('.topbar-title').innerHTML =
+      el.dataset.label.replace(/(\w+)$/, '<span>$1</span>');
+    updatePosTabs();
+    loadRankings();
+  });
+});
+
+document.querySelectorAll('.pos-tab').forEach(el => {
+  el.addEventListener('click', () => {
+    if (el.classList.contains('disabled')) return;
+    document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    state.pos     = el.dataset.pos;
+    state.custom  = false;
+    state.checked = new Set();
+    loadRankings();
+  });
+});
+
+function updatePosTabs() {
+  const populated = POPULATED[state.mode] || {};
+  document.querySelectorAll('.pos-tab').forEach(el => {
+    const pos = el.dataset.pos;
+    el.classList.toggle('disabled', !populated[pos]);
+    if (!populated[pos] && el.classList.contains('active')) {
+      el.classList.remove('active');
+      // fall back to first populated
+      const first = Object.keys(populated).find(p => populated[p]);
+      if (first) {
+        state.pos = first;
+        document.querySelector(`.pos-tab[data-pos="${first}"]`)?.classList.add('active');
+      }
+    }
+  });
+}
+
+// ── Data fetch ───────────────────────────────────────────────────────────────
+async function loadRankings() {
+  const container = document.getElementById('tableContainer');
+  const populated = POPULATED[state.mode]?.[state.pos];
+  if (!populated) {
+    container.innerHTML = '<div class="coming-soon-msg">Rankings Coming Soon</div>';
+    document.getElementById('playerCount').textContent = '';
+    return;
+  }
+
+  container.innerHTML = '<div class="coming-soon-msg">Loading...</div>';
+
+  try {
+    const res  = await fetch(`/api/rankings/${state.mode}/${state.pos}`);
+    state.data  = await res.json();
+    state.order = state.custom && state.order.length === state.data.length
+      ? state.order
+      : state.data.map((_, i) => i);
+    renderTable();
+  } catch (e) {
+    container.innerHTML = `<div class="coming-soon-msg">Error loading rankings</div>`;
+  }
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function playerSlug(name) {
+  return name.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+}
+
+function espnPhotoUrl(name) {
+  return `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/placeholder.png`; // fallback
+}
+
+function teamLogoUrl(abbrev) {
+  if (!abbrev) return null;
+  return `https://a.espncdn.com/i/teamlogos/nfl/500/${abbrev.toLowerCase()}.png`;
+}
+
+function renderTable() {
+  const rows = state.order.map(i => state.data[i]);
+  document.getElementById('playerCount').textContent = `${rows.length} players`;
+
+  const isOverall = state.pos === 'Overall' || state.pos === 'SF';
+
+  const tbody = rows.map((p, displayIdx) => {
+    const orig   = state.order[displayIdx];
+    const rank   = displayIdx + 1;
+    const isChecked = state.checked.has(orig);
+    const pos    = p.Pos || state.pos;
+    const posColor = POS_COLORS[pos] || '#aaa';
+
+    const nameParts = (p.Player || '').split(' ');
+    const initials  = nameParts.slice(0,2).map(w => w[0]).join('').toUpperCase();
+    const slug      = playerSlug(p.Player || '');
+
+    const posBadge = isOverall
+      ? `<span class="pos-badge" style="background:${posColor}">${pos}</span>`
+      : '';
+
+    return `<tr data-idx="${orig}" draggable="true" class="${isChecked ? 'checked' : ''}">
+      <td class="rank-cell">${rank}</td>
+      <td class="check-cell"><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCheck(${orig}, this)"></td>
+      <td class="photo-cell">
+        <img class="player-photo" src="https://a.espncdn.com/combiner/i?img=/i/headshots/college-football/players/full/placeholder.png"
+          data-slug="${slug}"
+          onerror="this.style.display='none';this.nextSibling.style.display='flex'"
+          alt="${p.Player}">
+        <div class="photo-initials" style="display:none">${initials}</div>
+      </td>
+      <td class="player-cell">
+        <div class="player-name">${p.Player || '—'}</div>
+        <div class="player-meta">${posBadge}</div>
+      </td>
+      <td class="team-cell">
+        <div class="team-inner">
+          ${p.Team ? `<img class="team-logo" src="${teamLogoUrl(p.Team)}" alt="${p.Team}" onerror="this.style.display='none'">` : ''}
+          <span class="team-abbrev">${p.Team || '—'}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tableContainer').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th class="rank-col">Rank</th>
+          <th class="check-col"></th>
+          <th class="photo-col"></th>
+          <th>Player</th>
+          <th>Team</th>
+        </tr>
+      </thead>
+      <tbody id="rankingsTbody">${tbody}</tbody>
+    </table>`;
+
+  initDragDrop();
+  loadPhotos();
+}
+
+// ── Photo loading (ESPN search) ──────────────────────────────────────────────
+async function loadPhotos() {
+  const imgs = document.querySelectorAll('.player-photo[data-slug]');
+  for (const img of imgs) {
+    const name = (img.alt || '').trim();
+    if (!name) continue;
+    try {
+      const res  = await fetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&type=player&sport=football&limit=5`);
+      const json = await res.json();
+      const hits = (json.results || []).flatMap(g => g.contents || []);
+      for (const h of hits) {
+        const m = (h.uid || '').match(/a:(\d+)/);
+        if (!m) continue;
+        const id = m[1];
+        for (const league of ['nfl', 'college-football']) {
+          const url = `https://a.espncdn.com/combiner/i?img=/i/headshots/${league}/players/full/${id}.png&w=350&h=254`;
+          img.src = url;
+          break;
+        }
+        break;
+      }
+    } catch {}
+  }
+}
+
+// ── Drag to reorder ──────────────────────────────────────────────────────────
+let dragSrc = null;
+
+function initDragDrop() {
+  document.querySelectorAll('#rankingsTbody tr').forEach(row => {
+    row.addEventListener('dragstart', e => {
+      dragSrc = row;
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      document.querySelectorAll('#rankingsTbody tr').forEach(r => r.classList.remove('drag-over'));
+    });
+    row.addEventListener('dragover', e => {
+      e.preventDefault();
+      document.querySelectorAll('#rankingsTbody tr').forEach(r => r.classList.remove('drag-over'));
+      row.classList.add('drag-over');
+    });
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      if (dragSrc === row) return;
+      const tbody = document.getElementById('rankingsTbody');
+      const rows  = [...tbody.querySelectorAll('tr')];
+      const from  = rows.indexOf(dragSrc);
+      const to    = rows.indexOf(row);
+      const newOrder = [...state.order];
+      const [moved] = newOrder.splice(from, 1);
+      newOrder.splice(to, 0, moved);
+      state.order  = newOrder;
+      state.custom = true;
+      renderTable();
+    });
+  });
+}
+
+// ── Checkbox ─────────────────────────────────────────────────────────────────
+function toggleCheck(idx, el) {
+  if (el.checked) state.checked.add(idx);
+  else            state.checked.delete(idx);
+  el.closest('tr').classList.toggle('checked', el.checked);
+}
+
+// ── Actions ──────────────────────────────────────────────────────────────────
+function resetOrder() {
+  state.order  = state.data.map((_, i) => i);
+  state.custom = false;
+  renderTable();
+}
+
+function copyLink() {
+  const p = new URLSearchParams();
+  p.set('mode', state.mode);
+  p.set('pos',  state.pos);
+  if (state.custom)          p.set('order',   btoa(JSON.stringify(state.order)));
+  if (state.checked.size > 0) p.set('checked', btoa(JSON.stringify([...state.checked])));
+  const url = `${location.origin}${location.pathname}?${p.toString()}`;
+  navigator.clipboard.writeText(url).catch(() => prompt('Copy this link:', url));
+  const fb = document.getElementById('copyFeedback');
+  fb.classList.add('show');
+  setTimeout(() => fb.classList.remove('show'), 2000);
+}
+
+function printCheatSheet() { window.print(); }
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+loadFromURL();
+updatePosTabs();
+
+// Sync sidebar/tabs to URL state
+const modeEl = document.querySelector(`.sidebar-item[data-mode="${state.mode}"]`);
+if (modeEl) {
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  modeEl.classList.add('active');
+  document.querySelector('.topbar-title').innerHTML =
+    (modeEl.dataset.label || '').replace(/(\w+)$/, '<span>$1</span>');
+}
+const posEl = document.querySelector(`.pos-tab[data-pos="${state.pos}"]`);
+if (posEl) {
+  document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
+  posEl.classList.add('active');
+}
+
+loadRankings();
+</script>
+</body>
+</html>
