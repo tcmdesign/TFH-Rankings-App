@@ -672,7 +672,7 @@ function renderTable() {
       ? `<span class="adp-val">${p.adp}</span>`
       : `<span class="adp-none">—</span>`;
 
-    return `<tr data-idx="${orig}" draggable="true" class="${isChecked ? 'checked' : ''}" onclick="openPanel('${(p.Player||'').replace(/'/g,\"\\'\")}', this)">
+    return `<tr data-idx="${orig}" draggable="true" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''}">
       <td class="drag-cell">
         <div class="drag-handle"><span></span><span></span><span></span></div>
       </td>
@@ -725,6 +725,13 @@ function renderTable() {
   initDragDrop();
   loadPhotos();
   updateCustomIndicator();
+  document.querySelectorAll('#rankingsTbody tr').forEach(row => {
+    row.addEventListener('click', e => {
+      if (e.target.closest('.drag-cell, .check-cell, .star-btn')) return;
+      const playerName = row.dataset.player;
+      if (playerName) openPanel(playerName, row);
+    });
+  });
 }
 
 function updateCustomIndicator() {
