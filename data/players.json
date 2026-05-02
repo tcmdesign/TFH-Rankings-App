@@ -1,0 +1,882 @@
+{
+  "players": [
+    {
+      "name": "Fernando Mendoza",
+      "first_name": "Fernando",
+      "last_name": "Mendoza",
+      "position": "Quarterback",
+      "school": "Arizona",
+      "nfl_team": "Las Vegas Raiders",
+      "risk_value": "1.0",
+      "re_injury_risk": "Low",
+      "college_games": 36,
+      "seasons": 3,
+      "games_missed": 0,
+      "avg_missed": "0.0",
+      "pct_missed": "0.0%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2023",
+          "description": "No Injuries — Missed 4 games due to being 3rd QB on the depth chart."
+        },
+        {
+          "year": "2024",
+          "description": "No Injuries — Missed final 2 games due to illness, then entered the transfer portal."
+        },
+        {
+          "year": "2025",
+          "description": "No Injuries."
+        }
+      ]
+    },
+    {
+      "name": "Ty Simpson",
+      "first_name": "Ty",
+      "last_name": "Simpson",
+      "position": "Quarterback",
+      "school": "Alabama",
+      "nfl_team": "Los Angeles Rams",
+      "risk_value": "1.5",
+      "re_injury_risk": "Low",
+      "college_games": 31,
+      "seasons": 4,
+      "games_missed": 0,
+      "avg_missed": "0.0",
+      "pct_missed": "0.0%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2025",
+          "description": "Disc Herniation / Elbow Bursitis / Gastritis — 11/29/25 @ Auburn. Didn't miss any games but dealt with multiple issues late in the season. The gastritis caused him to lose nearly 20 lbs."
+        },
+        {
+          "year": "2026",
+          "description": "Rib Fracture — 1/1/26 vs Indiana. Left the game and did not return."
+        }
+      ]
+    },
+    {
+      "name": "Garrett Nussmeier",
+      "first_name": "Garrett",
+      "last_name": "Nussmeier",
+      "position": "Quarterback",
+      "school": "LSU",
+      "nfl_team": "Kansas City Chiefs",
+      "risk_value": "2.75",
+      "re_injury_risk": "Low",
+      "college_games": 40,
+      "seasons": 5,
+      "games_missed": 4,
+      "avg_missed": "0.8",
+      "pct_missed": "9.1%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2023",
+          "description": "Patella Tendonitis (surgery) — Summer. Had surgery for chronic knee pain from Osgood Schlatter disease. Continues to bother him periodically but he considers it manageable."
+        },
+        {
+          "year": "2025",
+          "description": "Oblique Strain — August. Played through the injury for the first 9 weeks before being shut down. Missed the final 4 games of the season."
+        }
+      ]
+    },
+    {
+      "name": "Carson Beck",
+      "first_name": "Carson",
+      "last_name": "Beck",
+      "position": "Quarterback",
+      "school": "Miami",
+      "nfl_team": "Arizona Cardinals",
+      "risk_value": "3.0",
+      "re_injury_risk": "Low",
+      "college_games": 55,
+      "seasons": 6,
+      "games_missed": 1,
+      "avg_missed": "0.2",
+      "pct_missed": "1.8%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2024",
+          "description": "Right UCL Tear (surgery) — 12/7/24 vs Texas. Ruled out and missed the final game of the season. Transferred to Miami, missed spring training before returning for Week 1 in 2025."
+        }
+      ]
+    },
+    {
+      "name": "Drew Allar",
+      "first_name": "Drew",
+      "last_name": "Allar",
+      "position": "Quarterback",
+      "school": "Penn State",
+      "nfl_team": "Pittsburgh Steelers",
+      "risk_value": "3.0",
+      "re_injury_risk": "Low",
+      "college_games": 45,
+      "seasons": 4,
+      "games_missed": 7,
+      "avg_missed": "1.8",
+      "pct_missed": "13.5%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2025",
+          "description": "Left Ankle Fracture (surgery) — 10/11/25 vs Northwestern. Left the field late in the 4th quarter after a low shot to the ankle. Had surgery and was unable to redshirt. Missed the final 7 games of the season."
+        }
+      ]
+    },
+    {
+      "name": "Jeremiyah Love",
+      "first_name": "Jeremiyah",
+      "last_name": "Love",
+      "position": "Running Back",
+      "school": "Notre Dame",
+      "nfl_team": "Arizona Cardinals",
+      "risk_value": "1.75",
+      "re_injury_risk": "Low",
+      "college_games": 41,
+      "seasons": 3,
+      "games_missed": 0,
+      "avg_missed": "0.0",
+      "pct_missed": "0.0%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2024",
+          "description": "Left Knee Sprain — 11/30/24 @ USC. Tweaked his knee, required two weeks of rehab but did not miss any games. Tweaked it again vs Indiana in his next game."
+        }
+      ]
+    },
+    {
+      "name": "Jadarian Price",
+      "first_name": "Jadarian",
+      "last_name": "Price",
+      "position": "Running Back",
+      "school": "Notre Dame",
+      "risk_value": "5.0",
+      "re_injury_risk": "Moderate",
+      "college_games": 41,
+      "seasons": 4,
+      "games_missed": 13,
+      "avg_missed": "3.25",
+      "pct_missed": "24.1%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2022",
+          "description": "Left Achilles Rupture — June. Redshirted what would have been his freshman season at Notre Dame. Missed 13 games."
+        }
+      ],
+      "nfl_team": "Seattle Seahawks"
+    },
+    {
+      "name": "Mike Washington Jr.",
+      "first_name": "Mike",
+      "last_name": "Washington Jr.",
+      "position": "Running Back",
+      "school": "Arkansas",
+      "nfl_team": "Las Vegas Raiders",
+      "risk_value": "1.5",
+      "re_injury_risk": "Low",
+      "college_games": 51,
+      "seasons": 5,
+      "games_missed": 0,
+      "avg_missed": "0.0",
+      "pct_missed": "0.0%",
+      "page": "",
+      "injuries": []
+    },
+    {
+      "name": "Emmett Johnson",
+      "first_name": "Emmett",
+      "last_name": "Johnson",
+      "position": "Running Back",
+      "school": "Nebraska",
+      "nfl_team": "Seattle Seahawks",
+      "risk_value": "1.5",
+      "re_injury_risk": "Low",
+      "college_games": 41,
+      "seasons": 4,
+      "games_missed": 0,
+      "avg_missed": "0.0",
+      "pct_missed": "0.0%",
+      "page": "",
+      "injuries": []
+    },
+    {
+      "name": "Kaytron Allen",
+      "first_name": "Kaytron",
+      "last_name": "Allen",
+      "position": "Running Back",
+      "school": "Penn State",
+      "nfl_team": "Tampa Bay Buccaneers",
+      "risk_value": "1.75",
+      "re_injury_risk": "Low",
+      "college_games": 54,
+      "seasons": 4,
+      "games_missed": 1,
+      "avg_missed": "0.25",
+      "pct_missed": "1.8%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2023",
+          "description": "Undisclosed (Concussion) — 9/30/23 @ Northwestern. Left the game and went to the locker room, returning without his helmet. Had a bye the next week and ultimately didn't miss any games."
+        },
+        {
+          "year": "2025",
+          "description": "Undisclosed — 11/29/25 @ Rutgers. Missed the final game of the season; the team cited an injury though details were unconfirmed."
+        }
+      ]
+    },
+    {
+      "name": "Jonah Coleman",
+      "first_name": "Jonah",
+      "last_name": "Coleman",
+      "position": "Running Back",
+      "school": "Washington",
+      "risk_value": "2.5",
+      "re_injury_risk": "Low",
+      "college_games": 50,
+      "seasons": 4,
+      "games_missed": 1,
+      "avg_missed": "0.25",
+      "pct_missed": "2.0%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2025",
+          "description": "Left Knee PCL Sprain — 11/8/25 @ Wisconsin. Left the game and missed the following week before returning with a large brace. His next two games were his worst of the season (13 rushes, 28 yards, 1 TD total)."
+        }
+      ],
+      "nfl_team": "Denver Broncos"
+    },
+    {
+      "name": "Nicholas Singleton",
+      "first_name": "Nicholas",
+      "last_name": "Singleton",
+      "position": "Running Back",
+      "school": "Penn State",
+      "nfl_team": "Tennessee Titans",
+      "risk_value": "5.5",
+      "re_injury_risk": "Moderate",
+      "college_games": 53,
+      "seasons": 4,
+      "games_missed": 1,
+      "avg_missed": "0.25",
+      "pct_missed": "1.9%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2024",
+          "description": "Undisclosed — 9/28/24 vs Illinois. Missed 1 game with what was described as bumps and bruises. Also missed 1.5 quarters in the Wisconsin game that year."
+        },
+        {
+          "year": "2026",
+          "description": "Right Jones Fracture (surgery) — 1/30/26 Senior Bowl. Broke his 5th metatarsal on the last day of practice. Had surgery and missed the NFL Combine."
+        }
+      ]
+    },
+    {
+      "name": "Le'Veon Moss",
+      "first_name": "Le'Veon",
+      "last_name": "Moss",
+      "position": "Running Back",
+      "school": "Texas",
+      "nfl_team": "Miami Dolphins",
+      "risk_value": "7.0",
+      "re_injury_risk": "High",
+      "college_games": 32,
+      "seasons": 4,
+      "games_missed": 10,
+      "avg_missed": "2.5",
+      "pct_missed": "23.8%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2024",
+          "description": "Right ACL / MCL Tear (surgery) — 11/2/24 @ South Carolina. Went down after two carries. Missed the final 4 games of the season."
+        },
+        {
+          "year": "2025",
+          "description": "Left High Ankle Sprain — 10/11/25 vs Florida. Had his ankle rolled up on, missed 6 games before returning for the CFP game vs Miami. Re-aggravated the injury during that game."
+        }
+      ]
+    },
+    {
+      "name": "Demond Claiborne",
+      "first_name": "Demond",
+      "last_name": "Claiborne",
+      "position": "Running Back",
+      "school": "Wake Forest",
+      "nfl_team": "Minnesota Vikings",
+      "risk_value": "2.0",
+      "re_injury_risk": "Low",
+      "college_games": 44,
+      "seasons": 4,
+      "games_missed": 0,
+      "avg_missed": "0.0",
+      "pct_missed": "0.0%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2024",
+          "description": "Left Dislocated Kneecap — 9/28/24. Was carted off but returned to the game. No surgery reported; hasn't bothered him since."
+        },
+        {
+          "year": "2025",
+          "description": "Rib Contusion — 8/29 vs Kennesaw State. Banged up in the season opener but did not miss any games."
+        }
+      ]
+    },
+    {
+      "name": "Jamarion Miller",
+      "espn_search_name": "Jam Miller",
+      "first_name": "Jamarion",
+      "last_name": "Miller",
+      "position": "Running Back",
+      "school": "Alabama",
+      "risk_value": "2.75",
+      "re_injury_risk": "Low",
+      "college_games": 51,
+      "seasons": 4,
+      "games_missed": 4,
+      "avg_missed": "1.0",
+      "pct_missed": "7.3%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2025",
+          "description": "Clavicle Fracture — August. Injured during a scrimmage. Missed the first 3 games of the season."
+        },
+        {
+          "year": "2025",
+          "description": "Concussion — 10/11 @ Missouri. Confirmed after the game; played the following week."
+        },
+        {
+          "year": "2025",
+          "description": "Ankle Sprain — 11/29 @ Auburn. Considered non-serious at the time. Missed 1 game."
+        }
+      ]
+    },
+    {
+      "name": "Carnell Tate",
+      "first_name": "Carnell",
+      "last_name": "Tate",
+      "position": "Wide Receiver",
+      "school": "Ohio State",
+      "risk_value": "2.0",
+      "re_injury_risk": "Low",
+      "college_games": 39,
+      "seasons": 3,
+      "games_missed": 4,
+      "avg_missed": "1.33",
+      "pct_missed": "9.3%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2024",
+          "description": "Calf Strain — 9/28/24 @ Michigan State. Considered more tightness than a true injury. Missed 1 game."
+        },
+        {
+          "year": "2025",
+          "description": "Calf Strain — 9/8/25 @ Purdue. Technically re-injured during warmups. Missed the Purdue game and 2 more games after that. Appeared to slow him down in the CFB Playoff."
+        }
+      ],
+      "nfl_team": "Tennessee Titans"
+    },
+    {
+      "name": "Makai Lemon",
+      "first_name": "Makai",
+      "last_name": "Lemon",
+      "position": "Wide Receiver",
+      "school": "USC",
+      "risk_value": "1.5",
+      "re_injury_risk": "Low",
+      "college_games": 33,
+      "seasons": 3,
+      "games_missed": 1,
+      "avg_missed": "0.33",
+      "pct_missed": "2.9%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2024",
+          "description": "Concussion — 9/21/24 vs Michigan. Hit on a punt return; suffered a concussion and whiplash. Hospitalized overnight but returned to action without long-term effects. Missed 1 game."
+        }
+      ],
+      "nfl_team": "Philadelphia Eagles"
+    },
+    {
+      "name": "Jordyn Tyson",
+      "first_name": "Jordyn",
+      "last_name": "Tyson",
+      "position": "Wide Receiver",
+      "school": "Arizona State",
+      "risk_value": "7.5",
+      "re_injury_risk": "High",
+      "college_games": 30,
+      "seasons": 4,
+      "games_missed": 20,
+      "avg_missed": "5.0",
+      "pct_missed": "40.0%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2022",
+          "description": "Left ACL / MCL / PCL Tear (surgery) — Fall. Missed the final 3 games of 2022 and redshirted the following season. 15 games missed in total."
+        },
+        {
+          "year": "2024",
+          "description": "Clavicle Fracture — 11/30/24 @ Arizona. Injured in the final regular season game. Missed the final 2 CFB Playoff games."
+        },
+        {
+          "year": "2025",
+          "description": "Right and Left Hamstring Strain — 11/18/25 vs Texas Tech. Missed the next 3 games. Opted out of combine field testing, citing the ongoing hamstring issue."
+        }
+      ],
+      "nfl_team": "New Orleans Saints"
+    },
+    {
+      "name": "Denzel Boston",
+      "first_name": "Denzel",
+      "last_name": "Boston",
+      "position": "Wide Receiver",
+      "school": "Washington",
+      "risk_value": "3.0",
+      "re_injury_risk": "Low",
+      "college_games": 43,
+      "seasons": 4,
+      "games_missed": 2,
+      "avg_missed": "0.5",
+      "pct_missed": "4.4%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2023",
+          "description": "Undisclosed — 11/11/23 vs Utah. Missed 1 game."
+        },
+        {
+          "year": "2025",
+          "description": "Sports Hernia (surgery) — Spring. Missed 27 total practices and scrimmages after surgery."
+        },
+        {
+          "year": "2025",
+          "description": "Ankle Sprain — 11/8/25 vs Wisconsin. Carted off but returned in the second half. Missed the following game; recorded just 4 catches for 25 yards in the next two games combined."
+        }
+      ],
+      "nfl_team": "Cleveland Browns"
+    },
+    {
+      "name": "KC Concepcion",
+      "first_name": "KC",
+      "last_name": "Concepcion",
+      "position": "Wide Receiver",
+      "school": "Texas A&M",
+      "risk_value": "1.5",
+      "re_injury_risk": "Low",
+      "college_games": 38,
+      "seasons": 3,
+      "games_missed": 0,
+      "avg_missed": "0.0",
+      "pct_missed": "0.0%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2024",
+          "description": "Foot Injury — Early Season. No official diagnosis. Reportedly hampered him early in the season but he did not miss any games."
+        }
+      ],
+      "nfl_team": "Cleveland Browns"
+    },
+    {
+      "name": "Omar Cooper Jr.",
+      "first_name": "Omar",
+      "last_name": "Cooper Jr.",
+      "position": "Wide Receiver",
+      "school": "Indiana",
+      "risk_value": "4.0",
+      "re_injury_risk": "Moderate",
+      "college_games": 42,
+      "seasons": 4,
+      "games_missed": 0,
+      "avg_missed": "0.0",
+      "pct_missed": "0.0%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2020",
+          "description": "Left ACL Tear — High School. Injured at the end of his junior year. Returned for his senior season."
+        },
+        {
+          "year": "2025",
+          "description": "Right Ankle Sprain — 12/6/25 vs Ohio State. Left the game and was seen in a walking boot but ultimately played in the final 3 games. Did not record a catch in the Ohio State game due to the injury."
+        }
+      ],
+      "nfl_team": "New York Jets"
+    },
+    {
+      "name": "Chris Bell",
+      "first_name": "Chris",
+      "last_name": "Bell",
+      "position": "Wide Receiver",
+      "school": "Louisville",
+      "risk_value": "7.0",
+      "re_injury_risk": "High",
+      "college_games": 47,
+      "seasons": 4,
+      "games_missed": 2,
+      "avg_missed": "0.5",
+      "pct_missed": "4.1%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2023",
+          "description": "Labrum Tear (shoulder surgery) — Spring. Missed the entire spring session after his freshman season."
+        },
+        {
+          "year": "2025",
+          "description": "ACL Tear (surgery) — 11/22/25 @ SMU. Described as a clean ACL tear with no additional damage. Missed the final 2 games of the season."
+        }
+      ],
+      "nfl_team": "Miami Dolphins"
+    },
+    {
+      "name": "Chris Brazzell II",
+      "first_name": "Chris",
+      "last_name": "Brazzell II",
+      "position": "Wide Receiver",
+      "school": "Tennessee",
+      "risk_value": "2.0",
+      "re_injury_risk": "Low",
+      "college_games": 40,
+      "seasons": 4,
+      "games_missed": 12,
+      "avg_missed": "3.0",
+      "pct_missed": "23.1%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2022",
+          "description": "Shoulder Injury — 9/10/22 vs Alcorn State. Took a medical redshirt and missed the final 12 games of his freshman season. Severity of the injury was never officially disclosed."
+        },
+        {
+          "year": "2025",
+          "description": "Right Leg Strain — August. Missed the first 8 practices with a possible calf issue but played the entire regular season."
+        }
+      ],
+      "nfl_team": "Carolina Panthers"
+    },
+    {
+      "name": "Zachariah Branch",
+      "first_name": "Zachariah",
+      "last_name": "Branch",
+      "position": "Wide Receiver",
+      "school": "Georgia",
+      "risk_value": "2.0",
+      "re_injury_risk": "Low",
+      "college_games": 37,
+      "seasons": 3,
+      "games_missed": 2,
+      "avg_missed": "0.67",
+      "pct_missed": "5.1%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2023",
+          "description": "Hamstring Strain — 10/7/23 vs Arizona. Missed 2 games."
+        },
+        {
+          "year": "2025",
+          "description": "Hamstring Strain — Spring. Missed a scrimmage with a minor hamstring issue; no regular season games missed."
+        }
+      ],
+      "nfl_team": "Atlanta Falcons"
+    },
+    {
+      "name": "Ja'Kobi Lane",
+      "first_name": "Ja'Kobi",
+      "last_name": "Lane",
+      "position": "Wide Receiver",
+      "school": "USC",
+      "risk_value": "3.25",
+      "re_injury_risk": "Low",
+      "college_games": 30,
+      "seasons": 3,
+      "games_missed": 1,
+      "avg_missed": "0.33",
+      "pct_missed": "3.2%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2025",
+          "description": "Foot Fracture — Spring. Limited most of the summer with this issue. Missed 1 game during the season, possibly related to the same injury."
+        }
+      ],
+      "nfl_team": "Baltimore Ravens"
+    },
+    {
+      "name": "Germie Bernard",
+      "first_name": "Germie",
+      "last_name": "Bernard",
+      "position": "Wide Receiver",
+      "school": "Alabama",
+      "risk_value": "1.75",
+      "re_injury_risk": "Low",
+      "college_games": 53,
+      "seasons": 4,
+      "games_missed": 1,
+      "avg_missed": "0.25",
+      "pct_missed": "1.9%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2025",
+          "description": "Foot Sprain — 11/15/25 vs Oklahoma. Missed 1 game. Considered minor."
+        },
+        {
+          "year": "2026",
+          "description": "Undisclosed — Senior Bowl. Dropped out with a minor injury."
+        }
+      ],
+      "nfl_team": "Pittsburgh Steelers"
+    },
+    {
+      "name": "Elijah Sarratt",
+      "first_name": "Elijah",
+      "last_name": "Sarratt",
+      "position": "Wide Receiver",
+      "school": "Indiana",
+      "risk_value": "1.75",
+      "re_injury_risk": "Low",
+      "college_games": 40,
+      "seasons": 3,
+      "games_missed": 2,
+      "avg_missed": "0.67",
+      "pct_missed": "4.8%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2025",
+          "description": "Hamstring Strain — 11/1/25 @ Maryland. Considered significant. Missed the next two games plus a bye week before returning."
+        }
+      ],
+      "nfl_team": "Baltimore Ravens"
+    },
+    {
+      "name": "Antonio Williams",
+      "first_name": "Antonio",
+      "last_name": "Williams",
+      "position": "Wide Receiver",
+      "school": "Clemson",
+      "risk_value": "3.0",
+      "re_injury_risk": "Low",
+      "college_games": 43,
+      "seasons": 4,
+      "games_missed": 10,
+      "avg_missed": "2.5",
+      "pct_missed": "18.9%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2023",
+          "description": "Ankle Sprain — 9/16/23 vs Florida Atlantic. Missed 3 games with a rolled ankle."
+        },
+        {
+          "year": "2023",
+          "description": "Turf Toe — 10/21/23 @ Miami. Injured in his first game back from the ankle. Missed the next 5 games, but did play in the Gator Bowl."
+        },
+        {
+          "year": "2025",
+          "description": "Right Hamstring Strain — 9/30/25 vs LSU. Missed the next two games."
+        }
+      ]
+    },
+    {
+      "name": "Ted Hurst",
+      "first_name": "Ted",
+      "last_name": "Hurst",
+      "position": "Wide Receiver",
+      "school": "Georgia State",
+      "risk_value": "1.25",
+      "re_injury_risk": "Low",
+      "college_games": 59,
+      "seasons": 4,
+      "games_missed": 0,
+      "avg_missed": "0.0",
+      "pct_missed": "0.0%",
+      "page": "",
+      "injuries": [],
+      "nfl_team": "Tampa Bay Buccaneers"
+    },
+    {
+      "name": "Malachi Fields",
+      "first_name": "Malachi",
+      "last_name": "Fields",
+      "position": "Wide Receiver",
+      "school": "Notre Dame",
+      "risk_value": "3.75",
+      "re_injury_risk": "Low",
+      "college_games": 48,
+      "seasons": 5,
+      "games_missed": 9,
+      "avg_missed": "1.8",
+      "pct_missed": "15.8%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2022",
+          "description": "Foot Fracture (surgery) — Summer. Broke a metatarsal bone and missed the first 9 games of the season."
+        }
+      ],
+      "nfl_team": "New York Giants"
+    },
+    {
+      "name": "Kenyon Sadiq",
+      "first_name": "Kenyon",
+      "last_name": "Sadiq",
+      "position": "Tight End",
+      "school": "Oregon",
+      "risk_value": "1.5",
+      "re_injury_risk": "Low",
+      "college_games": 42,
+      "seasons": 3,
+      "games_missed": 1,
+      "avg_missed": "0.33",
+      "pct_missed": "2.3%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2025",
+          "description": "Undisclosed Injury — 10/18/25 vs Rutgers. Missed the second half and 1 additional game. Rumored to be a shoulder sprain."
+        }
+      ],
+      "nfl_team": "New York Jets"
+    },
+    {
+      "name": "Eli Stowers",
+      "first_name": "Eli",
+      "last_name": "Stowers",
+      "position": "Tight End",
+      "school": "Vanderbilt",
+      "risk_value": "6.0",
+      "re_injury_risk": "Moderate",
+      "college_games": 45,
+      "seasons": 5,
+      "games_missed": 9,
+      "avg_missed": "1.8",
+      "pct_missed": "16.7%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2019",
+          "description": "Left PCL and Meniscus Tear (surgery) — High School state title game (junior year). Surgery in January 2020."
+        },
+        {
+          "year": "2021",
+          "description": "Right Labrum Tear (shoulder surgery) — In Season. Had surgery in the offseason; missed 9 games the following year."
+        },
+        {
+          "year": "2025",
+          "description": "Undisclosed — August. Missed preseason scrimmages but no regular season games."
+        },
+        {
+          "year": "2026",
+          "description": "Hamstring Strain — February. Competed at the NFL Combine but reportedly had a hamstring strain just two weeks prior."
+        }
+      ],
+      "nfl_team": "Philadelphia Eagles"
+    },
+    {
+      "name": "Max Klare",
+      "first_name": "Max",
+      "last_name": "Klare",
+      "position": "Tight End",
+      "school": "Purdue",
+      "risk_value": "3.25",
+      "re_injury_risk": "Low",
+      "college_games": 33,
+      "seasons": 4,
+      "games_missed": 7,
+      "avg_missed": "1.75",
+      "pct_missed": "17.5%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2020",
+          "description": "Clavicle Fracture — High School. Broke his collar bone his junior year."
+        },
+        {
+          "year": "2022",
+          "description": "Left Foot Injury — Spring. Tried to play baseball for Purdue but an ankle/foot issue prevented him from doing both sports."
+        },
+        {
+          "year": "2023",
+          "description": "Left Ankle Sprain — 9/30/23 vs Illinois. Full deltoid ligament rupture and bone chip. Missed the final 7 games of the season."
+        }
+      ],
+      "nfl_team": "Los Angeles Rams"
+    },
+    {
+      "name": "Michael Trigg",
+      "first_name": "Michael",
+      "last_name": "Trigg",
+      "position": "Tight End",
+      "school": "Baylor",
+      "risk_value": "4.25",
+      "re_injury_risk": "Moderate",
+      "college_games": 38,
+      "seasons": 5,
+      "games_missed": 16,
+      "avg_missed": "3.2",
+      "pct_missed": "29.6%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2021",
+          "description": "Knee Sprain — 10/9/21 vs Utah. Carted off the field but avoided an ACL tear. Missed the final 6 games of the season."
+        },
+        {
+          "year": "2022",
+          "description": "Clavicle Fracture — 10/8/22 vs Vanderbilt. Missed the final 7 games of the season."
+        },
+        {
+          "year": "2023",
+          "description": "Refused to return to the team after just 3 games; took a redshirt before transferring to Baylor."
+        },
+        {
+          "year": "2024",
+          "description": "Left Shoulder Sprain — 9/21/24 @ Colorado. Missed the next game before returning. Missed the final game (LSU) with a recurrent shoulder issue."
+        },
+        {
+          "year": "2025",
+          "description": "Shoulder Contusion — November. Missed the final game of the season with a soft tissue injury."
+        }
+      ],
+      "nfl_team": "Dallas Cowboys"
+    },
+    {
+      "name": "Justin Joly",
+      "first_name": "Justin",
+      "last_name": "Joly",
+      "position": "Tight End",
+      "school": "NC State",
+      "risk_value": "1.5",
+      "re_injury_risk": "Low",
+      "college_games": 49,
+      "seasons": 4,
+      "games_missed": 1,
+      "avg_missed": "0.25",
+      "pct_missed": "2.0%",
+      "page": "",
+      "injuries": [
+        {
+          "year": "2025",
+          "description": "Quad Strain — 10/25/25 @ Pitt. Left the game with a quad strain, attempted to return, and ultimately missed the following game vs Georgia Tech."
+        }
+      ],
+      "nfl_team": "Denver Broncos"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 const express = require('express');
 const fetch   = require('node-fetch');
 const path    = require('path');
+const fs      = require('fs');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -27,7 +28,30 @@ const TABLES = {
   },
 };
 
-// Cache: 5 min for rankings, 1 hour for ADP
+// ── Static player data ────────────────────────────────────────────────────────
+const DATA_DIR      = path.join(__dirname, 'data');
+const ADP_HIST_FILE = path.join(DATA_DIR, 'adp_history.json');
+
+const scoutsRaw  = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'scouts.json'),  'utf8'));
+const playersRaw = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'players.json'), 'utf8'));
+
+// Build name-keyed lookup (lowercase)
+const scoutMap  = {};
+(scoutsRaw.players  || []).forEach(p => { scoutMap[p.name.toLowerCase()]  = p; });
+const injuryMap = {};
+(playersRaw.players || []).forEach(p => { injuryMap[p.name.toLowerCase()] = p; });
+
+// ── ADP history (persists to file between restarts) ──────────────────────────
+let adpHistory = [];
+try {
+  adpHistory = JSON.parse(fs.readFileSync(ADP_HIST_FILE, 'utf8'));
+} catch {}
+
+function saveAdpHistory() {
+  try { fs.writeFileSync(ADP_HIST_FILE, JSON.stringify(adpHistory)); } catch {}
+}
+
+// ── Cache ─────────────────────────────────────────────────────────────────────
 const cache = {};
 
 async function fetchTable(tableId) {
@@ -58,7 +82,6 @@ async function fetchMFLAdp() {
   const now = Date.now();
   if (cache.__mfl && now - cache.__mfl.ts < TTL) return cache.__mfl.data;
 
-  // Fetch players and ADP in parallel
   const [playersRes, adpRes] = await Promise.all([
     fetch('https://api.myfantasyleague.com/2026/export?TYPE=players&DETAILS=1&JSON=1'),
     fetch('https://api.myfantasyleague.com/2026/export?TYPE=adp&FCOUNT=12&PERIOD=RECENT&PPR=1&IS_KEEPER=0&JSON=1'),
@@ -69,21 +92,26 @@ async function fetchMFLAdp() {
   const playerMap = {};
   (playersJson.players?.player || []).forEach(p => { playerMap[p.id] = p; });
 
-  // Build name -> ADP map for 2026 rookies only
   const adpMap = {};
   (adpJson.adp?.player || []).forEach(a => {
     const p = playerMap[a.id];
     if (!p || p.draft_year !== '2026') return;
-    // MFL name format: "Last, First" — convert to "First Last"
     const parts = p.name.split(', ');
     const normalized = parts.length === 2 ? `${parts[1]} ${parts[0]}`.toLowerCase() : p.name.toLowerCase();
     adpMap[normalized] = parseFloat(a.averagePick).toFixed(1);
   });
 
   cache.__mfl = { ts: now, data: adpMap };
+
+  // Store ADP snapshot for history (max 720 points = 30 days hourly)
+  adpHistory.push({ ts: now, adpMap: { ...adpMap } });
+  if (adpHistory.length > 720) adpHistory = adpHistory.slice(-720);
+  saveAdpHistory();
+
   return adpMap;
 }
 
+// ── Routes ────────────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api/rankings/:mode/:pos', async (req, res) => {
@@ -103,9 +131,23 @@ app.get('/api/rankings/:mode/:pos', async (req, res) => {
   }
 });
 
-app.get('/api/adp/last-updated', async (req, res) => {
-  const ts = cache.__mfl?.ts;
-  res.json({ ts: ts || null });
+app.get('/api/player/:name', async (req, res) => {
+  const name = decodeURIComponent(req.params.name).toLowerCase();
+  const scout  = scoutMap[name]  || null;
+  const injury = injuryMap[name] || null;
+  res.json({ scout, injury });
+});
+
+app.get('/api/adp/history/:name', (req, res) => {
+  const name = decodeURIComponent(req.params.name).toLowerCase();
+  const history = adpHistory
+    .map(snap => ({ ts: snap.ts, adp: snap.adpMap[name] ? parseFloat(snap.adpMap[name]) : null }))
+    .filter(h => h.adp !== null);
+  res.json(history);
+});
+
+app.get('/api/adp/last-updated', (req, res) => {
+  res.json({ ts: cache.__mfl?.ts || null });
 });
 
 app.listen(PORT, () => console.log(`Rankings app running on port ${PORT}`));

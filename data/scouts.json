@@ -1,0 +1,1859 @@
+{
+  "players": [
+    {
+      "name": "Fernando Mendoza",
+      "first_name": "Fernando",
+      "last_name": "Mendoza",
+      "position": "Quarterback",
+      "school": "Arizona",
+      "round": 1,
+      "pick": 1,
+      "nfl_team": "Las Vegas Raiders",
+      "nfl_team_abbrev": "lv",
+      "strengths": [
+        "Presence and decision making in the pocket",
+        "Accuracy and power in the intermediate"
+      ],
+      "weaknesses": [
+        "Arm strength",
+        "Lack of mobility against NFL athletes",
+        "Mechanics on the move"
+      ],
+      "outlook": "The Raiders decided to add Kirk Cousins to give Mendoza time to transition to the NFL, and ensure their #1 pick can be successful. My pre-draft comp for Mendoza was Cousins, so this makes sense. A top-2 pick in dynasty superflex leagues still, Mendoza may not make an impact in redraft leagues this fall and Cousins should be considered the starter until further notice.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Kirk Cousins",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Aidan O'Connell",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "TY Simpson",
+      "first_name": "TY",
+      "last_name": "Simpson",
+      "position": "Quarterback",
+      "school": "Alabama",
+      "round": 1,
+      "pick": 13,
+      "nfl_team": "Los Angeles Rams",
+      "nfl_team_abbrev": "lar",
+      "strengths": [
+        "Pre and post snap IQ",
+        "Intermediate accuracy",
+        "Takes care of the football"
+      ],
+      "weaknesses": [
+        "Arm strength",
+        "Limited experience"
+      ],
+      "outlook": "Simpson landed in a great spot, but we won't see that for 2-3 years. Simpson will be the QB2 in LA until Stafford retires, but Stafford has also dealt with plenty of injury issues during his career. Simpson is a top-5 dynasty superflex pick, but would only be a redraft waiver add if Stafford is injured this year.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Matthew Stafford",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Stetson Bennett",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Carson Beck",
+      "first_name": "Carson",
+      "last_name": "Beck",
+      "position": "Quarterback",
+      "school": "Miami",
+      "round": 3,
+      "pick": 1,
+      "nfl_team": "Arizona Cardinals",
+      "nfl_team_abbrev": "ari",
+      "strengths": [
+        "Experience",
+        "Quick, compact throwing motion",
+        "Works through multiple reads"
+      ],
+      "weaknesses": [
+        "Arm strength post-2024 UCL surgery",
+        "Pocket pressure causes mental mistakes"
+      ],
+      "outlook": "The Cardinals are looking for their QB of the future after Jacoby Brissett bridges the gap. The Cardinals also have Gardner Minshew, so expect little time from Beck under center in 2026. This pick is for 2027 and beyond. Beck has a lot of work to do to become successful in the NFL, but he will get that work this year with an eye toward 2027 as the starter.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Gardner Minshew",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Jacoby Brissett",
+          "is_prospect": false
+        },
+        {
+          "label": "QB3",
+          "name": "Kedon Slovis",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Drew Allar",
+      "first_name": "Drew",
+      "last_name": "Allar",
+      "position": "Quarterback",
+      "school": "Penn State",
+      "round": 3,
+      "pick": 12,
+      "nfl_team": "Pittsburgh Steelers",
+      "nfl_team_abbrev": "pit",
+      "strengths": [
+        "Arm strength to make throws at all levels",
+        "Elite frame and size"
+      ],
+      "weaknesses": [
+        "Has issues placing ball where receiver has best chance to win",
+        "First look QB — issues adjusting mid-play"
+      ],
+      "outlook": "Allar was considered a top QB prospect prior to the season, but reports say Penn State let Allar down with his development. Maybe the Steelers will find gold here. Allar has all the tools to be successful in the NFL if he can clean up his accuracy and work on processing plays post-snap. I consider Allar to be QB3 behind Mendoza and Simpson with this landing spot.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Mason Rudolph",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Will Howard",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Cade Klubnik",
+      "first_name": "Cade",
+      "last_name": "Klubnik",
+      "position": "Quarterback",
+      "school": "Clemson",
+      "round": 4,
+      "pick": 10,
+      "nfl_team": "New York Jets",
+      "nfl_team_abbrev": "nyj",
+      "strengths": [
+        "Quick throwing motion",
+        "Solid accuracy when in a clean pocket",
+        "Sideline accuracy"
+      ],
+      "weaknesses": [
+        "Needs to engage lower half more on harder throws",
+        "Progressions and extending plays disrupt throws"
+      ],
+      "outlook": "The Jets need a QB of the future and maybe Klubnik can offer some value. He has a lot to work on behind Geno Smith, but will need more than a year to develop. The speed of good college defenses gave him issues, and that won't get easier in the NFL. Klubnik looks like a career backup at best, but gives the Jets a project until they draft a QB in 2027.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Geno Smith",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Bailey Zappe",
+          "is_prospect": false
+        },
+        {
+          "label": "QB3",
+          "name": "Brady Cook",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Cole Payton",
+      "first_name": "Cole",
+      "last_name": "Payton",
+      "position": "Quarterback",
+      "school": "Incarnate Word",
+      "round": 5,
+      "pick": 38,
+      "nfl_team": "Philadelphia Eagles",
+      "nfl_team_abbrev": "phi",
+      "strengths": [
+        "Frame and size",
+        "Rushing ability",
+        "Accuracy outside the pocket"
+      ],
+      "weaknesses": [
+        "Arm strength",
+        "Starter experience",
+        "Lower half mechanics"
+      ],
+      "outlook": "Payton could offer the Eagles a backup option behind Hurts in a year or two, but he is a very raw prospect with a lot of work ahead. It's more likely he was drafted for his athletic ability running the football and the Eagles will look to utilize that with specific packages to keep Hurts from taking so many hits.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Jalen Hurts",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Tanner McKee",
+          "is_prospect": false
+        },
+        {
+          "label": "QB3",
+          "name": "Andy Dalton",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Taylen Green",
+      "first_name": "Taylen",
+      "last_name": "Green",
+      "position": "Quarterback",
+      "school": "Boise State",
+      "round": 6,
+      "pick": 1,
+      "nfl_team": "Cleveland Browns",
+      "nfl_team_abbrev": "cle",
+      "strengths": [
+        "Size and athleticism",
+        "Elite runner",
+        "Works through progressions well in a clean pocket"
+      ],
+      "weaknesses": [
+        "Accuracy issues on the move",
+        "Post-snap defensive reads",
+        "Happy feet when pocket collapses"
+      ],
+      "outlook": "Green is Anthony Richardson 2.0 with less hype and less arm talent. Green looks to make moves with his legs first and arm second. When the pocket closes, he would rather move and try to improvise. While his scrambling is elite, he has trouble throwing on the run and reading the defense outside the pocket. He could compete for QB2 in a couple years, but he is firmly ahead of Dillon Gabriel already.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Shedeur Sanders",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Dillon Gabriel",
+          "is_prospect": false
+        },
+        {
+          "label": "QB3",
+          "name": "Deshaun Watson",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Athan Kaliakmanis",
+      "first_name": "Athan",
+      "last_name": "Kaliakmanis",
+      "position": "Quarterback",
+      "school": "Illinois",
+      "round": 7,
+      "pick": 7,
+      "nfl_team": "Washington Commanders",
+      "nfl_team_abbrev": "was",
+      "strengths": [
+        "Has improved each of the last three seasons",
+        "Mistake-free football",
+        "Quick release"
+      ],
+      "weaknesses": [
+        "Limited athleticism",
+        "Needs play-action to help open the pass game",
+        "Will take too many sacks"
+      ],
+      "outlook": "Kaliakmanis was not considered a draftable prospect by many, and seemed to be in line for a UDFA contract or a trip to a developmental league. He has some strengths that NFL teams feel they can convert into a backup role or emergency starter. With Jayden Daniels in Washington, it probably doesn't happen here.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Jayden Daniels",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Marcus Mariota",
+          "is_prospect": false
+        },
+        {
+          "label": "QB3",
+          "name": "Sam Hartman",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Behren Morton",
+      "first_name": "Behren",
+      "last_name": "Morton",
+      "position": "Quarterback",
+      "school": "Texas Tech",
+      "round": 7,
+      "pick": 18,
+      "nfl_team": "New England Patriots",
+      "nfl_team_abbrev": "ne",
+      "strengths": [
+        "Will stay in the pocket till the last minute to complete progressions",
+        "Leads pass catchers well to keep them from big hits"
+      ],
+      "weaknesses": [
+        "Injury history",
+        "Arm talent",
+        "Defensive reads"
+      ],
+      "outlook": "Morton doesn't have much tape for evaluation due to injury history in college. He's tough and will play until he literally can't, but it has affected his development. He has good intangibles and with some healthy seasons, could grow into a backup role.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Drake Maye",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Tommy DeVito",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Garrett Nussmeier",
+      "first_name": "Garrett",
+      "last_name": "Nussmeier",
+      "position": "Quarterback",
+      "school": "LSU",
+      "round": 7,
+      "pick": 33,
+      "nfl_team": "Kansas City Chiefs",
+      "nfl_team_abbrev": "kc",
+      "strengths": [
+        "Arm talent to drive ball down field and throw into tight windows",
+        "Pocket presence"
+      ],
+      "weaknesses": [
+        "Will try to force throws",
+        "Needs to learn the touch pass",
+        "Durability"
+      ],
+      "outlook": "Nussmeier likely will not be taking many snaps in a Chiefs uniform. If he can be a competent backup in KC, the Chiefs will move him to a QB-needy team. Nussmeier could have been a first round pick had he come out a year early, so the fall to the 7th is interesting. From a dynasty perspective, investing in Nussmeier over several QBs before him makes more sense.",
+      "depth_chart": [
+        {
+          "label": "QB1",
+          "name": "Patrick Mahomes",
+          "is_prospect": false
+        },
+        {
+          "label": "QB2",
+          "name": "Justin Fields",
+          "is_prospect": false
+        },
+        {
+          "label": "QB3",
+          "name": "Jake Haener",
+          "is_prospect": false
+        },
+        {
+          "label": "QB4",
+          "name": "Chris Oladokun",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Jeremiyah Love",
+      "first_name": "Jeremiyah",
+      "last_name": "Love",
+      "position": "Running Back",
+      "school": "Notre Dame",
+      "round": 1,
+      "pick": 3,
+      "nfl_team": "Arizona Cardinals",
+      "nfl_team_abbrev": "ari",
+      "strengths": [
+        "Gives contact, doesn't take it",
+        "Great balance through contact",
+        "Vision"
+      ],
+      "weaknesses": [
+        "Pass protection",
+        "Lean frame could keep him from a three-down role"
+      ],
+      "outlook": "The Cardinals made this pick to sell tickets, and it's a tough landing spot for fantasy. Hopefully James Conner is released before training camp and Trey Benson is traded. In redraft leagues, Love has a RB2 ceiling knowing that Allgeier will still get touches and TDs. In dynasty, he is still a top-12 RB, but the Cardinals need to improve the O-line for that to happen.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "James Conner",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Trey Benson",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Tyler Allgeier",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "Zonovan Knight",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Jadarian Price",
+      "first_name": "Jadarian",
+      "last_name": "Price",
+      "position": "Running Back",
+      "school": "Notre Dame",
+      "round": 1,
+      "pick": 32,
+      "nfl_team": "Seattle Seahawks",
+      "nfl_team_abbrev": "sea",
+      "strengths": [
+        "Smooth hips and footwork to make defenders miss",
+        "Vision behind the LOS and in the open field"
+      ],
+      "weaknesses": [
+        "Lack of elite speed and breakaway play ability",
+        "Two-down runner"
+      ],
+      "outlook": "Price decided to remain at Notre Dame and play alongside Heisman finalist Jeremiyah Love, but he could have been a top back at most other schools. Lacks elite speed and acceleration to be a home run threat and probably won't help in the pass game, but could be vital to any team as a two-down back with a nose for extra yards.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Zach Charbonnet",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Robbie Ouzts",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Emanuel Wilson",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "George Holani",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Kaelon Black",
+      "first_name": "Kaelon",
+      "last_name": "Black",
+      "position": "Running Back",
+      "school": "Indiana",
+      "round": 3,
+      "pick": 26,
+      "nfl_team": "San Francisco 49ers",
+      "nfl_team_abbrev": "sf",
+      "strengths": [
+        "Downhill runner",
+        "Doesn't slow through contact",
+        "Strong lower half"
+      ],
+      "weaknesses": [
+        "Heavy feet",
+        "Doesn't go off script",
+        "Pass catching ability"
+      ],
+      "outlook": "The 49ers want to limit McCaffrey's touches, and Black is the exact opposite of CMC. A hard runner who will pick up yards, but lacks creativity. If his lane is closed, he will still run there. Not great out of cuts and lacks burst. Will succeed only as a goal-line and short yardage back.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Christian McCaffrey",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Isaac Guerendo",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Kyle Juszczyk",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "Jordan James",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Jonah Coleman",
+      "first_name": "Jonah",
+      "last_name": "Coleman",
+      "position": "Running Back",
+      "school": "Washington",
+      "round": 4,
+      "pick": 8,
+      "nfl_team": "Denver Broncos",
+      "nfl_team_abbrev": "den",
+      "strengths": [
+        "Run blocking",
+        "Pass catching",
+        "Ball security"
+      ],
+      "weaknesses": [
+        "Doesn't run hard into or through contact",
+        "Lacks acceleration"
+      ],
+      "outlook": "Coleman will likely find himself behind Harvey and Dobbins in 2026 with an eye toward a pass catching role in 2027. Does not profile as a three-down back, but will be good on third downs due to pass blocking and catching ability. Coleman will likely be the #2 to Harvey in 2027 with a change of pace role at best. Not a strong enough runner to see double digit touches a game.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "RJ Harvey",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "J.K. Dobbins",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Jaleel McLaughlin",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "Tyler Badie",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Mike Washington",
+      "first_name": "Mike",
+      "last_name": "Washington",
+      "position": "Running Back",
+      "school": "Arkansas",
+      "round": 4,
+      "pick": 22,
+      "nfl_team": "Las Vegas Raiders",
+      "nfl_team_abbrev": "lv",
+      "strengths": [
+        "Size/speed/agility combo",
+        "Sudden change of direction",
+        "Breakaway speed"
+      ],
+      "weaknesses": [
+        "Vision between the tackles",
+        "Slow to hit openings in the O-line",
+        "Fumbles"
+      ],
+      "outlook": "Washington will be the perfect complement to Jeanty in LV. Klint Kubiak frustrated fantasy owners with the Walker/Charbonnet split in Seattle, and now he could do the same thing in LV. Washington has more big play ability than Jeanty and owners should handcuff him in dynasty. In redraft, he probably is only a waiver add if Jeanty gets hurt, but could sneak into the flex if the offense takes a big step forward.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Ashton Jeanty",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Dylan Laube",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Chris Collier",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Emmett Johnson",
+      "first_name": "Emmett",
+      "last_name": "Johnson",
+      "position": "Running Back",
+      "school": "Nebraska",
+      "round": 5,
+      "pick": 21,
+      "nfl_team": "Seattle Seahawks",
+      "nfl_team_abbrev": "sea",
+      "strengths": [
+        "Stays at top speed through breaks and cuts",
+        "Goes north-south quick",
+        "Solid pass catcher"
+      ],
+      "weaknesses": [
+        "Lack of vision behind the LOS",
+        "Not creative in the run game — will stick to the call"
+      ],
+      "outlook": "Johnson will be a nice complement to Kenneth Walker, and given Walker's injury history, Johnson could be a priority waiver add in 2026 redraft leagues. Johnson is a better all-around back than Brashard Smith and could take the RB2 role right away. In dynasty, adding Johnson should be a priority for Walker owners as insurance in the event Walker misses time.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Zach Charbonnet",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Robbie Ouzts",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Emanuel Wilson",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "George Holani",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Nicholas Singleton",
+      "first_name": "Nicholas",
+      "last_name": "Singleton",
+      "position": "Running Back",
+      "school": "Penn State",
+      "round": 5,
+      "pick": 25,
+      "nfl_team": "Tennessee Titans",
+      "nfl_team_abbrev": "ten",
+      "strengths": [
+        "Runs hard through the tackle",
+        "Pass blocking",
+        "Pass catching and special teams ability"
+      ],
+      "weaknesses": [
+        "Always runs at top speed, which affects his ability to visualize lanes and make defenders miss"
+      ],
+      "outlook": "Singleton to Tennessee is one of the better fantasy fits in this class. Tony Pollard may only have one season left in Tennessee and Tyjae Spears' knee has always been a concern. Singleton could start to carve out a role in 2026 if Pollard doesn't start well, and should be the RB1 for the Titans in 2027. Should be one of the first RBs drafted in dynasty rookie drafts.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Tony Pollard",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Tyjae Spears",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Julius Chestnut",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "Kalel Mullings",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Adam Randall",
+      "first_name": "Adam",
+      "last_name": "Randall",
+      "position": "Running Back",
+      "school": "Indiana",
+      "round": 5,
+      "pick": 34,
+      "nfl_team": "Baltimore Ravens",
+      "nfl_team_abbrev": "bal",
+      "strengths": [
+        "Sharp cuts and acceleration out of them",
+        "Tough runner",
+        "Route tree as a former WR"
+      ],
+      "weaknesses": [
+        "Runs too upright",
+        "Had trouble finding the open lane behind the LOS"
+      ],
+      "outlook": "A former WR with only one season at RB. A perfect project for the Ravens to pair with Derrick Henry for the next couple of seasons. Could take over for Justice Hill immediately due to his pass catching ability. Progressed well as a runner last season, and could be a solid fantasy contributor in a couple years after he grows into the role. Worth an add in the second round of rookie drafts.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Derrick Henry",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Justice Hill",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Rasheen Ali",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Kaytron Allen",
+      "first_name": "Kaytron",
+      "last_name": "Allen",
+      "position": "Running Back",
+      "school": "Penn State",
+      "round": 6,
+      "pick": 6,
+      "nfl_team": "Tampa Bay Buccaneers",
+      "nfl_team_abbrev": "tb",
+      "strengths": [
+        "Built like and hits like a truck",
+        "Vision and patience allows blocks and openings to develop"
+      ],
+      "weaknesses": [
+        "Lacks speed and acceleration",
+        "Two-down back without upside"
+      ],
+      "outlook": "Jacory Croskey-Merritt was inconsistent last year and Rachaad White is on a one-year contract. Allen could push JCM for his role in 2026 if JCM can't find more consistency. If Allen shows enough this season, he could earn the RB1 role in 2027. Long-term opportunity is there for dynasty rookie draft adds, while redraft leagues should just add him to the watch list.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Bucky Irving",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Kenneth Gainwell",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Sean Tucker",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "Josh Williams",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Demond Claiborne",
+      "first_name": "Demond",
+      "last_name": "Claiborne",
+      "position": "Running Back",
+      "school": "Wake Forest",
+      "round": 6,
+      "pick": 17,
+      "nfl_team": "Minnesota Vikings",
+      "nfl_team_abbrev": "min",
+      "strengths": [
+        "Patience to find open holes and create plays out of nothing",
+        "Elite acceleration out of cuts and stops"
+      ],
+      "weaknesses": [
+        "Will run past blocking before it is set",
+        "Fumbles",
+        "Pass catching ability"
+      ],
+      "outlook": "Claiborne could use a year behind Aaron Jones and Jordan Mason, then he'll turn into the perfect complement to Mason. Claiborne can turn nothing into something and if the Vikings pass game takes a big step forward, he could be a home run threat in 2027, even if it does come with inconsistencies. Probably no fantasy value in 2026 for redraft unless the Vikings lose multiple RBs.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Aaron Jones",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Jordan Mason",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Zavier Scott",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Eli Heidenreich",
+      "first_name": "Eli",
+      "last_name": "Heidenreich",
+      "position": "Running Back",
+      "school": "Wisconsin",
+      "round": 7,
+      "pick": 14,
+      "nfl_team": "Pittsburgh Steelers",
+      "nfl_team_abbrev": "pit",
+      "strengths": [
+        "Versatility as RB/WR/special teamer",
+        "Great at the point of catch"
+      ],
+      "weaknesses": [
+        "Lacks acceleration and top-end speed to be an elite NFL weapon",
+        "Short arms and stature"
+      ],
+      "outlook": "Dreaming up plays for Heidenreich will probably be more fun than his actual production. He seems headed for a special teams role instead of being utilized as a weapon on offense. The Steelers could find a way to use him from the slot from time to time, but his short stature doesn't make him a great target. Any fantasy potential will likely never be reached.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Kaleb Johnson",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Jaylen Warren",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Rico Dowdle",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "Travis Homer",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Seth McGowan",
+      "first_name": "Seth",
+      "last_name": "McGowan",
+      "position": "Running Back",
+      "school": "Kentucky",
+      "round": 7,
+      "pick": 21,
+      "nfl_team": "Indianapolis Colts",
+      "nfl_team_abbrev": "ind",
+      "strengths": [
+        "Lets blocks develop in front of him",
+        "Pass protection"
+      ],
+      "weaknesses": [
+        "Fumbles",
+        "Lack of big plays",
+        "Focus issues cause drops in the pass game"
+      ],
+      "outlook": "McGowan likely slips into an RB3 role right away and could be used in pass blocking situations this season. Doesn't offer much upside as a runner, with only 10 carries of 10+ yards last season and a longest run of 20 yards. Don't expect McGowan to have any fantasy value in 2026 or beyond.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Jonathan Taylor",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "DJ Giddens",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Jam Miller",
+      "first_name": "Jam",
+      "last_name": "Miller",
+      "position": "Running Back",
+      "school": "Alabama",
+      "round": 7,
+      "pick": 29,
+      "nfl_team": "New England Patriots",
+      "nfl_team_abbrev": "ne",
+      "espn_search_name": "Jamarion Miller",
+      "strengths": [
+        "Size and structure",
+        "Strong lower half",
+        "Good stiff arm"
+      ],
+      "weaknesses": [
+        "Lacks vision and discipline behind the LOS",
+        "Doesn't make tacklers miss in open space"
+      ],
+      "outlook": "Miller is not a good blocker or pass catcher, so he is already limited in what he can do to find the field. He doesn't create many yards in the run game, but has good enough size and lower half to pile through defenders for short yardage. Lack of burst and athleticism could also keep him off special teams. His route to any time on an NFL field seems limited.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "TreVeyon Henderson",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Rhamondre Stevenson",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Terrell Jennings",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "Lan Larison",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Jmari Taylor",
+      "first_name": "Jmari",
+      "last_name": "Taylor",
+      "position": "Running Back",
+      "school": "Virginia",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Jacksonville Jaguars",
+      "nfl_team_abbrev": "jax",
+      "strengths": [
+        "Tough runner that delivers contact",
+        "Can run routes from the slot or out wide",
+        "Blocks well despite size"
+      ],
+      "weaknesses": [
+        "Will take too much contact instead of creating opportunity",
+        "Slow out of cuts and stops"
+      ],
+      "outlook": "Taylor did not hear his name called in the draft, but went to Jacksonville as a UDFA. Bhayshul Tuten will get his shot as RB1 in 2026 and the Jags added Chris Rodriguez as well. Taylor will be more of a pass catching/change of pace back with an eye toward a third-down role in the future.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "Bhayshul Tuten",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Chris Rodriguez",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "LeQuint Allen",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "DeeJay Dallas",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Leveon Moss",
+      "first_name": "Leveon",
+      "last_name": "Moss",
+      "position": "Running Back",
+      "school": "Texas",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Miami Dolphins",
+      "nfl_team_abbrev": "mia",
+      "strengths": [
+        "Solid in pass protection",
+        "Finishes runs through contact and maintains balance for extra yards"
+      ],
+      "weaknesses": [
+        "Injury concerns",
+        "Straight runner with underwhelming cut ability"
+      ],
+      "outlook": "Moss would be a perfect complement to De'Von Achane due to his short yardage and goal line ability. But there are several backs in front of him to find chances. Ollie Gordon already fits the same role, while Jaylen Wright and Donovan Edwards are suitable backups with more explosive ability.",
+      "depth_chart": [
+        {
+          "label": "RB1",
+          "name": "De'Von Achane",
+          "is_prospect": false
+        },
+        {
+          "label": "RB2",
+          "name": "Ollie Gordon",
+          "is_prospect": false
+        },
+        {
+          "label": "RB3",
+          "name": "Jaylen Wright",
+          "is_prospect": false
+        },
+        {
+          "label": "RB4",
+          "name": "Donovan Edwards",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Jordyn Tyson",
+      "first_name": "Jordyn",
+      "last_name": "Tyson",
+      "position": "Wide Receiver",
+      "school": "Arizona State",
+      "round": null,
+      "pick": null,
+      "nfl_team": "New Orleans Saints",
+      "strengths": [
+        "Route running at all levels",
+        "Playmaking ability after the catch",
+        "Contested catch ability"
+      ],
+      "weaknesses": [
+        "Strength at the LOS",
+        "Body catches too often in traffic"
+      ],
+      "outlook": "The biggest concern for Tyson will be his medical evaluations. Injuries in college have limited his ability and he is still recovering from a hamstring injury. If healthy, he is the WR1 in this class with explosive playmaking ability at all levels, ability to create yards after the catch, and the ability to win downfield.",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Chris Olave",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Devaughn Vele",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Trey Palmer",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Mason Tipton",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "no"
+    },
+    {
+      "name": "Carnell Tate",
+      "first_name": "Carnell",
+      "last_name": "Tate",
+      "position": "Wide Receiver",
+      "school": "Ohio State",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Tennessee Titans",
+      "strengths": [
+        "Expansive route tree and runs them all well",
+        "Catch radius",
+        "Works back to his QB when in trouble"
+      ],
+      "weaknesses": [
+        "Lacks WR1 speed",
+        "Will make big plays, but not typically after the catch"
+      ],
+      "outlook": "Tate led the nation in 40+ yard TDs in 2025. While he lacks top end speed, he makes up for it with long strides that allow separation. Tate will be a welcome big play threat to any offense with his catch radius and advanced route tree at all levels. His instincts are a QB's best friend — finds open spots in zone coverage and works back to his QB when needed.",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Calvin Ridley",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Wan'Dale Robinson",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Elic Ayomanor",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Chimere Dike",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "ten"
+    },
+    {
+      "name": "Denzel Boston",
+      "first_name": "Denzel",
+      "last_name": "Boston",
+      "position": "Wide Receiver",
+      "school": "Washington",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Cleveland Browns",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Jerry Jeudy",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Cedric Tillman",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Jamari Thrash",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Isaiah Bond",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "cle"
+    },
+    {
+      "name": "Makai Lemon",
+      "first_name": "Makai",
+      "last_name": "Lemon",
+      "position": "Wide Receiver",
+      "school": "USC",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Philadelphia Eagles",
+      "strengths": [
+        "Tough at the point of catch",
+        "Strong hands",
+        "Catch adjustment in the air"
+      ],
+      "weaknesses": [
+        "Doesn't always allow route to develop",
+        "Yards after catch",
+        "Needs to add strength"
+      ],
+      "outlook": "Lemon closely resembles fellow Trojan Amon-Ra St. Brown. Tough over the middle of the field, did not showcase elite athleticism in college but plays like it. Solid route running, run blocks well, and will be a QB's favorite target almost immediately.",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "A.J. Brown",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "DeVonta Smith",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Marquise Brown",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Dontayvion Wicks",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "phi"
+    },
+    {
+      "name": "Skyler Bell",
+      "first_name": "Skyler",
+      "last_name": "Bell",
+      "position": "Wide Receiver",
+      "school": "UConn",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Buffalo Bills",
+      "strengths": [
+        "Quick out of cuts",
+        "Accelerates fast past press coverage",
+        "Yards after catch"
+      ],
+      "weaknesses": [
+        "Drops",
+        "Ability to run a full route tree",
+        "Contested catch ability"
+      ],
+      "outlook": "Bell has a chance to be a premier field stretcher in the NFL. He is able to accelerate past corners playing press and blow past safeties at top speed. He will need to rely on separation because he has trouble with contested catches. His route tree will also be limited — he will be best with slants and go routes.",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "DJ Moore",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Keon Coleman",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Khalil Shakir",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Joshua Palmer",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "buf"
+    },
+    {
+      "name": "Omar Cooper Jr",
+      "first_name": "Omar",
+      "last_name": "Cooper Jr",
+      "position": "Wide Receiver",
+      "school": "",
+      "round": null,
+      "pick": null,
+      "nfl_team": "New York Jets",
+      "strengths": [
+        "Scheme versatility",
+        "Plays physical with and without the ball",
+        "Acceleration",
+        "Contested catch ability"
+      ],
+      "weaknesses": [
+        "Slow and stiff in and out of breaks",
+        "Does not adjust well mid-play"
+      ],
+      "outlook": "Cooper has the ability to be successful in any offense. Typically a slot WR in college, Cooper also has the speed to play outside against tougher corners. Will be a huge red zone threat for the right team, although he could polish his footwork so he is not so stiff with his route running.",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Garrett Wilson",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Adonai Mitchell",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Arian Smith",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Myles White",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "nyj"
+    },
+    {
+      "name": "KC Concepcion",
+      "first_name": "KC",
+      "last_name": "Concepcion",
+      "position": "Wide Receiver",
+      "school": "Texas A&M",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Cleveland Browns",
+      "nfl_team_abbrev": "cle",
+      "strengths": [
+        "Acceleration at the LOS and out of his breaks",
+        "Footwork and route running",
+        "Yards after catch"
+      ],
+      "weaknesses": [
+        "Runs everything at 100% — needs finesse",
+        "Lack of elite deep threat speed",
+        "Adjustments to off-target throws"
+      ],
+      "outlook": "Concepcion will be a playmaker from the slot at the NFL level. He is more burst and quickness than top end speed, but nickel corners will have trouble covering him in man. He needs to learn some finesse and not run every route at top speed. Drops in traffic are also an issue that needs to be cleaned up.",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Jerry Jeudy",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Cedric Tillman",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Jamari Thrash",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Isaiah Bond",
+          "is_prospect": false
+        }
+      ]
+    },
+    {
+      "name": "Deion Burks",
+      "first_name": "Deion",
+      "last_name": "Burks",
+      "position": "Wide Receiver",
+      "school": "Oklahoma",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Indianapolis Colts",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Josh Downs",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Alec Pierce",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Nick Westbrook-Ikhine",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Ashton Dulin",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "ind"
+    },
+    {
+      "name": "Zachariah Branch",
+      "first_name": "Zachariah",
+      "last_name": "Branch",
+      "position": "Wide Receiver",
+      "school": "Georgia",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Atlanta Falcons",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Drake London",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Jahan Dotson",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Olamide Zaccheaus",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Dylan Drummond",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "atl"
+    },
+    {
+      "name": "Germie Bernard",
+      "first_name": "Germie",
+      "last_name": "Bernard",
+      "position": "Wide Receiver",
+      "school": "Alabama",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Pittsburgh Steelers",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "DK Metcalf",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Michael Pittman",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Roman Wilson",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Ben Skowronek",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "pit"
+    },
+    {
+      "name": "Malachi Fields",
+      "first_name": "Malachi",
+      "last_name": "Fields",
+      "position": "Wide Receiver",
+      "school": "Notre Dame",
+      "round": null,
+      "pick": null,
+      "nfl_team": "New York Giants",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Malik Nabers",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Darnell Mooney",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Calvin Austin",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Darius Slayton",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "nyg"
+    },
+    {
+      "name": "Chris Bell",
+      "first_name": "Chris",
+      "last_name": "Bell",
+      "position": "Wide Receiver",
+      "school": "Louisville",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Miami Dolphins",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Jalen Tolbert",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Tutu Atwell",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Theo Wease",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "Malik Washington",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "mia"
+    },
+    {
+      "name": "Chris Brazzell II",
+      "first_name": "Chris",
+      "last_name": "Brazzell II",
+      "position": "Wide Receiver",
+      "school": "Tennessee",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Carolina Panthers",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Tetairoa McMillan",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Xavier Legette",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Jalen Coker",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "David Moore",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "car"
+    },
+    {
+      "name": "Elijah Sarratt",
+      "first_name": "Elijah",
+      "last_name": "Sarratt",
+      "position": "Wide Receiver",
+      "school": "Indiana",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Baltimore Ravens",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Zay Flowers",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Rashod Bateman",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Devontez Walker",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "LaJohntay Wester",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "bal"
+    },
+    {
+      "name": "Antonio Williams",
+      "first_name": "Antonio",
+      "last_name": "Williams",
+      "position": "Wide Receiver",
+      "school": "Clemson",
+      "round": null,
+      "pick": null,
+      "nfl_team": null,
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": []
+    },
+    {
+      "name": "Brenen Thompson",
+      "first_name": "Brenen",
+      "last_name": "Thompson",
+      "position": "Wide Receiver",
+      "school": "",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Los Angeles Chargers",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "WR1",
+          "name": "Ladd McConkey",
+          "is_prospect": false
+        },
+        {
+          "label": "WR2",
+          "name": "Tre' Harris",
+          "is_prospect": false
+        },
+        {
+          "label": "WR3",
+          "name": "Quentin Johnston",
+          "is_prospect": false
+        },
+        {
+          "label": "WR4",
+          "name": "KeAndre Lambert-Smith",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "lac"
+    },
+    {
+      "name": "Kenyon Sadiq",
+      "first_name": "Kenyon",
+      "last_name": "Sadiq",
+      "position": "Tight End",
+      "school": "Oregon",
+      "round": null,
+      "pick": null,
+      "nfl_team": "New York Jets",
+      "strengths": [
+        "Can lineup outside, slot, or inline",
+        "Run blocking strength",
+        "YAC in the open field"
+      ],
+      "weaknesses": [
+        "Route running",
+        "Inconsistent hands"
+      ],
+      "outlook": "Sadiq is unlike athletes we have seen at TE before — he truly could move to WR and make plays right away. While he needs to refine his game and not rely on pure athleticism, his playmaking ability is unmatched by most other players in this draft. Take your time with Sadiq and he will have upside.",
+      "depth_chart": [
+        {
+          "label": "TE1",
+          "name": "Mason Taylor",
+          "is_prospect": false
+        },
+        {
+          "label": "TE2",
+          "name": "Jeremy Ruckert",
+          "is_prospect": false
+        },
+        {
+          "label": "TE3",
+          "name": "Jelani Woods",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "nyj"
+    },
+    {
+      "name": "Eli Stowers",
+      "first_name": "Eli",
+      "last_name": "Stowers",
+      "position": "Tight End",
+      "school": "Vanderbilt",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Philadelphia Eagles",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "TE1",
+          "name": "Dallas Goedert",
+          "is_prospect": false
+        },
+        {
+          "label": "TE2",
+          "name": "Grant Calcaterra",
+          "is_prospect": false
+        },
+        {
+          "label": "TE3",
+          "name": "Johnny Mundt",
+          "is_prospect": false
+        },
+        {
+          "label": "TE4",
+          "name": "Stone Smartt",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "phi"
+    },
+    {
+      "name": "Max Klare",
+      "first_name": "Max",
+      "last_name": "Klare",
+      "position": "Tight End",
+      "school": "Purdue",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Los Angeles Rams",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "TE1",
+          "name": "Tyler Higbee",
+          "is_prospect": false
+        },
+        {
+          "label": "TE2",
+          "name": "Terrance Ferguson",
+          "is_prospect": false
+        },
+        {
+          "label": "TE3",
+          "name": "Colby Parkinson",
+          "is_prospect": false
+        },
+        {
+          "label": "TE4",
+          "name": "Davis Allen",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "lar"
+    },
+    {
+      "name": "Michael Trigg",
+      "first_name": "Michael",
+      "last_name": "Trigg",
+      "position": "Tight End",
+      "school": "Baylor",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Dallas Cowboys",
+      "strengths": [],
+      "weaknesses": [],
+      "outlook": "",
+      "depth_chart": [
+        {
+          "label": "TE1",
+          "name": "Jake Ferguson",
+          "is_prospect": false
+        },
+        {
+          "label": "TE2",
+          "name": "Luke Schoonmaker",
+          "is_prospect": false
+        },
+        {
+          "label": "TE3",
+          "name": "Brevyn Spann-Ford",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "dal"
+    },
+    {
+      "name": "Arvell Reese",
+      "first_name": "Arvell",
+      "last_name": "Reese",
+      "position": "Linebacker",
+      "school": "",
+      "round": null,
+      "pick": null,
+      "nfl_team": "New York Giants",
+      "strengths": [
+        "Ball seeker",
+        "Can play off the ball, stop the run, set the edge, or rush the passer",
+        "Burst and explosiveness"
+      ],
+      "weaknesses": [
+        "One year of excellent college production",
+        "Needs to add different pass rush techniques"
+      ],
+      "outlook": "The top defender in the 2026 draft brings versatility and aggression anywhere on the field. Reese can stop the run, play in coverage against TEs, or rush the passer from anywhere in the formation. His instincts make him a tackling machine that offenses will need to run away from.",
+      "depth_chart": [
+        {
+          "label": "LB1",
+          "name": "Tremaine Edmunds",
+          "is_prospect": false
+        },
+        {
+          "label": "LB2",
+          "name": "Arvell Reese",
+          "is_prospect": false
+        },
+        {
+          "label": "LB3",
+          "name": "Micah McFadden",
+          "is_prospect": false
+        },
+        {
+          "label": "LB4",
+          "name": "Darius Muasau",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "nyg"
+    },
+    {
+      "name": "Spencer Fano",
+      "first_name": "Spencer",
+      "last_name": "Fano",
+      "position": "Offensive Tackle",
+      "school": "",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Cleveland Browns",
+      "strengths": [
+        "Stands defenders up in pass protection, mauls them in the run game",
+        "Clean feet and technique"
+      ],
+      "weaknesses": [
+        "Could use his hands more aggressively",
+        "Slightly undersized"
+      ],
+      "outlook": "Fano has the best technique for O-line in this draft. Excellent footwork and elite mobility allow Fano to attack defenders in the run game or stand them up in pass protection. While he may be slightly undersized, he makes up for it with his motor and intangibles to be the safest tackle in this year's class.",
+      "depth_chart": [],
+      "nfl_team_abbrev": "cle"
+    },
+    {
+      "name": "Caleb Downs",
+      "first_name": "Caleb",
+      "last_name": "Downs",
+      "position": "Safety",
+      "school": "Ohio State",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Dallas Cowboys",
+      "strengths": [
+        "Versatility",
+        "Defends the run and the pass",
+        "Instincts and football IQ"
+      ],
+      "weaknesses": [
+        "Undersized in multiple areas",
+        "Not a ball hawk"
+      ],
+      "outlook": "A Swiss Army knife that can move around the defense and play multiple positions effectively. He is undersized when it comes to height, weight, and length, but plays much larger and bigger. Hits anything in the area and is not afraid to play physical in both the run and pass game.",
+      "depth_chart": [
+        {
+          "label": "S1",
+          "name": "Malik Hooker",
+          "is_prospect": false
+        },
+        {
+          "label": "S2",
+          "name": "Jalen Thompson",
+          "is_prospect": false
+        },
+        {
+          "label": "S3",
+          "name": "DaRon Bland",
+          "is_prospect": false
+        },
+        {
+          "label": "S4",
+          "name": "Caelen Carson",
+          "is_prospect": false
+        }
+      ],
+      "nfl_team_abbrev": "dal"
+    },
+    {
+      "name": "Kadyn Proctor",
+      "first_name": "Kadyn",
+      "last_name": "Proctor",
+      "position": "Offensive Tackle",
+      "school": "",
+      "round": null,
+      "pick": null,
+      "nfl_team": "Miami Dolphins",
+      "strengths": [
+        "Massive human",
+        "Run game bulldozer",
+        "Controls his size and strength with ease"
+      ],
+      "weaknesses": [
+        "Stunts and switches can confuse him",
+        "Speed rush can beat him outside"
+      ],
+      "outlook": "Proctor combines strength and size that he controls with ease. Solid footwork and agility allow him to dominate in the run game. Still very young, defenders switching mid-play can throw off his blocks. Could play guard or RT right away but could grow into a dominant LT.",
+      "depth_chart": [],
+      "nfl_team_abbrev": "mia"
+    }
+  ]
+}

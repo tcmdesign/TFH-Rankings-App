@@ -6,6 +6,7 @@
 <title>TFH Rookie Rankings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -308,6 +309,135 @@ td { padding: 10px 12px; vertical-align: middle; }
   tbody tr.checked { opacity: 0.3; text-decoration: line-through; }
   .team-logo { width: 18px; height: 18px; }
 }
+
+/* ── Player panel ─────────────────────────────────────────────────────────── */
+.player-panel {
+  position: fixed; top: 0; right: -380px; width: 360px; height: 100vh;
+  background: #111114; border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transition: right 0.28s cubic-bezier(0.4,0,0.2,1);
+  z-index: 100; overflow-y: auto;
+}
+.player-panel.open { right: 0; }
+
+.panel-close {
+  position: absolute; top: 14px; right: 14px;
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); padding: 4px; border-radius: 4px;
+  transition: color 0.15s;
+}
+.panel-close:hover { color: var(--text); }
+
+.panel-hero {
+  position: relative; padding: 28px 20px 20px;
+  background: linear-gradient(180deg, #1a1a1f 0%, #111114 100%);
+  border-bottom: 1px solid var(--border);
+}
+.panel-hero-top { display: flex; gap: 14px; align-items: flex-start; }
+.panel-photo {
+  width: 72px; height: 72px; border-radius: 50%;
+  object-fit: cover; object-position: center top;
+  background: var(--surface2); flex-shrink: 0;
+}
+.panel-photo-initials {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--surface2); display: flex; align-items: center;
+  justify-content: center; font-size: 22px; font-weight: 700;
+  color: var(--muted); flex-shrink: 0;
+}
+.panel-name-block { flex: 1; padding-top: 4px; }
+.panel-name { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.1; }
+.panel-meta { font-size: 12px; color: var(--sub); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+.panel-team-logo { width: 20px; height: 20px; object-fit: contain; }
+
+.panel-ranks {
+  display: flex; gap: 8px; margin-top: 14px;
+}
+.panel-rank-box {
+  flex: 1; background: var(--surface2); border-radius: 6px;
+  padding: 10px 12px; text-align: center;
+}
+.panel-rank-val { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
+.panel-rank-val.red { color: var(--red); }
+.panel-rank-lbl { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+
+.panel-section { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.panel-section-title {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  color: var(--muted); text-transform: uppercase; margin-bottom: 10px;
+}
+
+.panel-chart-wrap { position: relative; height: 140px; }
+.panel-chart-empty {
+  display: flex; align-items: center; justify-content: center;
+  height: 140px; font-size: 11px; color: var(--muted);
+  text-align: center; line-height: 1.5;
+}
+
+.panel-draft-info {
+  display: flex; gap: 8px;
+}
+.panel-draft-box {
+  flex: 1; background: var(--surface2); border-radius: 6px;
+  padding: 8px 10px; text-align: center;
+}
+.panel-draft-val { font-size: 16px; font-weight: 800; color: var(--text); }
+.panel-draft-lbl { font-size: 9px; font-weight: 600; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-top: 3px; }
+
+.panel-bullets { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.panel-bullets li {
+  font-size: 12px; color: #c0c0d0; line-height: 1.5;
+  padding-left: 14px; position: relative;
+}
+.panel-bullets li::before {
+  content: ''; position: absolute; left: 0; top: 7px;
+  width: 5px; height: 5px; border-radius: 50%;
+}
+.panel-bullets.strengths li::before { background: var(--pos-rb); }
+.panel-bullets.weaknesses li::before { background: var(--red); }
+
+.panel-outlook {
+  font-size: 12px; color: #c0c0d0; line-height: 1.65;
+}
+
+.panel-depth { display: flex; flex-direction: column; gap: 4px; }
+.panel-depth-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border-radius: 5px; background: var(--surface2);
+  font-size: 12px;
+}
+.panel-depth-row.prospect { border: 1px solid rgba(229,34,34,0.3); background: var(--red-dim); }
+.depth-pos {
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  color: var(--muted); width: 20px;
+}
+.depth-name { flex: 1; font-weight: 600; color: var(--text); }
+.depth-meta { font-size: 10px; color: var(--muted); }
+
+.panel-injury-row {
+  display: flex; gap: 10px; align-items: flex-start; margin-bottom: 7px;
+}
+.panel-injury-year {
+  font-size: 10px; font-weight: 700; color: var(--red);
+  background: var(--red-dim); border: 1px solid rgba(229,34,34,0.25);
+  padding: 2px 6px; border-radius: 3px; flex-shrink: 0; white-space: nowrap;
+}
+.panel-injury-desc { font-size: 11px; color: #c0c0d0; line-height: 1.5; }
+
+.panel-risk-row {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;
+}
+.panel-risk-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 3px 8px; border-radius: 4px;
+}
+.risk-low      { background: rgba(0,204,102,0.15); color: #00cc66; }
+.risk-moderate { background: rgba(255,215,0,0.15);  color: #FFD700; }
+.risk-high     { background: rgba(229,34,34,0.15);  color: var(--red); }
+
+/* Highlight selected row */
+tbody tr.selected { background: rgba(229,34,34,0.06) !important; }
+
 </style>
 </head>
 <body>
@@ -542,7 +672,7 @@ function renderTable() {
       ? `<span class="adp-val">${p.adp}</span>`
       : `<span class="adp-none">—</span>`;
 
-    return `<tr data-idx="${orig}" draggable="true" class="${isChecked ? 'checked' : ''}">
+    return `<tr data-idx="${orig}" draggable="true" class="${isChecked ? 'checked' : ''}" onclick="openPanel('${(p.Player||'').replace(/'/g,\"\\'\")}', this)">
       <td class="drag-cell">
         <div class="drag-handle"><span></span><span></span><span></span></div>
       </td>
@@ -716,6 +846,256 @@ function copyLink() {
 
 function printCheatSheet() { window.print(); }
 
+
+// ── Player panel ──────────────────────────────────────────────────────────────
+let panelChart = null;
+let selectedRow = null;
+
+function closePanel() {
+  document.getElementById('playerPanel').classList.remove('open');
+  if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
+}
+
+async function openPanel(playerName, row) {
+  // Toggle if same row clicked
+  if (selectedRow === row) { closePanel(); return; }
+  if (selectedRow) selectedRow.classList.remove('selected');
+  selectedRow = row;
+  row.classList.add('selected');
+  document.getElementById('playerPanel').classList.add('open');
+  document.getElementById('panelContent').innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:12px">Loading...</div>';
+
+  const [detailRes, historyRes] = await Promise.all([
+    fetch(`/api/player/${encodeURIComponent(playerName)}`),
+    fetch(`/api/adp/history/${encodeURIComponent(playerName)}`),
+  ]);
+  const detail  = await detailRes.json();
+  const history = await historyRes.json();
+
+  // Find rank in current list
+  const rankIdx = state.order.findIndex(i => (state.data[i]?.Player || '') === playerName);
+  const rank    = rankIdx >= 0 ? rankIdx + 1 : null;
+  const adp     = state.data[state.order[rankIdx]]?.adp || null;
+
+  renderPanel(playerName, detail.scout, detail.injury, rank, adp, history);
+}
+
+function renderPanel(name, scout, injury, rank, adp, history) {
+  const pos  = scout?.position || '';
+  const team = scout?.nfl_team || injury?.nfl_team || '';
+  const abbrev = scout?.nfl_team_abbrev || injury?.nfl_team_abbrev || '';
+  const school = scout?.school || injury?.school || '';
+  const nameParts = name.split(' ');
+  const initials  = nameParts.slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+  const slug = name.trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+
+  const posColor = {'quarterback':'#E52222','running back':'#00cc66','wide receiver':'#00bfff','tight end':'#ff8c00'}[pos.toLowerCase()] || '#aaa';
+  const posAbbr  = {'quarterback':'QB','running back':'RB','wide receiver':'WR','tight end':'TE'}[pos.toLowerCase()] || pos.toUpperCase().slice(0,2);
+
+  // Draft slot
+  const draftSlot = scout?.round ? `Rd ${scout.round}, Pick ${scout.pick}` : '—';
+
+  // Risk
+  const riskLevel = injury?.re_injury_risk || null;
+  const riskClass = riskLevel ? `risk-${riskLevel.toLowerCase()}` : '';
+
+  // Depth chart
+  const depthRows = (scout?.depth_chart || []).map((p,i) => `
+    <div class="panel-depth-row">
+      <span class="depth-pos">${i+1}</span>
+      <span class="depth-name">${p.name}</span>
+      <span class="depth-meta">${p.years_exp !== undefined ? (p.years_exp === 0 ? 'Rookie' : `Yr ${p.years_exp}`) : ''}</span>
+    </div>`).join('');
+
+  // Strengths / weaknesses
+  const strengthRows = (scout?.strengths || []).map(s => `<li>${s}</li>`).join('');
+  const weaknessRows = (scout?.weaknesses || []).map(w => `<li>${w}</li>`).join('');
+
+  // Injury history
+  const injuryRows = (injury?.injuries || []).length > 0
+    ? (injury.injuries).map(inj => `
+        <div class="panel-injury-row">
+          <span class="panel-injury-year">${inj.year}</span>
+          <span class="panel-injury-desc">${inj.description}</span>
+        </div>`).join('')
+    : '<div style="font-size:12px;color:var(--muted)">No major injuries reported.</div>';
+
+  const html = `
+    <div class="panel-hero">
+      <div class="panel-hero-top">
+        <img class="panel-photo" id="panelPhoto" src="" style="display:none" alt="${name}">
+        <div class="panel-photo-initials" id="panelInitials">${initials}</div>
+        <div class="panel-name-block">
+          <div class="panel-name">${name}</div>
+          <div class="panel-meta">
+            <span style="color:${posColor};font-weight:700">${posAbbr}</span>
+            <span style="color:var(--muted)">·</span>
+            ${team}
+            ${abbrev ? `<img class="panel-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${abbrev}.png" onerror="this.style.display='none'" alt="${abbrev}">` : ''}
+          </div>
+          ${school ? `<div style="font-size:11px;color:var(--muted);margin-top:4px">${school}</div>` : ''}
+        </div>
+      </div>
+      <div class="panel-ranks">
+        <div class="panel-rank-box">
+          <div class="panel-rank-val red">${rank !== null ? '#'+rank : '—'}</div>
+          <div class="panel-rank-lbl">TFH Rank</div>
+        </div>
+        <div class="panel-rank-box">
+          <div class="panel-rank-val">${adp || '—'}</div>
+          <div class="panel-rank-lbl">MFL ADP</div>
+        </div>
+        <div class="panel-rank-box">
+          <div class="panel-rank-val">${draftSlot}</div>
+          <div class="panel-rank-lbl">Draft Slot</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADP Trend -->
+    <div class="panel-section">
+      <div class="panel-section-title">ADP Trend</div>
+      <div class="panel-chart-wrap">
+        ${history.length >= 2
+          ? `<canvas id="adpChart"></canvas>`
+          : `<div class="panel-chart-empty">Current ADP: <strong style="color:var(--text)">${adp || '—'}</strong><br><span style="font-size:10px">Trend data accumulates hourly</span></div>`
+        }
+      </div>
+    </div>
+
+    ${scout?.outlook ? `
+    <div class="panel-section">
+      <div class="panel-section-title">Outlook</div>
+      <div class="panel-outlook">${scout.outlook}</div>
+    </div>` : ''}
+
+    ${strengthRows ? `
+    <div class="panel-section">
+      <div class="panel-section-title">Strengths</div>
+      <ul class="panel-bullets strengths">${strengthRows}</ul>
+    </div>` : ''}
+
+    ${weaknessRows ? `
+    <div class="panel-section">
+      <div class="panel-section-title">Weaknesses</div>
+      <ul class="panel-bullets weaknesses">${weaknessRows}</ul>
+    </div>` : ''}
+
+    ${depthRows ? `
+    <div class="panel-section">
+      <div class="panel-section-title">The Room They're Walking Into</div>
+      <div class="panel-depth">${depthRows}</div>
+    </div>` : ''}
+
+    ${injury ? `
+    <div class="panel-section">
+      <div class="panel-section-title">Injury History
+        ${riskLevel ? `<span class="panel-risk-badge ${riskClass}" style="margin-left:8px">${riskLevel.toUpperCase()} RISK</span>` : ''}
+      </div>
+      ${injuryRows}
+      ${injury.games_missed !== undefined ? `
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <div class="panel-draft-box"><div class="panel-draft-val">${injury.college_games}</div><div class="panel-draft-lbl">Games</div></div>
+        <div class="panel-draft-box"><div class="panel-draft-val">${injury.games_missed}</div><div class="panel-draft-lbl">Missed</div></div>
+        <div class="panel-draft-box"><div class="panel-draft-val">${injury.pct_missed}%</div><div class="panel-draft-lbl">% Missed</div></div>
+      </div>` : ''}
+    </div>` : ''}
+  `;
+
+  document.getElementById('panelContent').innerHTML = html;
+
+  // Load photo
+  loadPanelPhoto(name, slug);
+
+  // Render chart
+  if (history.length >= 2) renderAdpChart(history);
+}
+
+function loadPanelPhoto(name, slug) {
+  const cached = window._photoCache?.[name];
+  const img    = document.getElementById('panelPhoto');
+  const inits  = document.getElementById('panelInitials');
+  if (!img) return;
+  const applyUrl = url => {
+    img.src = url;
+    img.style.display = 'block';
+    img.onload  = () => { if(inits) inits.style.display = 'none'; };
+    img.onerror = () => { img.style.display = 'none'; };
+  };
+  if (cached) { applyUrl(cached); return; }
+  fetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&type=player&sport=football&limit=5`)
+    .then(r => r.json()).then(json => {
+      const hits = (json.results||[]).flatMap(g=>g.contents||[]);
+      for (const h of hits) {
+        const m = (h.uid||'').match(/a:(\d+)/);
+        if (!m) continue;
+        const id = m[1];
+        const url = `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${id}.png&w=350&h=254`;
+        if (window._photoCache) window._photoCache[name] = url;
+        applyUrl(url);
+        break;
+      }
+    }).catch(()=>{});
+}
+
+function renderAdpChart(history) {
+  const ctx = document.getElementById('adpChart');
+  if (!ctx) return;
+  if (panelChart) { panelChart.destroy(); panelChart = null; }
+
+  const labels = history.map(h => {
+    const d = new Date(h.ts);
+    return `${d.getMonth()+1}/${d.getDate()}`;
+  });
+  const values = history.map(h => h.adp);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const trending = values[values.length-1] < values[0] ? '#00cc66' : values[values.length-1] > values[0] ? '#E52222' : '#888';
+
+  panelChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        borderColor: trending,
+        backgroundColor: trending.replace(')', ',0.08)').replace('rgb','rgba'),
+        borderWidth: 2,
+        pointRadius: history.length <= 10 ? 4 : 1,
+        pointBackgroundColor: trending,
+        tension: 0.3,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: '#1e1e23',
+        borderColor: '#333',
+        borderWidth: 1,
+        titleColor: '#aaa',
+        bodyColor: '#fff',
+        callbacks: { label: ctx => `ADP: ${ctx.raw}` }
+      }},
+      scales: {
+        y: {
+          reverse: true,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#555', font: { size: 10 } },
+          suggestedMin: Math.max(1, min - 5),
+          suggestedMax: max + 5,
+        },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#555', font: { size: 10 }, maxTicksLimit: 6 },
+        }
+      }
+    }
+  });
+}
+
+
 // ── Boot ─────────────────────────────────────────────────────────────────────
 loadFromURL();
 updatePosTabs();
@@ -735,5 +1115,14 @@ if (activePosEl) {
 
 loadRankings();
 </script>
+
+<!-- Player Panel -->
+<div class="player-panel" id="playerPanel">
+  <button class="panel-close" onclick="closePanel()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <div id="panelContent"></div>
+</div>
+
 </body>
 </html>
