@@ -5,23 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TFH Rookie Rankings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #0d0d0d;
-  --sidebar:   #111111;
-  --surface:   #181818;
-  --border:    #222222;
-  --accent:    #e05c2a;
-  --accent2:   #ff7a45;
-  --text:      #f0f0f0;
-  --muted:     #666666;
-  --pos-qb:    #e05c2a;
-  --pos-rb:    #00cc66;
-  --pos-wr:    #00bfff;
-  --pos-te:    #ff8c00;
+  --bg:       #0d0d0f;
+  --sidebar:  #111114;
+  --surface:  #18181c;
+  --surface2: #1e1e23;
+  --border:   #26262e;
+  --red:      #E52222;
+  --red-dim:  rgba(229,34,34,0.12);
+  --red-glow: rgba(229,34,34,0.25);
+  --text:     #f0f0f2;
+  --muted:    #5a5a6a;
+  --sub:      #8888a0;
+  --pos-qb:   #E52222;
+  --pos-rb:   #00cc66;
+  --pos-wr:   #00bfff;
+  --pos-te:   #ff8c00;
+  --gold:     #F5C518;
+  --silver:   #A8A9AD;
+  --bronze:   #CD7F32;
 }
 
 body {
@@ -33,9 +39,9 @@ body {
   overflow: hidden;
 }
 
-/* ── Sidebar ── */
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
 .sidebar {
-  width: 220px;
+  width: 210px;
   flex-shrink: 0;
   background: var(--sidebar);
   border-right: 1px solid var(--border);
@@ -44,285 +50,247 @@ body {
   overflow-y: auto;
 }
 
-.sidebar-logo {
-  padding: 20px 18px 16px;
+.sidebar-brand {
+  padding: 20px 16px 18px;
   border-bottom: 1px solid var(--border);
-}
-.sidebar-logo .tfh {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--text);
-  text-transform: uppercase;
-}
-.sidebar-logo .tfh span {
-  color: var(--accent);
-}
-.sidebar-logo .sub {
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
-.sidebar-section {
-  padding: 16px 0 8px;
-}
-.sidebar-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--muted);
-  text-transform: uppercase;
-  padding: 0 18px 8px;
-}
-.sidebar-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #aaa;
+}
+.brand-icon {
+  width: 36px; height: 36px;
+  background: var(--red);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+.brand-text { line-height: 1.2; }
+.brand-name { font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: 0.5px; }
+.brand-sub  { font-size: 9px; font-weight: 600; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-top: 1px; }
+
+.sidebar-section { padding: 20px 0 6px; }
+.sidebar-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  color: var(--muted); text-transform: uppercase;
+  padding: 0 16px 8px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px 8px 16px;
+  font-size: 13px; font-weight: 500;
+  color: var(--sub);
   cursor: pointer;
-  border-left: 2px solid transparent;
+  border-radius: 0;
+  margin: 1px 8px;
+  border-radius: 6px;
   transition: all 0.15s;
   user-select: none;
+  position: relative;
 }
-.sidebar-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.sidebar-item:hover:not(.disabled) { color: var(--text); background: rgba(255,255,255,0.04); }
 .sidebar-item.active {
-  color: var(--text);
-  border-left-color: var(--accent);
-  background: rgba(224, 92, 42, 0.08);
+  color: #fff;
+  background: var(--red-dim);
+  font-weight: 600;
 }
-.sidebar-item .dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--muted);
-  flex-shrink: 0;
+.sidebar-item.active::before {
+  content: '';
+  position: absolute;
+  left: -8px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 20px;
+  background: var(--red);
+  border-radius: 0 2px 2px 0;
 }
-.sidebar-item.active .dot { background: var(--accent); }
-.sidebar-item .coming-soon {
-  font-size: 9px;
-  color: var(--muted);
-  margin-left: auto;
-  letter-spacing: 0.5px;
+.sidebar-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--muted); flex-shrink: 0; transition: background 0.15s;
 }
+.sidebar-item.active .sidebar-dot { background: var(--red); }
+.sidebar-soon {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.5px;
+  color: var(--muted); margin-left: auto;
+  background: var(--surface2); padding: 2px 6px; border-radius: 3px;
+}
+.sidebar-item.disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ── Main ── */
+/* ── Main ────────────────────────────────────────────────────────────────── */
 .main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0;
 }
 
+/* ── Topbar ── */
 .topbar {
-  padding: 16px 24px;
+  padding: 18px 28px 16px;
   border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: flex; align-items: flex-start; justify-content: space-between;
   flex-shrink: 0;
 }
-.topbar-title {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-.topbar-title span { color: var(--accent); }
+.topbar-left {}
+.topbar-title { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
+.topbar-sub   { font-size: 12px; color: var(--sub); margin-top: 2px; font-weight: 500; }
+.topbar-right { display: flex; align-items: center; gap: 8px; padding-top: 4px; }
+.last-updated { font-size: 11px; color: var(--muted); }
 
-.pos-tabs {
-  display: flex;
-  gap: 6px;
-  padding: 14px 24px;
+/* ── Position tabs ── */
+.pos-bar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 12px 28px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 .pos-tab {
-  padding: 6px 16px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
+  padding: 7px 18px;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
   cursor: pointer;
-  border: 1px solid var(--border);
-  color: var(--muted);
+  border: 1.5px solid var(--border);
+  color: var(--sub);
   background: transparent;
   transition: all 0.15s;
   user-select: none;
 }
 .pos-tab:hover:not(.disabled) { color: var(--text); border-color: #444; }
-.pos-tab.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-.pos-tab.disabled { opacity: 0.35; cursor: not-allowed; }
+.pos-tab.active { background: var(--red); border-color: var(--red); color: #fff; }
+.pos-tab.disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* ── Table area ── */
-.table-wrap {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 24px 24px;
-}
-
-.coming-soon-msg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  font-size: 14px;
-  color: var(--muted);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 8px;
-}
-
-thead th {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  color: var(--muted);
-  text-transform: uppercase;
-  padding: 12px 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: var(--bg);
-  z-index: 1;
-}
-thead th.rank-col { width: 50px; text-align: center; }
-thead th.check-col { width: 36px; }
-thead th.photo-col { width: 44px; }
-
-tbody tr {
-  border-bottom: 1px solid #1a1a1a;
-  transition: background 0.1s;
-  cursor: grab;
-}
-tbody tr:hover { background: rgba(255,255,255,0.025); }
-tbody tr.dragging { opacity: 0.4; }
-tbody tr.drag-over { background: rgba(224,92,42,0.08); border-bottom-color: var(--accent); }
-tbody tr.checked td { opacity: 0.45; }
-tbody tr.checked td.check-cell { opacity: 1; }
-
-td {
-  padding: 10px 12px;
-  font-size: 13px;
-  vertical-align: middle;
-}
-
-.rank-cell {
-  text-align: center;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--accent);
-  width: 50px;
-}
-
-.check-cell { width: 36px; }
-.check-cell input[type=checkbox] {
-  width: 15px; height: 15px;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
-
-.photo-cell { width: 44px; }
-.player-photo {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: center top;
-  background: #222;
-  display: block;
-}
-.photo-initials {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: #252525;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: #555;
-}
-
-.player-cell { min-width: 180px; }
-.player-name { font-weight: 600; font-size: 14px; }
-.player-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
-
-.team-cell { width: 120px; }
-.team-inner { display: flex; align-items: center; gap: 8px; }
-.team-logo {
-  width: 24px; height: 24px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-.team-abbrev { font-size: 12px; font-weight: 600; color: #bbb; }
-
-.pos-badge {
-  display: inline-block;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  padding: 2px 7px;
-  border-radius: 3px;
-  color: #000;
-}
-
-/* ── Toolbar ── */
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
+/* ── Action bar ── */
+.action-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 28px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 .btn {
+  display: flex; align-items: center; gap: 6px;
   padding: 7px 14px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: #bbb;
-  transition: all 0.15s;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.2px;
+  cursor: pointer; border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--sub);
+  transition: all 0.15s; white-space: nowrap;
 }
-.btn:hover { color: var(--text); border-color: #444; }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.btn.primary:hover { background: var(--accent2); border-color: var(--accent2); }
-.copy-feedback {
-  font-size: 11px;
-  color: var(--pos-rb);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.copy-feedback.show { opacity: 1; }
+.btn:hover { color: var(--text); border-color: #444; background: var(--surface2); }
+.btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+.btn.primary:hover { background: #cc1a1a; border-color: #cc1a1a; }
+.btn svg { flex-shrink: 0; }
 .spacer { flex: 1; }
-.player-count { font-size: 11px; color: var(--muted); }
+.player-count { font-size: 12px; color: var(--muted); font-weight: 500; }
+.copy-feedback { font-size: 11px; color: var(--pos-rb); opacity: 0; transition: opacity 0.3s; }
+.copy-feedback.show { opacity: 1; }
 
-/* ── Print styles ── */
+/* ── Table ───────────────────────────────────────────────────────────────── */
+.table-wrap { flex: 1; overflow-y: auto; }
+
+.coming-soon-msg {
+  display: flex; align-items: center; justify-content: center;
+  height: 200px; font-size: 13px; color: var(--muted);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+thead th {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  color: var(--muted); text-transform: uppercase;
+  padding: 10px 12px; text-align: left;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--bg); z-index: 1;
+}
+thead th.center { text-align: center; }
+
+tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  transition: background 0.1s;
+}
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody tr.drag-over { background: var(--red-dim); border-bottom: 1px solid var(--red); }
+tbody tr.dragging { opacity: 0.3; }
+tbody tr.checked td:not(.check-cell) { opacity: 0.35; }
+
+td { padding: 10px 12px; vertical-align: middle; }
+
+/* drag handle */
+.drag-cell { width: 24px; padding: 0 4px 0 12px; cursor: grab; color: var(--muted); }
+.drag-cell:active { cursor: grabbing; }
+.drag-handle { display: flex; flex-direction: column; gap: 2.5px; padding: 4px 0; }
+.drag-handle span { display: block; width: 14px; height: 1.5px; background: currentColor; border-radius: 1px; }
+
+/* rank */
+.rank-cell { width: 44px; text-align: center; padding: 10px 6px; }
+.rank-circle {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  background: var(--surface2); color: var(--sub);
+}
+.rank-circle.gold   { background: rgba(245,197,24,0.15); color: var(--gold); border: 1.5px solid rgba(245,197,24,0.3); }
+.rank-circle.silver { background: rgba(168,169,173,0.12); color: var(--silver); border: 1.5px solid rgba(168,169,173,0.25); }
+.rank-circle.bronze { background: rgba(205,127,50,0.12); color: var(--bronze); border: 1.5px solid rgba(205,127,50,0.25); }
+
+/* star/check */
+.check-cell { width: 32px; padding: 10px 4px; text-align: center; }
+.star-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); padding: 2px; transition: color 0.15s;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.star-btn:hover { color: var(--gold); }
+.star-btn.starred { color: var(--gold); }
+
+/* photo */
+.photo-cell { width: 48px; padding: 10px 6px; }
+.player-photo {
+  width: 38px; height: 38px; border-radius: 50%;
+  object-fit: cover; object-position: center top;
+  background: var(--surface2); display: block;
+}
+.photo-initials {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--muted);
+}
+
+/* player name */
+.player-cell { min-width: 160px; }
+.player-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.player-meta { font-size: 11px; color: var(--sub); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+.pos-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
+
+/* ADP */
+.adp-cell { width: 70px; text-align: center; }
+.adp-val  { font-size: 13px; font-weight: 600; color: var(--sub); }
+.adp-none { font-size: 12px; color: var(--muted); }
+
+/* team */
+.team-cell { width: 100px; }
+.team-inner { display: flex; align-items: center; gap: 8px; }
+.team-logo { width: 26px; height: 26px; object-fit: contain; }
+.team-abbrev { font-size: 12px; font-weight: 700; color: var(--sub); }
+
+/* pos badge (overall tables) */
+.pos-badge {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.5px; padding: 2px 7px; border-radius: 4px; color: #000;
+}
+
+/* ── Cheat sheet print ───────────────────────────────────────────────────── */
 @media print {
-  body { background: #fff; color: #000; display: block; height: auto; }
-  .sidebar, .topbar, .pos-tabs, .toolbar { display: none; }
+  body { background: #fff; color: #000; display: block; height: auto; overflow: visible; }
+  .sidebar, .topbar, .pos-bar, .action-bar { display: none !important; }
   .main { overflow: visible; }
-  .table-wrap { overflow: visible; padding: 0; }
+  .table-wrap { overflow: visible; }
   table { font-size: 11px; }
-  tbody tr.checked { text-decoration: line-through; opacity: 0.4; }
-  .check-cell { display: none; }
-  thead th { background: #fff; color: #333; }
-  .rank-cell { color: #c0392b; }
+  .drag-cell, .check-cell { display: none; }
+  .rank-circle { background: #eee !important; color: #000 !important; border: 1px solid #ccc !important; }
+  .player-name { color: #000; }
+  .player-meta, .adp-val, .team-abbrev { color: #555; }
+  tbody tr { border-bottom: 1px solid #ddd; }
+  thead th { background: #fff; color: #555; border-bottom: 2px solid #999; }
+  tbody tr.checked { opacity: 0.3; text-decoration: line-through; }
   .team-logo { width: 18px; height: 18px; }
-  .player-photo, .photo-initials { width: 0; height: 0; display: none; }
-  .photo-cell { display: none; }
 }
 </style>
 </head>
@@ -330,37 +298,49 @@ td {
 
 <!-- Sidebar -->
 <aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="tfh">TFH <span>·</span> Rankings</div>
-    <div class="sub">2026 Rookie Season</div>
+  <div class="sidebar-brand">
+    <div class="brand-icon">TFH</div>
+    <div class="brand-text">
+      <div class="brand-name">Rankings</div>
+      <div class="brand-sub">2026 Rookie Season</div>
+    </div>
   </div>
 
   <div class="sidebar-section">
     <div class="sidebar-label">Redraft</div>
-    <div class="sidebar-item active" data-mode="redraft" data-label="Redraft Rankings">
-      <span class="dot"></span> Rookie Rankings
+    <div class="sidebar-item active" data-mode="redraft" data-label="Rookie Rankings" data-sub="2026 Redraft Rankings">
+      <span class="sidebar-dot"></span> Rookie Rankings
     </div>
-    <div class="sidebar-item disabled" data-mode="redraft-bestball" data-label="Best Ball">
-      <span class="dot"></span> Best Ball
-      <span class="coming-soon">Soon</span>
+    <div class="sidebar-item disabled" data-mode="redraft-bestball" data-label="Best Ball" data-sub="2026 Best Ball Rankings">
+      <span class="sidebar-dot"></span> Best Ball
+      <span class="sidebar-soon">Soon</span>
     </div>
   </div>
 
   <div class="sidebar-section">
     <div class="sidebar-label">Dynasty</div>
-    <div class="sidebar-item" data-mode="dynasty" data-label="Dynasty Rankings">
-      <span class="dot"></span> Rookie Rankings
+    <div class="sidebar-item" data-mode="dynasty" data-label="Rookie Rankings" data-sub="2026 Dynasty Rankings">
+      <span class="sidebar-dot"></span> Rookie Rankings
     </div>
   </div>
 </aside>
 
 <!-- Main -->
 <div class="main">
+
+  <!-- Topbar -->
   <div class="topbar">
-    <div class="topbar-title">Redraft <span>Rankings</span></div>
+    <div class="topbar-left">
+      <div class="topbar-title" id="topbarTitle">Rookie Rankings</div>
+      <div class="topbar-sub" id="topbarSub">2026 Redraft Rankings</div>
+    </div>
+    <div class="topbar-right">
+      <span class="last-updated" id="lastUpdated"></span>
+    </div>
   </div>
 
-  <div class="pos-tabs">
+  <!-- Position tabs -->
+  <div class="pos-bar">
     <div class="pos-tab active" data-pos="QB">QB</div>
     <div class="pos-tab" data-pos="RB">RB</div>
     <div class="pos-tab" data-pos="WR">WR</div>
@@ -369,18 +349,30 @@ td {
     <div class="pos-tab" data-pos="SF">SF Overall</div>
   </div>
 
-  <div class="toolbar">
-    <button class="btn primary" onclick="printCheatSheet()">Print Cheat Sheet</button>
-    <button class="btn" onclick="resetOrder()">Reset Order</button>
-    <button class="btn" onclick="copyLink()">Copy Shareable Link</button>
+  <!-- Action bar -->
+  <div class="action-bar">
+    <button class="btn primary" onclick="printCheatSheet()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print Cheat Sheet
+    </button>
+    <button class="btn" onclick="resetOrder()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.6"/></svg>
+      Reset Order
+    </button>
+    <button class="btn" onclick="copyLink()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Copy Shareable Link
+    </button>
     <span class="copy-feedback" id="copyFeedback">Link copied!</span>
     <span class="spacer"></span>
     <span class="player-count" id="playerCount"></span>
   </div>
 
+  <!-- Table -->
   <div class="table-wrap">
     <div id="tableContainer"></div>
   </div>
+
 </div>
 
 <script>
@@ -389,27 +381,29 @@ const POPULATED = {
   dynasty: { QB: true, RB: true, WR: false, TE: false, Overall: false, SF: false },
 };
 
-const POS_COLORS = { QB: '#e05c2a', RB: '#00cc66', WR: '#00bfff', TE: '#ff8c00' };
+const POS_COLORS = { QB: '#E52222', RB: '#00cc66', WR: '#00bfff', TE: '#ff8c00' };
 
 let state = {
-  mode: 'redraft',
-  pos:  'QB',
-  data: [],           // original from API
-  order: [],          // current display order (indices into data[])
+  mode:    'redraft',
+  pos:     'QB',
+  data:    [],
+  order:   [],
+  starred: new Set(),
   checked: new Set(),
-  custom: false,
+  custom:  false,
 };
 
-// ── Init from URL ────────────────────────────────────────────────────────────
+// ── URL state ────────────────────────────────────────────────────────────────
 function loadFromURL() {
   const p = new URLSearchParams(location.search);
   if (p.has('mode'))    state.mode    = p.get('mode');
   if (p.has('pos'))     state.pos     = p.get('pos');
   if (p.has('order'))   try { state.order   = JSON.parse(atob(p.get('order'))); state.custom = true; } catch {}
   if (p.has('checked')) try { state.checked = new Set(JSON.parse(atob(p.get('checked')))); } catch {}
+  if (p.has('starred')) try { state.starred = new Set(JSON.parse(atob(p.get('starred')))); } catch {}
 }
 
-// ── Sidebar / tab nav ────────────────────────────────────────────────────────
+// ── Nav ──────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
   el.addEventListener('click', () => {
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
@@ -417,8 +411,8 @@ document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
     state.mode    = el.dataset.mode;
     state.custom  = false;
     state.checked = new Set();
-    document.querySelector('.topbar-title').innerHTML =
-      el.dataset.label.replace(/(\w+)$/, '<span>$1</span>');
+    document.getElementById('topbarTitle').textContent = el.dataset.label;
+    document.getElementById('topbarSub').textContent   = el.dataset.sub;
     updatePosTabs();
     loadRankings();
   });
@@ -440,10 +434,10 @@ function updatePosTabs() {
   const populated = POPULATED[state.mode] || {};
   document.querySelectorAll('.pos-tab').forEach(el => {
     const pos = el.dataset.pos;
-    el.classList.toggle('disabled', !populated[pos]);
-    if (!populated[pos] && el.classList.contains('active')) {
+    const isPopulated = !!populated[pos];
+    el.classList.toggle('disabled', !isPopulated);
+    if (!isPopulated && el.classList.contains('active')) {
       el.classList.remove('active');
-      // fall back to first populated
       const first = Object.keys(populated).find(p => populated[p]);
       if (first) {
         state.pos = first;
@@ -453,82 +447,100 @@ function updatePosTabs() {
   });
 }
 
-// ── Data fetch ───────────────────────────────────────────────────────────────
+// ── Fetch ────────────────────────────────────────────────────────────────────
 async function loadRankings() {
-  const container = document.getElementById('tableContainer');
-  const populated = POPULATED[state.mode]?.[state.pos];
+  const container  = document.getElementById('tableContainer');
+  const populated  = POPULATED[state.mode]?.[state.pos];
   if (!populated) {
     container.innerHTML = '<div class="coming-soon-msg">Rankings Coming Soon</div>';
     document.getElementById('playerCount').textContent = '';
     return;
   }
-
   container.innerHTML = '<div class="coming-soon-msg">Loading...</div>';
-
   try {
-    const res  = await fetch(`/api/rankings/${state.mode}/${state.pos}`);
+    const res   = await fetch(`/api/rankings/${state.mode}/${state.pos}`);
     state.data  = await res.json();
     state.order = state.custom && state.order.length === state.data.length
-      ? state.order
-      : state.data.map((_, i) => i);
+      ? state.order : state.data.map((_, i) => i);
     renderTable();
-  } catch (e) {
-    container.innerHTML = `<div class="coming-soon-msg">Error loading rankings</div>`;
+    updateLastUpdated();
+  } catch {
+    container.innerHTML = '<div class="coming-soon-msg">Error loading rankings</div>';
   }
 }
 
+async function updateLastUpdated() {
+  try {
+    const res  = await fetch('/api/adp/last-updated');
+    const json = await res.json();
+    if (json.ts) {
+      const d = new Date(json.ts);
+      document.getElementById('lastUpdated').textContent =
+        `MFL ADP updated: ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`;
+    }
+  } catch {}
+}
+
 // ── Render ───────────────────────────────────────────────────────────────────
-function playerSlug(name) {
-  return name.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-}
-
-function espnPhotoUrl(name) {
-  return `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/placeholder.png`; // fallback
-}
-
-function teamLogoUrl(abbrev) {
-  if (!abbrev) return null;
-  return `https://a.espncdn.com/i/teamlogos/nfl/500/${abbrev.toLowerCase()}.png`;
+function rankClass(rank) {
+  if (rank === 1) return 'gold';
+  if (rank === 2) return 'silver';
+  if (rank === 3) return 'bronze';
+  return '';
 }
 
 function renderTable() {
+  const isOverall = state.pos === 'Overall' || state.pos === 'SF';
   const rows = state.order.map(i => state.data[i]);
   document.getElementById('playerCount').textContent = `${rows.length} players`;
 
-  const isOverall = state.pos === 'Overall' || state.pos === 'SF';
-
   const tbody = rows.map((p, displayIdx) => {
-    const orig   = state.order[displayIdx];
-    const rank   = displayIdx + 1;
+    const orig      = state.order[displayIdx];
+    const rank      = displayIdx + 1;
     const isChecked = state.checked.has(orig);
-    const pos    = p.Pos || state.pos;
-    const posColor = POS_COLORS[pos] || '#aaa';
-
+    const isStarred = state.starred.has(orig);
+    const pos       = p.Pos || state.pos;
+    const posColor  = POS_COLORS[pos] || '#aaa';
     const nameParts = (p.Player || '').split(' ');
-    const initials  = nameParts.slice(0,2).map(w => w[0]).join('').toUpperCase();
-    const slug      = playerSlug(p.Player || '');
+    const initials  = nameParts.slice(0,2).map(w => w[0] || '').join('').toUpperCase();
+    const slug      = (p.Player || '').trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
 
     const posBadge = isOverall
       ? `<span class="pos-badge" style="background:${posColor}">${pos}</span>`
-      : '';
+      : `<span class="pos-dot" style="background:${posColor}"></span>${pos}`;
+
+    const adpHtml = p.adp
+      ? `<span class="adp-val">${p.adp}</span>`
+      : `<span class="adp-none">—</span>`;
 
     return `<tr data-idx="${orig}" draggable="true" class="${isChecked ? 'checked' : ''}">
-      <td class="rank-cell">${rank}</td>
-      <td class="check-cell"><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCheck(${orig}, this)"></td>
+      <td class="drag-cell">
+        <div class="drag-handle"><span></span><span></span><span></span></div>
+      </td>
+      <td class="rank-cell">
+        <span class="rank-circle ${rankClass(rank)}">${rank}</span>
+      </td>
+      <td class="check-cell">
+        <button class="star-btn ${isStarred ? 'starred' : ''}" onclick="toggleStar(${orig}, this)" title="Star player">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="${isStarred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </button>
+      </td>
       <td class="photo-cell">
-        <img class="player-photo" src="https://a.espncdn.com/combiner/i?img=/i/headshots/college-football/players/full/placeholder.png"
-          data-slug="${slug}"
-          onerror="this.style.display='none';this.nextSibling.style.display='flex'"
-          alt="${p.Player}">
-        <div class="photo-initials" style="display:none">${initials}</div>
+        <img class="player-photo" src="" data-name="${p.Player || ''}" data-slug="${slug}"
+          style="display:none" alt="${p.Player}">
+        <div class="photo-initials" data-init="${slug}">${initials}</div>
       </td>
       <td class="player-cell">
         <div class="player-name">${p.Player || '—'}</div>
-        <div class="player-meta">${posBadge}</div>
+        <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team}` : ''}</div>
       </td>
+      <td class="adp-cell">${adpHtml}</td>
       <td class="team-cell">
         <div class="team-inner">
-          ${p.Team ? `<img class="team-logo" src="${teamLogoUrl(p.Team)}" alt="${p.Team}" onerror="this.style.display='none'">` : ''}
+          ${p.Team ? `<img class="team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${p.Team.toLowerCase()}.png"
+            alt="${p.Team}" onerror="this.style.display='none'">` : ''}
           <span class="team-abbrev">${p.Team || '—'}</span>
         </div>
       </td>
@@ -539,11 +551,13 @@ function renderTable() {
     <table>
       <thead>
         <tr>
-          <th class="rank-col">Rank</th>
-          <th class="check-col"></th>
-          <th class="photo-col"></th>
+          <th style="width:24px"></th>
+          <th class="center" style="width:44px">Rank</th>
+          <th style="width:32px"></th>
+          <th style="width:48px"></th>
           <th>Player</th>
-          <th>Team</th>
+          <th class="center" style="width:70px">MFL ADP</th>
+          <th style="width:100px">Team</th>
         </tr>
       </thead>
       <tbody id="rankingsTbody">${tbody}</tbody>
@@ -553,11 +567,12 @@ function renderTable() {
   loadPhotos();
 }
 
-// ── Photo loading (ESPN search) ──────────────────────────────────────────────
+// ── Photos ───────────────────────────────────────────────────────────────────
 async function loadPhotos() {
-  const imgs = document.querySelectorAll('.player-photo[data-slug]');
+  const imgs = document.querySelectorAll('.player-photo[data-name]');
   for (const img of imgs) {
-    const name = (img.alt || '').trim();
+    const name = img.dataset.name;
+    const slug = img.dataset.slug;
     if (!name) continue;
     try {
       const res  = await fetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&type=player&sport=football&limit=5`);
@@ -570,6 +585,12 @@ async function loadPhotos() {
         for (const league of ['nfl', 'college-football']) {
           const url = `https://a.espncdn.com/combiner/i?img=/i/headshots/${league}/players/full/${id}.png&w=350&h=254`;
           img.src = url;
+          img.style.display = 'block';
+          img.onload = () => {
+            const init = document.querySelector(`.photo-initials[data-init="${slug}"]`);
+            if (init) init.style.display = 'none';
+          };
+          img.onerror = () => { img.style.display = 'none'; };
           break;
         }
         break;
@@ -614,14 +635,13 @@ function initDragDrop() {
   });
 }
 
-// ── Checkbox ─────────────────────────────────────────────────────────────────
-function toggleCheck(idx, el) {
-  if (el.checked) state.checked.add(idx);
-  else            state.checked.delete(idx);
-  el.closest('tr').classList.toggle('checked', el.checked);
+// ── Star / check ─────────────────────────────────────────────────────────────
+function toggleStar(idx, btn) {
+  if (state.starred.has(idx)) { state.starred.delete(idx); btn.classList.remove('starred'); btn.querySelector('svg').setAttribute('fill','none'); }
+  else                        { state.starred.add(idx);    btn.classList.add('starred');    btn.querySelector('svg').setAttribute('fill','currentColor'); }
 }
 
-// ── Actions ──────────────────────────────────────────────────────────────────
+// ── Actions ───────────────────────────────────────────────────────────────────
 function resetOrder() {
   state.order  = state.data.map((_, i) => i);
   state.custom = false;
@@ -632,8 +652,9 @@ function copyLink() {
   const p = new URLSearchParams();
   p.set('mode', state.mode);
   p.set('pos',  state.pos);
-  if (state.custom)          p.set('order',   btoa(JSON.stringify(state.order)));
+  if (state.custom)           p.set('order',   btoa(JSON.stringify(state.order)));
   if (state.checked.size > 0) p.set('checked', btoa(JSON.stringify([...state.checked])));
+  if (state.starred.size > 0) p.set('starred', btoa(JSON.stringify([...state.starred])));
   const url = `${location.origin}${location.pathname}?${p.toString()}`;
   navigator.clipboard.writeText(url).catch(() => prompt('Copy this link:', url));
   const fb = document.getElementById('copyFeedback');
@@ -647,18 +668,17 @@ function printCheatSheet() { window.print(); }
 loadFromURL();
 updatePosTabs();
 
-// Sync sidebar/tabs to URL state
-const modeEl = document.querySelector(`.sidebar-item[data-mode="${state.mode}"]`);
-if (modeEl) {
+const activeSidebarEl = document.querySelector(`.sidebar-item[data-mode="${state.mode}"]`);
+if (activeSidebarEl) {
   document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-  modeEl.classList.add('active');
-  document.querySelector('.topbar-title').innerHTML =
-    (modeEl.dataset.label || '').replace(/(\w+)$/, '<span>$1</span>');
+  activeSidebarEl.classList.add('active');
+  document.getElementById('topbarTitle').textContent = activeSidebarEl.dataset.label;
+  document.getElementById('topbarSub').textContent   = activeSidebarEl.dataset.sub;
 }
-const posEl = document.querySelector(`.pos-tab[data-pos="${state.pos}"]`);
-if (posEl) {
+const activePosEl = document.querySelector(`.pos-tab[data-pos="${state.pos}"]`);
+if (activePosEl) {
   document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
-  posEl.classList.add('active');
+  activePosEl.classList.add('active');
 }
 
 loadRankings();
