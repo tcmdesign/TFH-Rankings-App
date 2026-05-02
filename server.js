@@ -30,8 +30,7 @@ const TABLES = {
 };
 
 // ── Static player data ────────────────────────────────────────────────────────
-const DATA_DIR      = path.join(__dirname, 'data');
-const ADP_HIST_FILE = path.join(DATA_DIR, 'adp_history.json');
+const DATA_DIR = path.join(__dirname, 'data');
 
 const scoutsRaw  = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'scouts.json'),  'utf8'));
 const playersRaw = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'players.json'), 'utf8'));
@@ -42,53 +41,10 @@ const scoutMap  = {};
 const injuryMap = {};
 (playersRaw.players || []).forEach(p => { injuryMap[p.name.toLowerCase()] = p; });
 
-// ── Postgres (ADP history persistence) ───────────────────────────────────────
+// ── Postgres ──────────────────────────────────────────────────────────────────
 const db = process.env.DATABASE_URL
   ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
   : null;
-
-async function initDb() {
-  if (!db) return;
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS adp_snapshots (
-      ts BIGINT PRIMARY KEY,
-      adp_map JSONB NOT NULL
-    )
-  `);
-}
-
-// ── ADP history (persists to Postgres, falls back to file) ────────────────────
-let adpHistory = [];
-
-async function loadAdpHistory() {
-  if (db) {
-    try {
-      const { rows } = await db.query('SELECT ts, adp_map FROM adp_snapshots ORDER BY ts ASC');
-      adpHistory = rows.map(r => ({ ts: Number(r.ts), adpMap: r.adp_map }));
-      return;
-    } catch (e) { console.error('DB load failed, falling back to file:', e.message); }
-  }
-  try { adpHistory = JSON.parse(fs.readFileSync(ADP_HIST_FILE, 'utf8')); } catch {}
-}
-
-async function saveAdpSnapshot(ts, adpMap) {
-  if (db) {
-    try {
-      await db.query(
-        'INSERT INTO adp_snapshots (ts, adp_map) VALUES ($1, $2) ON CONFLICT (ts) DO NOTHING',
-        [ts, JSON.stringify(adpMap)]
-      );
-      // Prune old rows beyond 720
-      await db.query(`
-        DELETE FROM adp_snapshots WHERE ts NOT IN (
-          SELECT ts FROM adp_snapshots ORDER BY ts DESC LIMIT 720
-        )
-      `);
-      return;
-    } catch (e) { console.error('DB save failed, falling back to file:', e.message); }
-  }
-  try { fs.writeFileSync(ADP_HIST_FILE, JSON.stringify(adpHistory)); } catch {}
-}
 
 // ── Cache ─────────────────────────────────────────────────────────────────────
 const cache = {};
@@ -116,21 +72,38 @@ async function fetchTable(tableId) {
   return records;
 }
 
-async function fetchMFLAdp() {
-  const TTL = 60 * 60 * 1000;
+// Reads latest ADP snapshot from the shared Postgres table (populated by the other app).
+// Falls back to direct MFL API call if DB is unavailable.
+async function fetchAdpMap() {
+  const TTL = 5 * 60 * 1000;
   const now = Date.now();
-  if (cache.__mfl && now - cache.__mfl.ts < TTL) return cache.__mfl.data;
+  if (cache.__adp && now - cache.__adp.ts < TTL) return cache.__adp.data;
 
+  if (db) {
+    try {
+      const { rows } = await db.query(`
+        SELECT p.name, s.adp, s.pulled_at
+        FROM adp_snapshots s
+        JOIN players p ON p.id = s.player_id
+        WHERE s.pulled_at = (SELECT MAX(pulled_at) FROM adp_snapshots WHERE season = 2026)
+          AND s.season = 2026 AND s.scoring = 'ppr'
+      `);
+      const adpMap = {};
+      rows.forEach(r => { adpMap[r.name.toLowerCase()] = parseFloat(r.adp).toFixed(1); });
+      cache.__adp = { ts: now, data: adpMap, lastPulled: rows[0]?.pulled_at || null };
+      return adpMap;
+    } catch (e) { console.error('DB ADP fetch failed, falling back to MFL:', e.message); }
+  }
+
+  // Fallback: direct MFL API
   const [playersRes, adpRes] = await Promise.all([
     fetch('https://api.myfantasyleague.com/2026/export?TYPE=players&DETAILS=1&JSON=1'),
     fetch('https://api.myfantasyleague.com/2026/export?TYPE=adp&FCOUNT=12&PERIOD=RECENT&PPR=1&IS_KEEPER=0&JSON=1'),
   ]);
   const playersJson = await playersRes.json();
   const adpJson     = await adpRes.json();
-
-  const playerMap = {};
+  const playerMap   = {};
   (playersJson.players?.player || []).forEach(p => { playerMap[p.id] = p; });
-
   const adpMap = {};
   (adpJson.adp?.player || []).forEach(a => {
     const p = playerMap[a.id];
@@ -139,14 +112,7 @@ async function fetchMFLAdp() {
     const normalized = parts.length === 2 ? `${parts[1]} ${parts[0]}`.toLowerCase() : p.name.toLowerCase();
     adpMap[normalized] = parseFloat(a.averagePick).toFixed(1);
   });
-
-  cache.__mfl = { ts: now, data: adpMap };
-
-  // Store ADP snapshot for history (max 720 points = 30 days hourly)
-  adpHistory.push({ ts: now, adpMap: { ...adpMap } });
-  if (adpHistory.length > 720) adpHistory = adpHistory.slice(-720);
-  await saveAdpSnapshot(now, adpMap);
-
+  cache.__adp = { ts: now, data: adpMap, lastPulled: null };
   return adpMap;
 }
 
@@ -158,7 +124,7 @@ app.get('/api/rankings/:mode/:pos', async (req, res) => {
   const tableId = TABLES[mode]?.[pos];
   if (!tableId) return res.status(400).json({ error: 'Invalid mode or position' });
   try {
-    const [data, adpMap] = await Promise.all([fetchTable(tableId), fetchMFLAdp()]);
+    const [data, adpMap] = await Promise.all([fetchTable(tableId), fetchAdpMap()]);
     const enriched = data.map(p => ({
       ...p,
       adp: adpMap[(p.Player || '').toLowerCase()] || null,
@@ -177,19 +143,31 @@ app.get('/api/player/:name', async (req, res) => {
   res.json({ scout, injury });
 });
 
-app.get('/api/adp/history/:name', (req, res) => {
+app.get('/api/adp/history/:name', async (req, res) => {
   const name = decodeURIComponent(req.params.name).toLowerCase();
-  const history = adpHistory
-    .map(snap => ({ ts: snap.ts, adp: snap.adpMap[name] ? parseFloat(snap.adpMap[name]) : null }))
-    .filter(h => h.adp !== null);
-  res.json(history);
+  if (!db) return res.json([]);
+  try {
+    const { rows } = await db.query(`
+      SELECT s.pulled_at AS ts, s.adp
+      FROM adp_snapshots s
+      JOIN players p ON p.id = s.player_id
+      WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.scoring = 'ppr'
+      ORDER BY s.pulled_at ASC
+    `, [name]);
+    res.json(rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })));
+  } catch (err) {
+    console.error(err);
+    res.json([]);
+  }
 });
 
-app.get('/api/adp/last-updated', (req, res) => {
-  res.json({ ts: cache.__mfl?.ts || null });
+app.get('/api/adp/last-updated', async (req, res) => {
+  if (cache.__adp?.lastPulled) return res.json({ ts: new Date(cache.__adp.lastPulled).getTime() });
+  if (!db) return res.json({ ts: null });
+  try {
+    const { rows } = await db.query('SELECT MAX(pulled_at) AS ts FROM adp_snapshots WHERE season = 2026');
+    res.json({ ts: rows[0]?.ts ? new Date(rows[0].ts).getTime() : null });
+  } catch { res.json({ ts: null }); }
 });
 
-initDb()
-  .then(() => loadAdpHistory())
-  .then(() => app.listen(PORT, () => console.log(`Rankings app running on port ${PORT}`)))
-  .catch(err => { console.error('Startup error:', err); process.exit(1); });
+app.listen(PORT, () => console.log(`Rankings app running on port ${PORT}`));
