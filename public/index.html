@@ -25,9 +25,6 @@
   --pos-rb:   #00cc66;
   --pos-wr:   #00bfff;
   --pos-te:   #ff8c00;
-  --gold:     #F5C518;
-  --silver:   #A8A9AD;
-  --bronze:   #CD7F32;
 }
 
 body {
@@ -225,9 +222,7 @@ td { padding: 10px 12px; vertical-align: middle; }
   font-size: 13px; font-weight: 700;
   background: var(--surface2); color: var(--sub);
 }
-.rank-circle.gold   { background: rgba(245,197,24,0.15); color: var(--gold); border: 1.5px solid rgba(245,197,24,0.3); }
-.rank-circle.silver { background: rgba(168,169,173,0.12); color: var(--silver); border: 1.5px solid rgba(168,169,173,0.25); }
-.rank-circle.bronze { background: rgba(205,127,50,0.12); color: var(--bronze); border: 1.5px solid rgba(205,127,50,0.25); }
+
 
 /* star/check */
 .check-cell { width: 32px; padding: 10px 4px; text-align: center; }
@@ -521,12 +516,7 @@ async function updateLastUpdated() {
 }
 
 // ── Render ───────────────────────────────────────────────────────────────────
-function rankClass(rank) {
-  if (rank === 1) return 'gold';
-  if (rank === 2) return 'silver';
-  if (rank === 3) return 'bronze';
-  return '';
-}
+function rankClass(rank) { return ''; }
 
 function renderTable() {
   const isOverall = state.pos === 'Overall' || state.pos === 'SF';
