@@ -2,6 +2,7 @@ const express = require('express');
 const fetch   = require('node-fetch');
 const path    = require('path');
 const fs      = require('fs');
+const { Pool } = require('pg');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -41,13 +42,51 @@ const scoutMap  = {};
 const injuryMap = {};
 (playersRaw.players || []).forEach(p => { injuryMap[p.name.toLowerCase()] = p; });
 
-// ── ADP history (persists to file between restarts) ──────────────────────────
-let adpHistory = [];
-try {
-  adpHistory = JSON.parse(fs.readFileSync(ADP_HIST_FILE, 'utf8'));
-} catch {}
+// ── Postgres (ADP history persistence) ───────────────────────────────────────
+const db = process.env.DATABASE_URL
+  ? new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } })
+  : null;
 
-function saveAdpHistory() {
+async function initDb() {
+  if (!db) return;
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS adp_snapshots (
+      ts BIGINT PRIMARY KEY,
+      adp_map JSONB NOT NULL
+    )
+  `);
+}
+
+// ── ADP history (persists to Postgres, falls back to file) ────────────────────
+let adpHistory = [];
+
+async function loadAdpHistory() {
+  if (db) {
+    try {
+      const { rows } = await db.query('SELECT ts, adp_map FROM adp_snapshots ORDER BY ts ASC');
+      adpHistory = rows.map(r => ({ ts: Number(r.ts), adpMap: r.adp_map }));
+      return;
+    } catch (e) { console.error('DB load failed, falling back to file:', e.message); }
+  }
+  try { adpHistory = JSON.parse(fs.readFileSync(ADP_HIST_FILE, 'utf8')); } catch {}
+}
+
+async function saveAdpSnapshot(ts, adpMap) {
+  if (db) {
+    try {
+      await db.query(
+        'INSERT INTO adp_snapshots (ts, adp_map) VALUES ($1, $2) ON CONFLICT (ts) DO NOTHING',
+        [ts, JSON.stringify(adpMap)]
+      );
+      // Prune old rows beyond 720
+      await db.query(`
+        DELETE FROM adp_snapshots WHERE ts NOT IN (
+          SELECT ts FROM adp_snapshots ORDER BY ts DESC LIMIT 720
+        )
+      `);
+      return;
+    } catch (e) { console.error('DB save failed, falling back to file:', e.message); }
+  }
   try { fs.writeFileSync(ADP_HIST_FILE, JSON.stringify(adpHistory)); } catch {}
 }
 
@@ -106,7 +145,7 @@ async function fetchMFLAdp() {
   // Store ADP snapshot for history (max 720 points = 30 days hourly)
   adpHistory.push({ ts: now, adpMap: { ...adpMap } });
   if (adpHistory.length > 720) adpHistory = adpHistory.slice(-720);
-  saveAdpHistory();
+  await saveAdpSnapshot(now, adpMap);
 
   return adpMap;
 }
@@ -150,4 +189,7 @@ app.get('/api/adp/last-updated', (req, res) => {
   res.json({ ts: cache.__mfl?.ts || null });
 });
 
-app.listen(PORT, () => console.log(`Rankings app running on port ${PORT}`));
+initDb()
+  .then(() => loadAdpHistory())
+  .then(() => app.listen(PORT, () => console.log(`Rankings app running on port ${PORT}`)))
+  .catch(err => { console.error('Startup error:', err); process.exit(1); });
