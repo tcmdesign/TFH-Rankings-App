@@ -276,6 +276,27 @@ td { padding: 10px 12px; vertical-align: middle; }
   letter-spacing: 0.5px; padding: 2px 7px; border-radius: 4px; color: #000;
 }
 
+/* ── Custom order indicator ── */
+.btn.reset-glow {
+  border-color: var(--red);
+  color: var(--red);
+  background: var(--red-dim);
+  box-shadow: 0 0 8px var(--red-glow);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 6px var(--red-glow); }
+  50%       { box-shadow: 0 0 14px var(--red-glow); }
+}
+.custom-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+  color: var(--red); background: var(--red-dim);
+  border: 1px solid rgba(229,34,34,0.3);
+  padding: 3px 8px; border-radius: 4px;
+  display: none;
+}
+.custom-badge.show { display: inline-block; }
+
 /* ── Cheat sheet print ───────────────────────────────────────────────────── */
 @media print {
   body { background: #fff; color: #000; display: block; height: auto; overflow: visible; }
@@ -364,6 +385,7 @@ td { padding: 10px 12px; vertical-align: middle; }
       Copy Shareable Link
     </button>
     <span class="copy-feedback" id="copyFeedback">Link copied!</span>
+    <span class="custom-badge" id="customBadge">Custom Order</span>
     <span class="spacer"></span>
     <span class="player-count" id="playerCount"></span>
   </div>
@@ -392,6 +414,22 @@ let state = {
   checked: new Set(),
   custom:  false,
 };
+// Persist custom order per tab so switching tabs doesn't lose customizations
+const tabOrders = {};
+function tabKey() { return `${state.mode}_${state.pos}`; }
+function saveTabOrder() {
+  if (state.custom) tabOrders[tabKey()] = { order: [...state.order], custom: true };
+}
+function restoreTabOrder() {
+  const saved = tabOrders[tabKey()];
+  if (saved && saved.order.length === state.data.length) {
+    state.order  = saved.order;
+    state.custom = true;
+  } else {
+    state.order  = state.data.map((_, i) => i);
+    state.custom = false;
+  }
+}
 
 // ── URL state ────────────────────────────────────────────────────────────────
 function loadFromURL() {
@@ -408,6 +446,7 @@ document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
   el.addEventListener('click', () => {
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
+    saveTabOrder();
     state.mode    = el.dataset.mode;
     state.custom  = false;
     state.checked = new Set();
@@ -423,6 +462,7 @@ document.querySelectorAll('.pos-tab').forEach(el => {
     if (el.classList.contains('disabled')) return;
     document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
+    saveTabOrder();
     state.pos     = el.dataset.pos;
     state.custom  = false;
     state.checked = new Set();
@@ -460,8 +500,7 @@ async function loadRankings() {
   try {
     const res   = await fetch(`/api/rankings/${state.mode}/${state.pos}`);
     state.data  = await res.json();
-    state.order = state.custom && state.order.length === state.data.length
-      ? state.order : state.data.map((_, i) => i);
+    restoreTabOrder();
     renderTable();
     updateLastUpdated();
   } catch {
@@ -565,38 +604,59 @@ function renderTable() {
 
   initDragDrop();
   loadPhotos();
+  updateCustomIndicator();
+}
+
+function updateCustomIndicator() {
+  const resetBtn   = document.querySelector('.btn[onclick="resetOrder()"]');
+  const customBadge = document.getElementById('customBadge');
+  if (state.custom) {
+    resetBtn?.classList.add('reset-glow');
+    customBadge?.classList.add('show');
+  } else {
+    resetBtn?.classList.remove('reset-glow');
+    customBadge?.classList.remove('show');
+  }
 }
 
 // ── Photos ───────────────────────────────────────────────────────────────────
 async function loadPhotos() {
-  const imgs = document.querySelectorAll('.player-photo[data-name]');
-  for (const img of imgs) {
+  const photoCache = window._photoCache = window._photoCache || {};
+  const imgs = [...document.querySelectorAll('.player-photo[data-name]')];
+  await Promise.allSettled(imgs.map(async img => {
     const name = img.dataset.name;
     const slug = img.dataset.slug;
-    if (!name) continue;
-    try {
-      const res  = await fetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&type=player&sport=football&limit=5`);
-      const json = await res.json();
-      const hits = (json.results || []).flatMap(g => g.contents || []);
-      for (const h of hits) {
-        const m = (h.uid || '').match(/a:(\d+)/);
-        if (!m) continue;
-        const id = m[1];
-        for (const league of ['nfl', 'college-football']) {
-          const url = `https://a.espncdn.com/combiner/i?img=/i/headshots/${league}/players/full/${id}.png&w=350&h=254`;
-          img.src = url;
-          img.style.display = 'block';
-          img.onload = () => {
-            const init = document.querySelector(`.photo-initials[data-init="${slug}"]`);
-            if (init) init.style.display = 'none';
-          };
-          img.onerror = () => { img.style.display = 'none'; };
+    if (!name) return;
+    // Use cache to avoid re-fetching same player
+    let url = photoCache[name];
+    if (!url) {
+      try {
+        const res  = await fetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&type=player&sport=football&limit=5`);
+        const json = await res.json();
+        const hits = (json.results || []).flatMap(g => g.contents || []);
+        for (const h of hits) {
+          const m = (h.uid || '').match(/a:(\d+)/);
+          if (!m) continue;
+          const id = m[1];
+          for (const league of ['nfl', 'college-football']) {
+            url = `https://a.espncdn.com/combiner/i?img=/i/headshots/${league}/players/full/${id}.png&w=350&h=254`;
+            break;
+          }
           break;
         }
-        break;
-      }
-    } catch {}
-  }
+        if (url) photoCache[name] = url;
+      } catch {}
+    }
+    if (url) {
+      img.src = url;
+      img.style.display = 'block';
+      img.onload = () => {
+        const init = document.querySelector(`.photo-initials[data-init="${slug}"]`);
+        if (init) init.style.display = 'none';
+      };
+      img.onerror = () => { img.style.display = 'none'; };
+    }
+  }));
 }
 
 // ── Drag to reorder ──────────────────────────────────────────────────────────
@@ -630,6 +690,7 @@ function initDragDrop() {
       newOrder.splice(to, 0, moved);
       state.order  = newOrder;
       state.custom = true;
+      tabOrders[tabKey()] = { order: [...state.order], custom: true };
       renderTable();
     });
   });
@@ -645,6 +706,7 @@ function toggleStar(idx, btn) {
 function resetOrder() {
   state.order  = state.data.map((_, i) => i);
   state.custom = false;
+  delete tabOrders[tabKey()];
   renderTable();
 }
 
