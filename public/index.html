@@ -951,8 +951,7 @@ function renderPanel(name, scout, injury, rank, adp, history) {
           <div class="panel-name">${name}</div>
           <div class="panel-meta">
             <span class="panel-pos-badge" style="background:${posColor}">${posAbbr}</span>
-            ${team}
-            ${abbrev ? `<img class="panel-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${abbrev}.png" onerror="this.style.display='none'" alt="${abbrev}">` : ''}
+            ${abbrev ? `<span style="font-weight:600;color:var(--text2)">${abbrev}</span>` : (team || '')}
           </div>
           ${school ? `<div style="font-size:11px;color:var(--muted);margin-top:5px">${school}</div>` : ''}
         </div>
