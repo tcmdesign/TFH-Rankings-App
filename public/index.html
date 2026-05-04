@@ -80,32 +80,26 @@ body {
   font-size: 13px; font-weight: 500;
   color: var(--sub);
   cursor: pointer;
+  margin: 1px 0;
   border-radius: 0;
-  margin: 1px 8px;
-  border-radius: 6px;
   transition: all 0.15s;
   user-select: none;
   position: relative;
 }
-.sidebar-item:hover:not(.disabled) { color: var(--text); background: rgba(255,255,255,0.04); }
+.sidebar-item:hover:not(.disabled) { color: var(--text); background: rgba(255,255,255,0.03); }
 .sidebar-item.active {
   color: #fff;
-  background: var(--red-dim);
   font-weight: 600;
+  background: linear-gradient(90deg, rgba(229,34,34,0.22) 0%, rgba(229,34,34,0.06) 50%, transparent 100%);
 }
 .sidebar-item.active::before {
   content: '';
   position: absolute;
-  left: -8px; top: 50%; transform: translateY(-50%);
-  width: 3px; height: 20px;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
   background: var(--red);
-  border-radius: 0 2px 2px 0;
 }
-.sidebar-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--muted); flex-shrink: 0; transition: background 0.15s;
-}
-.sidebar-item.active .sidebar-dot { background: var(--red); }
+.sidebar-dot { display: none; }
 .sidebar-soon {
   font-size: 9px; font-weight: 600; letter-spacing: 0.5px;
   color: var(--muted); margin-left: auto;
