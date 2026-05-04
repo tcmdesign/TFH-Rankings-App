@@ -27,23 +27,23 @@
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
 
 /* ── Sidebar ── */
-.sidebar{width:168px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar{width:200px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
 .sidebar-brand{padding:16px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
 .brand-icon{
   width:36px;height:36px;border-radius:8px;
   background:rgba(232,23,42,0.1);border:1px solid rgba(232,23,42,0.5);
   box-shadow:0 0 12px rgba(232,23,42,0.2),inset 0 0 8px rgba(232,23,42,0.05);
   display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red2);flex-shrink:0;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red2);flex-shrink:0;
 }
 .brand-text{line-height:1.2}
-.brand-name{font-size:13px;font-weight:700;color:var(--text)}
-.brand-sub{font-size:9px;font-weight:500;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:1px}
+.brand-name{font-size:15px;font-weight:700;color:var(--text)}
+.brand-sub{font-size:11px;font-weight:500;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:1px}
 .sidebar-section{padding:18px 0 4px}
-.sidebar-label{font-size:9px;font-weight:600;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;padding:0 16px 6px}
+.sidebar-label{font-size:11px;font-weight:600;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;padding:0 16px 6px}
 .sidebar-item{
   display:flex;align-items:center;gap:8px;padding:7px 10px;
-  font-size:12px;font-weight:500;color:var(--text2);
+  font-size:14px;font-weight:500;color:var(--text2);
   cursor:pointer;margin:1px 0;border-radius:0;
   transition:all 0.15s;user-select:none;position:relative;
 }
@@ -58,7 +58,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 }
 .sidebar-dot{display:none}
 .sidebar-soon{
-  font-size:8px;font-weight:700;letter-spacing:0.5px;color:var(--text3);
+  font-size:10px;font-weight:700;letter-spacing:0.5px;color:var(--text3);
   margin-left:auto;background:var(--bg4);border:1px solid var(--border);
   padding:2px 5px;border-radius:4px;text-transform:uppercase;
 }
@@ -73,10 +73,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;
 }
 .topbar-left{}
-.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:0.5px;line-height:1;color:var(--text)}
-.topbar-sub{font-size:11px;color:var(--text3);margin-top:3px;margin-bottom:12px}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.5px;line-height:1;color:var(--text)}
+.topbar-sub{font-size:13px;color:var(--text3);margin-top:3px;margin-bottom:12px}
 .topbar-right{display:flex;align-items:center;gap:6px;padding-top:6px}
-.last-updated{font-size:11px;color:var(--text3)}
+.last-updated{font-size:13px;color:var(--text3)}
 
 /* ── Position tabs ── */
 .pos-bar{
@@ -85,7 +85,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 }
 .pos-tab{
   padding:6px 16px;border-radius:6px 6px 0 0;
-  font-size:11px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;
+  font-size:13px;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;
   cursor:pointer;transition:all 0.15s;user-select:none;
   background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-bottom:none;
   color:var(--text3);position:relative;overflow:hidden;margin-top:8px;
@@ -121,7 +121,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 /* ── Buttons ── */
 .btn{
   display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:7px;
-  font-size:11px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;
+  font-size:13px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;
   cursor:pointer;transition:all 0.18s ease;white-space:nowrap;
   position:relative;overflow:hidden;
   background:rgba(255,255,255,0.04);color:var(--text2);border:1px solid rgba(255,255,255,0.1);
@@ -144,8 +144,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 }
 .btn svg{flex-shrink:0}
 .spacer{flex:1}
-.player-count{font-size:12px;color:var(--text3);font-weight:500}
-.copy-feedback{font-size:11px;color:var(--green);opacity:0;transition:opacity 0.3s}
+.player-count{font-size:14px;color:var(--text3);font-weight:500}
+.copy-feedback{font-size:13px;color:var(--green);opacity:0;transition:opacity 0.3s}
 .copy-feedback.show{opacity:1}
 .btn.reset-glow{
   border-color:rgba(232,23,42,0.7);color:var(--red2);
@@ -157,23 +157,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   50%{box-shadow:0 0 18px rgba(232,23,42,0.45)}
 }
 .custom-badge{
-  font-size:10px;font-weight:700;letter-spacing:0.5px;
+  font-size:12px;font-weight:700;letter-spacing:0.5px;
   color:var(--red2);background:var(--red-dim);
   border:1px solid rgba(232,23,42,0.3);
   padding:3px 8px;border-radius:4px;display:none;
 }
 .custom-badge.show{display:inline-block}
 
+/* ── Content row ── */
+.content-row{display:flex;flex:1;overflow:hidden}
+
 /* ── Table ── */
-.table-wrap{flex:1;overflow-y:auto;padding:8px 12px}
+.table-wrap{flex:1;min-width:0;overflow-y:auto;padding:8px 12px}
 .coming-soon-msg{
   display:flex;align-items:center;justify-content:center;
-  height:200px;font-size:12px;color:var(--text3);
+  height:200px;font-size:14px;color:var(--text3);
   letter-spacing:1px;text-transform:uppercase;
 }
 table{width:100%;border-collapse:separate;border-spacing:0 2px}
 thead th{
-  font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;
+  font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;
   padding:8px 8px;text-align:left;
   border-bottom:1px solid var(--border);
   position:sticky;top:0;background:var(--bg);z-index:1;
@@ -197,7 +200,7 @@ td{padding:7px 8px;vertical-align:middle}
 .rank-circle{
   width:28px;height:28px;border-radius:7px;
   display:inline-flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:15px;
+  font-family:'Bebas Neue',sans-serif;font-size:17px;
   background:var(--bg3);border:1px solid var(--border);color:var(--text2);
 }
 .rank-1{background:rgba(232,23,42,0.12);border-color:rgba(232,23,42,0.5);color:var(--red2);box-shadow:0 0 10px rgba(232,23,42,0.25)}
@@ -220,24 +223,24 @@ td{padding:7px 8px;vertical-align:middle}
   width:38px;height:38px;border-radius:50%;
   background:var(--bg4);border:1.5px solid var(--border);
   display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;color:var(--text3);
+  font-size:15px;font-weight:700;color:var(--text3);
 }
 .player-cell{min-width:120px}
-.player-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
-.player-meta{font-size:10px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:4px}
-.pos-badge{display:inline-block;font-size:9px;font-weight:800;letter-spacing:0.5px;padding:1px 5px;border-radius:3px}
+.player-name{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.player-meta{font-size:12px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:4px}
+.pos-badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:0.5px;padding:1px 5px;border-radius:3px}
 .pos-qb{background:rgba(232,23,42,0.2);color:var(--red2)}
 .pos-rb{background:rgba(0,217,122,0.15);color:var(--green)}
 .pos-wr{background:rgba(74,158,255,0.15);color:var(--blue)}
 .pos-te{background:rgba(155,109,255,0.15);color:var(--purple)}
 .pos-k {background:rgba(255,140,0,0.15);color:var(--orange)}
 .adp-cell{width:80px;text-align:center}
-.adp-val{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--text2)}
-.adp-none{font-size:12px;color:var(--text3)}
+.adp-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text2)}
+.adp-none{font-size:14px;color:var(--text3)}
 .team-cell{width:90px}
 .team-inner{display:flex;align-items:center;gap:6px}
 .team-logo{width:22px;height:22px;object-fit:contain}
-.team-abbrev{font-size:11px;font-weight:600;color:var(--text2)}
+.team-abbrev{font-size:13px;font-weight:600;color:var(--text2)}
 .pos-dot{display:none}
 
 /* ── Print ── */
@@ -245,7 +248,7 @@ td{padding:7px 8px;vertical-align:middle}
   body{background:#fff;color:#000;display:block;height:auto;overflow:visible}
   .sidebar,.topbar,.pos-bar,.action-bar,.bottom-nav,.player-panel{display:none!important}
   .main{overflow:visible}.table-wrap{overflow:visible;padding:0}
-  table{font-size:11px;border-collapse:collapse}
+  table{font-size:13px;border-collapse:collapse}
   .drag-cell,.check-cell{display:none}
   .rank-circle{background:#eee!important;color:#000!important;border:1px solid #ccc!important;box-shadow:none!important}
   .player-name{color:#000}.player-meta,.adp-val,.team-abbrev{color:#555}
@@ -262,7 +265,7 @@ td{padding:7px 8px;vertical-align:middle}
 }
 .bottom-nav-item{
   display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:6px;
-  font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
+  font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
   color:var(--text3);cursor:pointer;border:1px solid transparent;transition:all 0.15s;user-select:none;
 }
 .bottom-nav-item:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);color:var(--text2)}
@@ -273,13 +276,16 @@ td{padding:7px 8px;vertical-align:middle}
 
 /* ── Player panel ── */
 .player-panel{
-  position:fixed;top:0;right:-320px;width:300px;height:100vh;
+  width:340px;flex-shrink:0;
   background:var(--bg2);border-left:1px solid var(--border);
-  display:flex;flex-direction:column;
-  transition:right 0.28s cubic-bezier(0.4,0,0.2,1);
-  z-index:100;overflow-y:auto;
+  display:flex;flex-direction:column;overflow-y:auto;
 }
-.player-panel.open{right:0}
+.panel-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:24px;text-align:center;color:var(--text3);
+}
+.panel-empty svg{opacity:0.18}
+.panel-empty-text{font-size:14px;line-height:1.6;letter-spacing:0.3px}
 .panel-close{
   position:absolute;top:12px;right:12px;
   background:none;border:none;cursor:pointer;color:var(--text3);
@@ -306,55 +312,55 @@ td{padding:7px 8px;vertical-align:middle}
   width:56px;height:56px;border-radius:10px;background:var(--bg4);
   border:2px solid rgba(232,23,42,0.3);box-shadow:0 0 20px rgba(232,23,42,0.2);
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;font-weight:700;color:var(--text3);flex-shrink:0;
+  font-size:20px;font-weight:700;color:var(--text3);flex-shrink:0;
 }
 .panel-name-block{flex:1;padding-top:2px}
-.panel-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.5px;line-height:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.panel-meta{font-size:11px;color:var(--text2);margin-top:5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.panel-pos-badge{font-size:10px;font-weight:800;letter-spacing:0.5px;padding:2px 6px;border-radius:3px;color:#fff}
+.panel-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.5px;line-height:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.panel-meta{font-size:13px;color:var(--text2);margin-top:5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.panel-pos-badge{font-size:12px;font-weight:800;letter-spacing:0.5px;padding:2px 6px;border-radius:3px;color:#fff}
 .panel-team-logo{width:16px;height:16px;object-fit:contain}
 .panel-ranks{display:flex;gap:6px;margin-top:12px;position:relative}
 .panel-rank-box{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 8px;text-align:center}
-.panel-rank-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);line-height:1}
+.panel-rank-val{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--text);line-height:1}
 .panel-rank-val.red{color:var(--red2)}
-.panel-rank-lbl{font-size:8px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:4px}
+.panel-rank-lbl{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:4px}
 .score-wheels{display:flex;justify-content:space-around;align-items:flex-start;padding:16px;border-bottom:1px solid var(--border)}
 .score-wheel{display:flex;flex-direction:column;align-items:center;gap:8px}
 .wheel-wrap{position:relative;width:80px;height:80px}
 .wheel-wrap svg{width:80px;height:80px}
 .wheel-track{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:5}
 .wheel-arc{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset 0.6s ease}
-.wheel-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text)}
-.wheel-lbl{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase}
+.wheel-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text)}
+.wheel-lbl{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase}
 .panel-section{padding:14px 16px;border-bottom:1px solid var(--border)}
-.panel-section-title{font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.panel-section-title{font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .panel-chart-wrap{position:relative;height:130px}
-.panel-chart-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;height:130px;font-size:11px;color:var(--text3);text-align:center;line-height:1.5}
+.panel-chart-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;height:130px;font-size:13px;color:var(--text3);text-align:center;line-height:1.5}
 .panel-draft-info{display:flex;gap:6px}
 .panel-draft-box{flex:1;background:var(--bg3);border-radius:6px;padding:8px 10px;text-align:center}
-.panel-draft-val{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--text)}
-.panel-draft-lbl{font-size:9px;font-weight:600;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:3px}
+.panel-draft-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text)}
+.panel-draft-lbl{font-size:11px;font-weight:600;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:3px}
 .panel-bullets{list-style:none;display:flex;flex-direction:column;gap:6px}
-.panel-bullets li{font-size:11px;color:var(--text2);line-height:1.4;padding-left:14px;position:relative}
+.panel-bullets li{font-size:13px;color:var(--text2);line-height:1.4;padding-left:14px;position:relative}
 .panel-bullets li::before{content:'';position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%}
 .panel-bullets.strengths li::before{background:var(--green);box-shadow:0 0 6px rgba(0,217,122,0.5)}
 .panel-bullets.weaknesses li::before{background:var(--red2);box-shadow:0 0 6px rgba(232,23,42,0.35)}
-.panel-outlook{font-size:12px;color:var(--text2);line-height:1.6}
+.panel-outlook{font-size:14px;color:var(--text2);line-height:1.6}
 .panel-depth{display:flex;flex-direction:column;gap:4px}
-.panel-depth-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--bg3);font-size:12px}
-.depth-pos{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--text3);width:16px}
-.depth-name{flex:1;font-weight:600;color:var(--text)}.depth-meta{font-size:10px;color:var(--text3)}
+.panel-depth-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;background:var(--bg3);font-size:14px}
+.depth-pos{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text3);width:16px}
+.depth-name{flex:1;font-weight:600;color:var(--text)}.depth-meta{font-size:12px;color:var(--text3)}
 .panel-injury-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:7px}
-.panel-injury-year{font-size:10px;font-weight:700;color:var(--red2);background:var(--red-dim);border:1px solid rgba(232,23,42,0.25);padding:2px 6px;border-radius:3px;flex-shrink:0;white-space:nowrap}
-.panel-injury-desc{font-size:11px;color:var(--text2);line-height:1.5}
-.panel-risk-badge{font-size:9px;font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:3px}
+.panel-injury-year{font-size:12px;font-weight:700;color:var(--red2);background:var(--red-dim);border:1px solid rgba(232,23,42,0.25);padding:2px 6px;border-radius:3px;flex-shrink:0;white-space:nowrap}
+.panel-injury-desc{font-size:13px;color:var(--text2);line-height:1.5}
+.panel-risk-badge{font-size:11px;font-weight:700;letter-spacing:0.5px;padding:2px 7px;border-radius:3px}
 .risk-low{background:rgba(0,217,122,0.15);color:var(--green)}
 .risk-moderate{background:rgba(255,215,0,0.15);color:#FFD700}
 .risk-high{background:rgba(232,23,42,0.15);color:var(--red2)}
 .panel-mini-stats{display:flex;gap:6px;margin-top:10px}
 .panel-mini-box{flex:1;text-align:center;background:var(--bg3);border-radius:5px;padding:7px 4px}
-.panel-mini-val{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--text)}
-.panel-mini-lbl{font-size:8px;font-weight:600;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:2px}
+.panel-mini-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text)}
+.panel-mini-lbl{font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:2px}
 </style>
 </head>
 <body>
@@ -432,9 +438,23 @@ td{padding:7px 8px;vertical-align:middle}
     <span class="player-count" id="playerCount"></span>
   </div>
 
-  <!-- Table -->
-  <div class="table-wrap">
-    <div id="tableContainer"></div>
+  <!-- Table + Panel -->
+  <div class="content-row">
+    <div class="table-wrap">
+      <div id="tableContainer"></div>
+    </div>
+
+    <!-- Player Panel -->
+    <div class="player-panel" id="playerPanel">
+      <div class="panel-empty" id="panelEmpty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>
+        <div class="panel-empty-text">Select a player<br>to view details</div>
+      </div>
+      <button class="panel-close" id="panelClose" onclick="closePanel()" style="display:none" title="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div id="panelContent"></div>
+    </div>
   </div>
 
 </div>
@@ -776,7 +796,13 @@ let panelChart = null;
 let selectedRow = null;
 
 function closePanel() {
-  document.getElementById('playerPanel').classList.remove('open');
+  const empty = document.getElementById('panelEmpty');
+  const close = document.getElementById('panelClose');
+  const content = document.getElementById('panelContent');
+  if (empty) empty.style.display = 'flex';
+  if (close) close.style.display = 'none';
+  if (content) content.innerHTML = '';
+  if (panelChart) { panelChart.destroy(); panelChart = null; }
   if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
 }
 
@@ -786,8 +812,11 @@ async function openPanel(playerName, row) {
   if (selectedRow) selectedRow.classList.remove('selected');
   selectedRow = row;
   row.classList.add('selected');
-  document.getElementById('playerPanel').classList.add('open');
-  document.getElementById('panelContent').innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--muted);font-size:12px">Loading...</div>';
+  const empty = document.getElementById('panelEmpty');
+  const close = document.getElementById('panelClose');
+  if (empty) empty.style.display = 'none';
+  if (close) close.style.display = 'block';
+  document.getElementById('panelContent').innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--text3);font-size:12px">Loading...</div>';
 
   const [detailRes, historyRes] = await Promise.all([
     fetch(`/api/player/${encodeURIComponent(playerName)}`),
@@ -1094,13 +1123,6 @@ if (activePosEl) {
 loadRankings();
 </script>
 
-<!-- Player Panel -->
-<div class="player-panel" id="playerPanel">
-  <button class="panel-close" onclick="closePanel()">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-  </button>
-  <div id="panelContent"></div>
-</div>
 
 </body>
 </html>
