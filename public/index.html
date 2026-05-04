@@ -687,7 +687,7 @@ function renderTable() {
       </td>
       <td class="player-cell">
         <div class="player-name">${p.Player || '—'}</div>
-        <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team}` : ''}</div>
+        <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team.toUpperCase()}` : ''}</div>
       </td>
       <td class="adp-cell source-col">${adpHtml}</td>
       <td class="adp-cell source-col">${p.sleeperAdp
@@ -951,7 +951,7 @@ function renderPanel(name, scout, injury, rank, adp, history) {
           <div class="panel-name">${name}</div>
           <div class="panel-meta">
             <span class="panel-pos-badge" style="background:${posColor}">${posAbbr}</span>
-            ${abbrev ? `<span style="font-weight:600;color:var(--text2)">${abbrev}</span>` : (team || '')}
+            ${abbrev ? `<span style="font-weight:600;color:var(--text2)">${abbrev.toUpperCase()}</span>` : (team ? `<span style="font-weight:600;color:var(--text2)">${team.toUpperCase()}</span>` : '')}
           </div>
           ${school ? `<div style="font-size:11px;color:var(--muted);margin-top:5px">${school}</div>` : ''}
         </div>
