@@ -895,11 +895,13 @@ async function printCheatSheet() {
   const buildSection = ({ pos, rows }) => {
     const hd = `<div class="cs-hd" style="background:${posColors[pos]}">${pos}</div>`;
     if (!rows.length) return `<div class="cs-section">${hd}<p class="cs-empty">Rankings coming soon</p></div>`;
-    const adpHead = format.startsWith('dynasty') ? 'Dyn ADP' : 'ADP';
-    const thead = `<tr><th class="tc">#</th><th>Player</th><th>Tm</th><th class="tc">${adpHead}</th></tr>`;
-    const tbody = rows.map((r, i) => {
-      const adp = r.sleeperAdp || r.adp || '—';
-      return `<tr><td class="tc">${i + 1}</td><td>${r.Player || '—'}</td><td>${(r.Team || '').toUpperCase()}</td><td class="tc">${adp}</td></tr>`;
+    // Apply any saved custom order for this position
+    const savedOrder = tabOrders[`${format}_${pos}`];
+    const ordered = savedOrder ? savedOrder.order.map(i => rows[i]).filter(Boolean) : rows;
+    const thead = `<tr><th class="tc">#</th><th>Player</th><th class="tc">Pos</th><th class="tc">Tm</th></tr>`;
+    const tbody = ordered.map((r, i) => {
+      const posVal = (r.Pos || pos).toUpperCase();
+      return `<tr><td class="tc">${i + 1}</td><td>${r.Player || '—'}</td><td class="tc">${posVal}</td><td class="tc">${(r.Team || '').toUpperCase()}</td></tr>`;
     }).join('');
     return `<div class="cs-section">${hd}<table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
   };
@@ -937,7 +939,7 @@ tbody tr.checked-row td{opacity:0.35;text-decoration:line-through}
   <div class="grid">${results.map(buildSection).join('')}</div>
   <div class="footer">
     <span>TheFantasyHeadliners.com</span>
-    <span>ADP via Sleeper · ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>
+    <span>Generated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>
   </div>
 </div>
 <script>window.onload=function(){window.print();}<\/script>
