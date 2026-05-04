@@ -122,15 +122,17 @@ async function fetchSleeperAdpMap() {
   const now = Date.now();
   if (cache.__sleeperAdp && now - cache.__sleeperAdp.ts < TTL) return cache.__sleeperAdp.data;
   try {
-    const url = 'https://api.sleeper.com/projections/nfl/2026?season_type=regular&position[]=QB&position[]=RB&position[]=TE&position[]=WR&order_by=adp_ppr';
+    const url = 'https://api.sleeper.com/projections/nfl/2026?season_type=regular&position[]=QB&position[]=RB&position[]=TE&position[]=WR&order_by=adp_dynasty_2qb';
     const res  = await fetch(url);
     const json = await res.json();
     const adpMap = {};
     (Array.isArray(json) ? json : []).forEach(entry => {
-      const adp = entry.stats?.adp_ppr;
-      if (!adp || adp >= 999) return;
+      const s = entry.stats || {};
+      const ppr         = s.adp_ppr         < 999 ? parseFloat(s.adp_ppr).toFixed(1)         : null;
+      const dynastyPpr  = s.adp_dynasty_ppr  < 999 ? parseFloat(s.adp_dynasty_ppr).toFixed(1)  : null;
+      if (!ppr && !dynastyPpr) return;
       const name = `${entry.player?.first_name || ''} ${entry.player?.last_name || ''}`.trim().toLowerCase();
-      if (name) adpMap[name] = parseFloat(adp).toFixed(1);
+      if (name) adpMap[name] = { ppr, dynastyPpr };
     });
     cache.__sleeperAdp = { ts: now, data: adpMap };
     return adpMap;
@@ -149,11 +151,14 @@ app.get('/api/rankings/:mode/:pos', async (req, res) => {
   if (!tableId) return res.status(400).json({ error: 'Invalid mode or position' });
   try {
     const [data, adpMap, sleeperAdpMap] = await Promise.all([fetchTable(tableId), fetchAdpMap(), fetchSleeperAdpMap()]);
-    const enriched = data.map(p => ({
-      ...p,
-      adp:        adpMap[(p.Player || '').toLowerCase()]        || null,
-      sleeperAdp: sleeperAdpMap[(p.Player || '').toLowerCase()] || null,
-    }));
+    const enriched = data.map(p => {
+      const sleeperEntry = sleeperAdpMap[(p.Player || '').toLowerCase()];
+      return {
+        ...p,
+        adp:        adpMap[(p.Player || '').toLowerCase()] || null,
+        sleeperAdp: sleeperEntry ? (mode === 'dynasty' ? sleeperEntry.dynastyPpr : sleeperEntry.ppr) : null,
+      };
+    });
     res.json(enriched);
   } catch (err) {
     console.error(err);
