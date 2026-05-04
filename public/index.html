@@ -870,7 +870,83 @@ function copyLink() {
   setTimeout(() => fb.classList.remove('show'), 2000);
 }
 
-function printCheatSheet() { window.print(); }
+async function printCheatSheet() {
+  const btn = document.querySelector('.btn.primary[onclick="printCheatSheet()"]');
+  const origText = btn?.innerHTML;
+  if (btn) btn.innerHTML = 'Loading…';
+
+  const positions = ['QB', 'RB', 'WR', 'TE'];
+  const format     = state.format;
+  const mode       = state.mode;
+  const formatLabel = FORMAT_CONFIG[format]?.label || '';
+
+  const results = await Promise.all(positions.map(async pos => {
+    if (!POPULATED[mode]?.[pos]) return { pos, rows: [] };
+    try {
+      const res = await fetch(`/api/rankings/${mode}/${pos}?format=${format}`);
+      return { pos, rows: await res.json() };
+    } catch { return { pos, rows: [] }; }
+  }));
+
+  if (btn) btn.innerHTML = origText;
+
+  const posColors = { QB: '#b91c1c', RB: '#166534', WR: '#1d4ed8', TE: '#b45309' };
+
+  const buildSection = ({ pos, rows }) => {
+    const hd = `<div class="cs-hd" style="background:${posColors[pos]}">${pos}</div>`;
+    if (!rows.length) return `<div class="cs-section">${hd}<p class="cs-empty">Rankings coming soon</p></div>`;
+    const adpHead = format.startsWith('dynasty') ? 'Dyn ADP' : 'ADP';
+    const thead = `<tr><th class="tc">#</th><th>Player</th><th>Tm</th><th class="tc">${adpHead}</th></tr>`;
+    const tbody = rows.map((r, i) => {
+      const adp = r.sleeperAdp || r.adp || '—';
+      return `<tr><td class="tc">${i + 1}</td><td>${r.Player || '—'}</td><td>${(r.Team || '').toUpperCase()}</td><td class="tc">${adp}</td></tr>`;
+    }).join('');
+    return `<div class="cs-section">${hd}<table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
+  };
+
+  const html = `<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<title>TFH 2026 Rookie Rankings — ${formatLabel}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;font-size:8.5pt;color:#000;background:#fff}
+.page{padding:0.35in 0.35in 0.25in}
+.header{text-align:center;border-bottom:2.5px solid #000;padding-bottom:5pt;margin-bottom:9pt}
+.header h1{font-size:20pt;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;line-height:1.1}
+.header h2{font-size:10.5pt;font-weight:700;text-transform:uppercase;color:#444;margin-top:1pt}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16pt}
+.cs-section{margin-bottom:10pt;break-inside:avoid}
+.cs-hd{color:#fff;font-size:8pt;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2.5pt 5pt}
+.cs-empty{font-size:8pt;color:#888;padding:4pt 5pt;font-style:italic}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid #000}
+thead th{font-size:6.5pt;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;padding:2pt 4pt;background:#f2f2f2;text-align:left}
+thead th.tc{text-align:center}
+tbody td{font-size:8pt;padding:1.6pt 4pt;border-bottom:1px solid #ebebeb}
+tbody td.tc{text-align:center}
+tbody tr:nth-child(even){background:#f8f8f8}
+tbody tr.checked-row td{opacity:0.35;text-decoration:line-through}
+.footer{margin-top:6pt;border-top:1px solid #ccc;padding-top:3pt;font-size:6.5pt;color:#777;display:flex;justify-content:space-between}
+@media print{@page{size:letter portrait;margin:0}body{padding:0}}
+</style></head><body>
+<div class="page">
+  <div class="header">
+    <h1>TFH 2026 Rookie Rankings</h1>
+    <h2>${formatLabel}</h2>
+  </div>
+  <div class="grid">${results.map(buildSection).join('')}</div>
+  <div class="footer">
+    <span>TheFantasyHeadliners.com</span>
+    <span>ADP via Sleeper · ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>
+  </div>
+</div>
+<script>window.onload=function(){window.print();}<\/script>
+</body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
 
 
 // ── Player panel ──────────────────────────────────────────────────────────────
