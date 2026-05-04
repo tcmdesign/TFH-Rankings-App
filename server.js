@@ -116,6 +116,30 @@ async function fetchAdpMap() {
   return adpMap;
 }
 
+// ── Sleeper ADP ───────────────────────────────────────────────────────────────
+async function fetchSleeperAdpMap() {
+  const TTL = 5 * 60 * 1000;
+  const now = Date.now();
+  if (cache.__sleeperAdp && now - cache.__sleeperAdp.ts < TTL) return cache.__sleeperAdp.data;
+  try {
+    const url = 'https://api.sleeper.com/projections/nfl/2026?season_type=regular&position[]=QB&position[]=RB&position[]=TE&position[]=WR&order_by=adp_ppr';
+    const res  = await fetch(url);
+    const json = await res.json();
+    const adpMap = {};
+    (Array.isArray(json) ? json : []).forEach(entry => {
+      const adp = entry.stats?.adp_ppr;
+      if (!adp || adp >= 999) return;
+      const name = `${entry.player?.first_name || ''} ${entry.player?.last_name || ''}`.trim().toLowerCase();
+      if (name) adpMap[name] = parseFloat(adp).toFixed(1);
+    });
+    cache.__sleeperAdp = { ts: now, data: adpMap };
+    return adpMap;
+  } catch (e) {
+    console.error('Sleeper ADP fetch failed:', e.message);
+    return {};
+  }
+}
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -124,10 +148,11 @@ app.get('/api/rankings/:mode/:pos', async (req, res) => {
   const tableId = TABLES[mode]?.[pos];
   if (!tableId) return res.status(400).json({ error: 'Invalid mode or position' });
   try {
-    const [data, adpMap] = await Promise.all([fetchTable(tableId), fetchAdpMap()]);
+    const [data, adpMap, sleeperAdpMap] = await Promise.all([fetchTable(tableId), fetchAdpMap(), fetchSleeperAdpMap()]);
     const enriched = data.map(p => ({
       ...p,
-      adp: adpMap[(p.Player || '').toLowerCase()] || null,
+      adp:        adpMap[(p.Player || '').toLowerCase()]        || null,
+      sleeperAdp: sleeperAdpMap[(p.Player || '').toLowerCase()] || null,
     }));
     res.json(enriched);
   } catch (err) {

@@ -643,6 +643,9 @@ function renderTable() {
         <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team}` : ''}</div>
       </td>
       <td class="adp-cell source-col">${adpHtml}</td>
+      <td class="adp-cell source-col">${p.sleeperAdp
+        ? `<span class="adp-val">${p.sleeperAdp}</span>`
+        : `<span class="adp-none">—</span>`}</td>
     </tr>`;
   }).join('');
 
@@ -656,6 +659,7 @@ function renderTable() {
           <th style="width:48px"></th>
           <th>Player</th>
           <th class="source-col" style="width:80px">MFL ADP</th>
+          <th class="source-col" style="width:80px">Sleeper</th>
         </tr>
       </thead>
       <tbody id="rankingsTbody">${tbody}</tbody>
