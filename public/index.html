@@ -366,6 +366,27 @@ td.source-col{border-left:1px solid var(--border);background:rgba(74,158,255,0.0
 .panel-mini-box{flex:1;text-align:center;background:var(--bg3);border-radius:5px;padding:7px 4px}
 .panel-mini-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text)}
 .panel-mini-lbl{font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:2px}
+
+/* ── Format bar ── */
+.format-bar{
+  display:flex;align-items:center;gap:6px;padding:10px 24px;
+  border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2);
+}
+.format-group-label{font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--text3);text-transform:uppercase;margin-right:2px}
+.format-sep{width:1px;height:18px;background:var(--border2);margin:0 6px}
+.format-pill{
+  padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:0.4px;
+  cursor:pointer;transition:all 0.15s;white-space:nowrap;border:none;
+  background:rgba(255,255,255,0.04);color:var(--text3);
+  border:1px solid rgba(255,255,255,0.07);
+}
+.format-pill:hover{color:var(--text);background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.14)}
+.format-pill.active{
+  color:var(--red2);background:rgba(232,23,42,0.08);
+  border-color:rgba(232,23,42,0.45);
+  box-shadow:0 0 10px rgba(232,23,42,0.18);
+}
 </style>
 </head>
 <body>
@@ -381,20 +402,13 @@ td.source-col{border-left:1px solid var(--border);background:rgba(74,158,255,0.0
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-label">Redraft</div>
-    <div class="sidebar-item active" data-mode="redraft" data-label="Rookie Rankings" data-sub="2026 Redraft Rankings">
-      <span class="sidebar-dot"></span> Rookie Rankings
+    <div class="sidebar-label">2026 Season</div>
+    <div class="sidebar-item active" data-tool="rookie">
+      Rookie Rankings
     </div>
-    <div class="sidebar-item disabled" data-mode="redraft-bestball" data-label="Best Ball" data-sub="2026 Best Ball Rankings">
-      <span class="sidebar-dot"></span> Best Ball
+    <div class="sidebar-item disabled" data-tool="bestball">
+      Best Ball
       <span class="sidebar-soon">Soon</span>
-    </div>
-  </div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-label">Dynasty</div>
-    <div class="sidebar-item" data-mode="dynasty" data-label="Rookie Rankings" data-sub="2026 Dynasty Rankings">
-      <span class="sidebar-dot"></span> Rookie Rankings
     </div>
   </div>
 </aside>
@@ -406,11 +420,23 @@ td.source-col{border-left:1px solid var(--border);background:rgba(74,158,255,0.0
   <div class="topbar">
     <div class="topbar-left">
       <div class="topbar-title" id="topbarTitle">Rookie Rankings</div>
-      <div class="topbar-sub" id="topbarSub">2026 Redraft Rankings</div>
+      <div class="topbar-sub" id="topbarSub">2026 Dynasty · 1QB</div>
     </div>
     <div class="topbar-right">
       <span class="last-updated" id="lastUpdated"></span>
     </div>
+  </div>
+
+  <!-- Format bar -->
+  <div class="format-bar">
+    <span class="format-group-label">Dynasty</span>
+    <button class="format-pill active" data-format="dynasty_1qb">1QB</button>
+    <button class="format-pill" data-format="dynasty_2qb">SF / 2QB</button>
+    <div class="format-sep"></div>
+    <span class="format-group-label">Redraft</span>
+    <button class="format-pill" data-format="redraft_ppr">PPR</button>
+    <button class="format-pill" data-format="redraft_half">½ PPR</button>
+    <button class="format-pill" data-format="redraft_std">Standard</button>
   </div>
 
   <!-- Position tabs -->
@@ -472,8 +498,17 @@ const POPULATED = {
 
 const POS_COLORS = { QB: '#E52222', RB: '#00cc66', WR: '#00bfff', TE: '#ff8c00' };
 
+const FORMAT_CONFIG = {
+  dynasty_1qb:  { mode: 'dynasty',  label: '2026 Dynasty · 1QB'       },
+  dynasty_2qb:  { mode: 'dynasty',  label: '2026 Dynasty · SF / 2QB'  },
+  redraft_ppr:  { mode: 'redraft',  label: '2026 Redraft · PPR'       },
+  redraft_half: { mode: 'redraft',  label: '2026 Redraft · Half PPR'  },
+  redraft_std:  { mode: 'redraft',  label: '2026 Redraft · Standard'  },
+};
+
 let state = {
-  mode:    'redraft',
+  format:  'dynasty_1qb',
+  mode:    'dynasty',
   pos:     'QB',
   data:    [],
   order:   [],
@@ -483,7 +518,7 @@ let state = {
 };
 // Persist custom order per tab so switching tabs doesn't lose customizations
 const tabOrders = {};
-function tabKey() { return `${state.mode}_${state.pos}`; }
+function tabKey() { return `${state.format}_${state.pos}`; }
 function saveTabOrder() {
   if (state.custom) tabOrders[tabKey()] = { order: [...state.order], custom: true };
 }
@@ -501,8 +536,9 @@ function restoreTabOrder() {
 // ── URL state ────────────────────────────────────────────────────────────────
 function loadFromURL() {
   const p = new URLSearchParams(location.search);
-  if (p.has('mode'))    state.mode    = p.get('mode');
-  if (p.has('pos'))     state.pos     = p.get('pos');
+  if (p.has('format') && FORMAT_CONFIG[p.get('format')]) state.format = p.get('format');
+  if (p.has('pos'))     state.pos = p.get('pos');
+  state.mode = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
   if (p.has('order'))   try { state.order   = JSON.parse(atob(p.get('order'))); state.custom = true; } catch {}
   if (p.has('checked')) try { state.checked = new Set(JSON.parse(atob(p.get('checked')))); } catch {}
   if (p.has('starred')) try { state.starred = new Set(JSON.parse(atob(p.get('starred')))); } catch {}
@@ -513,12 +549,19 @@ document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
   el.addEventListener('click', () => {
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
+  });
+});
+
+document.querySelectorAll('.format-pill').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
     saveTabOrder();
-    state.mode    = el.dataset.mode;
+    state.format  = el.dataset.format;
+    state.mode    = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
     state.custom  = false;
     state.checked = new Set();
-    document.getElementById('topbarTitle').textContent = el.dataset.label;
-    document.getElementById('topbarSub').textContent   = el.dataset.sub;
+    document.getElementById('topbarSub').textContent = FORMAT_CONFIG[state.format]?.label || '';
     updatePosTabs();
     loadRankings();
   });
@@ -565,7 +608,7 @@ async function loadRankings() {
   }
   container.innerHTML = '<div class="coming-soon-msg">Loading...</div>';
   try {
-    const res   = await fetch(`/api/rankings/${state.mode}/${state.pos}`);
+    const res   = await fetch(`/api/rankings/${state.mode}/${state.pos}?format=${state.format}`);
     state.data  = await res.json();
     restoreTabOrder();
     renderTable();
@@ -782,8 +825,8 @@ function resetOrder() {
 
 function copyLink() {
   const p = new URLSearchParams();
-  p.set('mode', state.mode);
-  p.set('pos',  state.pos);
+  p.set('format', state.format);
+  p.set('pos',    state.pos);
   if (state.custom)           p.set('order',   btoa(JSON.stringify(state.order)));
   if (state.checked.size > 0) p.set('checked', btoa(JSON.stringify([...state.checked])));
   if (state.starred.size > 0) p.set('starred', btoa(JSON.stringify([...state.starred])));
@@ -1113,13 +1156,12 @@ function renderAdpChart(history) {
 loadFromURL();
 updatePosTabs();
 
-const activeSidebarEl = document.querySelector(`.sidebar-item[data-mode="${state.mode}"]`);
-if (activeSidebarEl) {
-  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-  activeSidebarEl.classList.add('active');
-  document.getElementById('topbarTitle').textContent = activeSidebarEl.dataset.label;
-  document.getElementById('topbarSub').textContent   = activeSidebarEl.dataset.sub;
-}
+// Activate format pill
+document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
+const activeFmt = document.querySelector(`.format-pill[data-format="${state.format}"]`);
+if (activeFmt) activeFmt.classList.add('active');
+document.getElementById('topbarSub').textContent = FORMAT_CONFIG[state.format]?.label || '';
+
 const activePosEl = document.querySelector(`.pos-tab[data-pos="${state.pos}"]`);
 if (activePosEl) {
   document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));

@@ -128,11 +128,17 @@ async function fetchSleeperAdpMap() {
     const adpMap = {};
     (Array.isArray(json) ? json : []).forEach(entry => {
       const s = entry.stats || {};
-      const ppr         = s.adp_ppr         < 999 ? parseFloat(s.adp_ppr).toFixed(1)         : null;
-      const dynastyPpr  = s.adp_dynasty_ppr  < 999 ? parseFloat(s.adp_dynasty_ppr).toFixed(1)  : null;
-      if (!ppr && !dynastyPpr) return;
+      const v = f => (f != null && f < 999) ? parseFloat(f).toFixed(1) : null;
+      const vals = {
+        ppr:        v(s.adp_ppr),
+        halfPpr:    v(s.adp_half_ppr),
+        std:        v(s.adp_std),
+        dynastyPpr: v(s.adp_dynasty_ppr),
+        dynasty2qb: v(s.adp_dynasty_2qb),
+      };
+      if (!Object.values(vals).some(x => x)) return;
       const name = `${entry.player?.first_name || ''} ${entry.player?.last_name || ''}`.trim().toLowerCase();
-      if (name) adpMap[name] = { ppr, dynastyPpr };
+      if (name) adpMap[name] = vals;
     });
     cache.__sleeperAdp = { ts: now, data: adpMap };
     return adpMap;
@@ -150,13 +156,22 @@ app.get('/api/rankings/:mode/:pos', async (req, res) => {
   const tableId = TABLES[mode]?.[pos];
   if (!tableId) return res.status(400).json({ error: 'Invalid mode or position' });
   try {
+    const format = req.query.format || 'dynasty_1qb';
+    const sleeperFieldMap = {
+      dynasty_1qb:  'dynastyPpr',
+      dynasty_2qb:  'dynasty2qb',
+      redraft_ppr:  'ppr',
+      redraft_half: 'halfPpr',
+      redraft_std:  'std',
+    };
+    const sf = sleeperFieldMap[format] || 'dynastyPpr';
     const [data, adpMap, sleeperAdpMap] = await Promise.all([fetchTable(tableId), fetchAdpMap(), fetchSleeperAdpMap()]);
     const enriched = data.map(p => {
-      const sleeperEntry = sleeperAdpMap[(p.Player || '').toLowerCase()];
+      const sEntry = sleeperAdpMap[(p.Player || '').toLowerCase()];
       return {
         ...p,
         adp:        adpMap[(p.Player || '').toLowerCase()] || null,
-        sleeperAdp: sleeperEntry ? (mode === 'dynasty' ? sleeperEntry.dynastyPpr : sleeperEntry.ppr) : null,
+        sleeperAdp: sEntry?.[sf] || null,
       };
     });
     res.json(enriched);
