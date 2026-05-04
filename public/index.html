@@ -237,10 +237,15 @@ td{padding:7px 8px;vertical-align:middle}
 .adp-cell{width:80px;text-align:center}
 .adp-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text2)}
 .adp-none{font-size:14px;color:var(--text3)}
-.team-cell{width:90px}
-.team-inner{display:flex;align-items:center;gap:6px}
-.team-logo{width:22px;height:22px;object-fit:contain}
-.team-abbrev{font-size:13px;font-weight:600;color:var(--text2)}
+/* ── Source columns (comparison) ── */
+.source-group-th{
+  font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--blue);text-transform:uppercase;
+  text-align:center;border-left:1px solid var(--border2);padding-bottom:4px;
+}
+thead th.source-col{
+  color:var(--blue);font-size:9px;border-left:1px solid var(--border2);text-align:center;
+}
+td.source-col{border-left:1px solid var(--border);background:rgba(74,158,255,0.02);text-align:center}
 .pos-dot{display:none}
 
 /* ── Print ── */
@@ -565,6 +570,11 @@ async function loadRankings() {
     restoreTabOrder();
     renderTable();
     updateLastUpdated();
+    // Auto-open top player in panel
+    const firstRow = document.querySelector('#rankingsTbody tr');
+    if (firstRow && state.data[state.order[0]]?.Player) {
+      openPanel(state.data[state.order[0]].Player, firstRow);
+    }
   } catch {
     container.innerHTML = '<div class="coming-soon-msg">Error loading rankings</div>';
   }
@@ -632,14 +642,7 @@ function renderTable() {
         <div class="player-name">${p.Player || '—'}</div>
         <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team}` : ''}</div>
       </td>
-      <td class="adp-cell">${adpHtml}</td>
-      <td class="team-cell">
-        <div class="team-inner">
-          ${p.Team ? `<img class="team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${p.Team.toLowerCase()}.png"
-            alt="${p.Team}" onerror="this.style.display='none'">` : ''}
-          <span class="team-abbrev">${p.Team || '—'}</span>
-        </div>
-      </td>
+      <td class="adp-cell source-col">${adpHtml}</td>
     </tr>`;
   }).join('');
 
@@ -652,8 +655,7 @@ function renderTable() {
           <th style="width:32px"></th>
           <th style="width:48px"></th>
           <th>Player</th>
-          <th class="center" style="width:70px">MFL ADP</th>
-          <th style="width:100px">Team</th>
+          <th class="source-col" style="width:80px">MFL ADP</th>
         </tr>
       </thead>
       <tbody id="rankingsTbody">${tbody}</tbody>
