@@ -246,6 +246,11 @@ thead th.source-col{
   color:var(--blue);font-size:9px;border-left:1px solid var(--border2);text-align:center;
 }
 td.source-col{border-left:1px solid var(--border);background:rgba(74,158,255,0.02);text-align:center}
+thead th.sortable{cursor:pointer;user-select:none;}
+thead th.sortable:hover{opacity:0.75;}
+.sort-arrow{display:inline-block;margin-left:2px;font-size:10px;}
+thead th.tfh-rank-th{color:var(--red2);font-size:9px;font-weight:700;letter-spacing:1.5px;text-align:center;width:52px;border-right:1px solid var(--border2);}
+td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red2);opacity:0.7;border-right:1px solid var(--border);}
 .pos-dot{display:none}
 
 /* ── Print ── */
@@ -519,6 +524,8 @@ let state = {
   starred: new Set(),
   checked: new Set(),
   custom:  false,
+  sortCol: null,
+  sortDir: 'asc',
 };
 // Persist custom order per tab so switching tabs doesn't lose customizations
 const tabOrders = {};
@@ -644,11 +651,19 @@ function rankClass(rank) { return rank===1?"rank-1":rank===2?"rank-2":rank===3?"
 
 function renderTable() {
   const isOverall = state.pos === 'Overall' || state.pos === 'SF';
-  const rows = state.order.map(i => state.data[i]);
-  document.getElementById('playerCount').textContent = `${rows.length} players`;
+  let displayRows = state.order.map(i => ({ ...state.data[i], _orig: i }));
+  if (state.sortCol) {
+    const dir = state.sortDir === 'asc' ? 1 : -1;
+    displayRows.sort((a, b) => {
+      const av = parseFloat(a[state.sortCol]) || 9999;
+      const bv = parseFloat(b[state.sortCol]) || 9999;
+      return (av - bv) * dir;
+    });
+  }
+  document.getElementById('playerCount').textContent = `${displayRows.length} players`;
 
-  const tbody = rows.map((p, displayIdx) => {
-    const orig      = state.order[displayIdx];
+  const tbody = displayRows.map((p, displayIdx) => {
+    const orig      = p._orig;
     const rank      = displayIdx + 1;
     const isChecked = state.checked.has(orig);
     const isStarred = state.starred.has(orig);
@@ -689,6 +704,7 @@ function renderTable() {
         <div class="player-name">${p.Player || '—'}</div>
         <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team.toUpperCase()}` : ''}</div>
       </td>
+      ${state.custom ? `<td class="tfh-rank-col">${p.Rank || '—'}</td>` : ''}
       <td class="adp-cell source-col">${adpHtml}</td>
       <td class="adp-cell source-col">${p.sleeperAdp
         ? `<span class="adp-val">${p.sleeperAdp}</span>`
@@ -705,8 +721,9 @@ function renderTable() {
           <th style="width:32px"></th>
           <th style="width:48px"></th>
           <th>Player</th>
-          <th class="source-col" style="width:80px">MFL ADP</th>
-          <th class="source-col" style="width:80px">Sleeper</th>
+          ${state.custom ? `<th class="tfh-rank-th">TFH</th>` : ''}
+          <th class="source-col sortable" style="width:80px" onclick="sortBy('adp')">MFL ADP<span class="sort-arrow">${state.sortCol==='adp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>
+          <th class="source-col sortable" style="width:80px" onclick="sortBy('sleeperAdp')">Sleeper<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>
         </tr>
       </thead>
       <tbody id="rankingsTbody">${tbody}</tbody>
@@ -734,6 +751,17 @@ function updateCustomIndicator() {
     resetBtn?.classList.remove('reset-glow');
     customBadge?.classList.remove('show');
   }
+}
+
+function sortBy(col) {
+  if (state.sortCol === col) {
+    if (state.sortDir === 'asc') { state.sortDir = 'desc'; }
+    else { state.sortCol = null; state.sortDir = 'asc'; }
+  } else {
+    state.sortCol = col;
+    state.sortDir = 'asc';
+  }
+  renderTable();
 }
 
 // ── Photos ───────────────────────────────────────────────────────────────────
@@ -798,15 +826,16 @@ function initDragDrop() {
     row.addEventListener('drop', e => {
       e.preventDefault();
       if (dragSrc === row) return;
-      const tbody = document.getElementById('rankingsTbody');
-      const rows  = [...tbody.querySelectorAll('tr')];
-      const from  = rows.indexOf(dragSrc);
-      const to    = rows.indexOf(row);
+      const srcIdx = parseInt(dragSrc.dataset.idx);
+      const tgtIdx = parseInt(row.dataset.idx);
+      const from   = state.order.indexOf(srcIdx);
+      const to     = state.order.indexOf(tgtIdx);
       const newOrder = [...state.order];
       const [moved] = newOrder.splice(from, 1);
       newOrder.splice(to, 0, moved);
-      state.order  = newOrder;
-      state.custom = true;
+      state.order   = newOrder;
+      state.custom  = true;
+      state.sortCol = null;
       tabOrders[tabKey()] = { order: [...state.order], custom: true };
       renderTable();
     });
