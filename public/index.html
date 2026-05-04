@@ -1025,10 +1025,13 @@ function renderPanel(name, scout, injury, rank, adp, history) {
   const riskLevel = injury?.re_injury_risk || null;
   const riskClass = riskLevel ? `risk-${riskLevel.toLowerCase()}` : '';
 
-  // Seeded scores (consistent per player, looks random)
+  // Upside / Consistency: no real data yet, seeded placeholder
   const upside  = seededVal(name, 1, 48, 88);
-  const risk    = seededVal(name, 2, 28, 72);
   const consist = seededVal(name, 3, 42, 82);
+  // Injury risk: real — risk_value is 1.0 (cleanest) → 7.5 (highest), normalized to 10–85
+  const risk = injury?.risk_value
+    ? Math.round((parseFloat(injury.risk_value) - 1) / 6.5 * 75 + 10)
+    : seededVal(name, 2, 28, 72);
 
   const depthRows = (scout?.depth_chart || []).map((p,i) => `
     <div class="panel-depth-row">
