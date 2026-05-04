@@ -1060,29 +1060,23 @@ function renderAdpChart(history) {
   const min = Math.min(...values), max = Math.max(...values);
   const pad = Math.max((max - min) * 0.4, 3);
 
-  // Gradient fill plugin — runs after layout so chartArea is available
-  const gradientPlugin = {
-    id: 'gradientFill',
-    beforeRender(chart) {
-      const area = chart.chartArea;
-      if (!area) return;
-      const g = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
-      g.addColorStop(0,   color + '55');
-      g.addColorStop(0.6, color + '18');
-      g.addColorStop(1,   color + '00');
-      chart.data.datasets[0].backgroundColor = g;
-    }
-  };
-
   panelChart = new Chart(canvas, {
     type: 'line',
-    plugins: [gradientPlugin],
     data: {
       labels,
       datasets: [{
         data: values,
         borderColor: color,
-        backgroundColor: 'transparent',
+        backgroundColor: (context) => {
+          const chart = context.chart;
+          const { ctx: c, chartArea } = chart;
+          if (!chartArea) return 'transparent';
+          const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          g.addColorStop(0,   color + '66');
+          g.addColorStop(0.5, color + '22');
+          g.addColorStop(1,   color + '00');
+          return g;
+        },
         borderWidth: 2.5,
         pointRadius: 0,
         pointHoverRadius: 5,
