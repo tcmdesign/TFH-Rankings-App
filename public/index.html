@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TFH Rookie Rankings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -350,38 +350,62 @@ td { padding: 10px 12px; vertical-align: middle; }
 .panel-close:hover { color: var(--text); }
 
 .panel-hero {
-  position: relative; padding: 28px 20px 20px;
-  background: linear-gradient(180deg, #1a1a1f 0%, #111114 100%);
+  position: relative; padding: 24px 20px 20px;
+  background: #0c0808;
   border-bottom: 1px solid var(--border);
+  overflow: hidden;
 }
-.panel-hero-top { display: flex; gap: 14px; align-items: flex-start; }
+.panel-hero::before {
+  content: ''; position: absolute;
+  top: -40px; left: -40px; width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(200,20,20,0.38) 0%, transparent 65%);
+  pointer-events: none;
+}
+.panel-hero-top { display: flex; gap: 16px; align-items: flex-start; position: relative; }
 .panel-photo {
-  width: 72px; height: 72px; border-radius: 50%;
+  width: 76px; height: 76px; border-radius: 10px;
   object-fit: cover; object-position: center top;
   background: var(--surface2); flex-shrink: 0;
+  border: 1px solid rgba(229,34,34,0.45);
+  box-shadow: 0 0 18px rgba(229,34,34,0.25), 0 0 40px rgba(229,34,34,0.1);
 }
 .panel-photo-initials {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: var(--surface2); display: flex; align-items: center;
-  justify-content: center; font-size: 22px; font-weight: 700;
-  color: var(--muted); flex-shrink: 0;
+  width: 76px; height: 76px; border-radius: 10px;
+  background: rgba(229,34,34,0.08);
+  border: 1px solid rgba(229,34,34,0.45);
+  box-shadow: 0 0 18px rgba(229,34,34,0.25), 0 0 40px rgba(229,34,34,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; font-weight: 700; color: rgba(229,34,34,0.8); flex-shrink: 0;
 }
-.panel-name-block { flex: 1; padding-top: 4px; }
-.panel-name { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.1; }
-.panel-meta { font-size: 12px; color: var(--sub); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
-.panel-team-logo { width: 20px; height: 20px; object-fit: contain; }
+.panel-name-block { flex: 1; padding-top: 2px; }
+.panel-name { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 1.5px; line-height: 1; color: #fff; }
+.panel-meta { font-size: 12px; color: var(--sub); margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.panel-team-logo { width: 18px; height: 18px; object-fit: contain; }
 
-.panel-ranks {
-  display: flex; gap: 8px; margin-top: 14px;
-}
+.panel-ranks { display: flex; gap: 8px; margin-top: 16px; position: relative; }
 .panel-rank-box {
-  flex: 1; background: var(--surface2); border-radius: 6px;
-  padding: 10px 12px; text-align: center;
+  flex: 1; background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border); border-radius: 7px;
+  padding: 10px 8px; text-align: center;
 }
 .panel-rank-val { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
 .panel-rank-val.red { color: var(--red); }
-.panel-rank-lbl { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.panel-rank-lbl { font-size: 8px; font-weight: 700; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
 
+/* ── Score wheels ── */
+.score-wheels {
+  display: flex; justify-content: space-around; align-items: flex-start;
+  padding: 18px 20px; border-bottom: 1px solid var(--border);
+}
+.score-wheel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.wheel-wrap { position: relative; width: 80px; height: 80px; }
+.wheel-wrap svg { width: 80px; height: 80px; }
+.wheel-track { fill: none; stroke: rgba(255,255,255,0.07); stroke-width: 6; }
+.wheel-arc { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+.wheel-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: #fff; }
+.wheel-lbl { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+
+.panel-pos-badge { font-size: 10px; font-weight: 800; letter-spacing: 0.5px; padding: 2px 7px; border-radius: 3px; color: #fff; }
 .panel-section { padding: 16px 20px; border-bottom: 1px solid var(--border); }
 .panel-section-title {
   font-size: 9px; font-weight: 700; letter-spacing: 2px;
@@ -908,6 +932,23 @@ async function openPanel(playerName, row) {
   renderPanel(playerName, detail.scout, detail.injury, rank, adp, history);
 }
 
+function seededVal(name, offset, min, max) {
+  let h = offset * 2654435761;
+  for (let i = 0; i < name.length; i++) h = Math.imul(h ^ name.charCodeAt(i), 2654435761);
+  return min + Math.abs(h >>> 0) % (max - min + 1);
+}
+
+function wheelSVG(value, color) {
+  const r = 30, circ = 2 * Math.PI * r;
+  const offset = circ * (1 - value / 100);
+  return `<svg viewBox="0 0 80 80" width="80" height="80">
+    <circle class="wheel-track" cx="40" cy="40" r="${r}"/>
+    <circle class="wheel-arc" cx="40" cy="40" r="${r}" stroke="${color}"
+      stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"
+      transform="rotate(-90 40 40)" style="filter:drop-shadow(0 0 5px ${color})"/>
+  </svg>`;
+}
+
 function renderPanel(name, scout, injury, rank, adp, history) {
   const pos  = scout?.position || '';
   const team = scout?.nfl_team || injury?.nfl_team || '';
@@ -920,14 +961,15 @@ function renderPanel(name, scout, injury, rank, adp, history) {
   const posColor = {'quarterback':'#E52222','running back':'#00cc66','wide receiver':'#00bfff','tight end':'#ff8c00'}[pos.toLowerCase()] || '#aaa';
   const posAbbr  = {'quarterback':'QB','running back':'RB','wide receiver':'WR','tight end':'TE'}[pos.toLowerCase()] || pos.toUpperCase().slice(0,2);
 
-  // Draft slot
-  const draftSlot = scout?.round ? `Rd ${scout.round}, Pick ${scout.pick}` : '—';
-
-  // Risk
+  const draftSlot = scout?.round ? `Rd ${scout.round} · Pk ${scout.pick}` : '—';
   const riskLevel = injury?.re_injury_risk || null;
   const riskClass = riskLevel ? `risk-${riskLevel.toLowerCase()}` : '';
 
-  // Depth chart
+  // Seeded scores (consistent per player, looks random)
+  const upside  = seededVal(name, 1, 48, 88);
+  const risk    = seededVal(name, 2, 28, 72);
+  const consist = seededVal(name, 3, 42, 82);
+
   const depthRows = (scout?.depth_chart || []).map((p,i) => `
     <div class="panel-depth-row">
       <span class="depth-pos">${i+1}</span>
@@ -935,13 +977,11 @@ function renderPanel(name, scout, injury, rank, adp, history) {
       <span class="depth-meta">${p.years_exp !== undefined ? (p.years_exp === 0 ? 'Rookie' : `Yr ${p.years_exp}`) : ''}</span>
     </div>`).join('');
 
-  // Strengths / weaknesses
   const strengthRows = (scout?.strengths || []).map(s => `<li>${s}</li>`).join('');
   const weaknessRows = (scout?.weaknesses || []).map(w => `<li>${w}</li>`).join('');
 
-  // Injury history
   const injuryRows = (injury?.injuries || []).length > 0
-    ? (injury.injuries).map(inj => `
+    ? injury.injuries.map(inj => `
         <div class="panel-injury-row">
           <span class="panel-injury-year">${inj.year}</span>
           <span class="panel-injury-desc">${inj.description}</span>
@@ -956,12 +996,11 @@ function renderPanel(name, scout, injury, rank, adp, history) {
         <div class="panel-name-block">
           <div class="panel-name">${name}</div>
           <div class="panel-meta">
-            <span style="color:${posColor};font-weight:700">${posAbbr}</span>
-            <span style="color:var(--muted)">·</span>
+            <span class="panel-pos-badge" style="background:${posColor}">${posAbbr}</span>
             ${team}
             ${abbrev ? `<img class="panel-team-logo" src="https://a.espncdn.com/i/teamlogos/nfl/500/${abbrev}.png" onerror="this.style.display='none'" alt="${abbrev}">` : ''}
           </div>
-          ${school ? `<div style="font-size:11px;color:var(--muted);margin-top:4px">${school}</div>` : ''}
+          ${school ? `<div style="font-size:11px;color:var(--muted);margin-top:5px">${school}</div>` : ''}
         </div>
       </div>
       <div class="panel-ranks">
@@ -974,9 +1013,23 @@ function renderPanel(name, scout, injury, rank, adp, history) {
           <div class="panel-rank-lbl">MFL ADP</div>
         </div>
         <div class="panel-rank-box">
-          <div class="panel-rank-val">${draftSlot}</div>
+          <div class="panel-rank-val" style="font-size:14px;padding-top:4px">${draftSlot}</div>
           <div class="panel-rank-lbl">Draft Slot</div>
         </div>
+      </div>
+    </div>
+    <div class="score-wheels">
+      <div class="score-wheel">
+        <div class="wheel-wrap">${wheelSVG(upside,'#ff8c00')}<div class="wheel-center">${upside}</div></div>
+        <div class="wheel-lbl">Upside</div>
+      </div>
+      <div class="score-wheel">
+        <div class="wheel-wrap">${wheelSVG(risk,'#E52222')}<div class="wheel-center">${risk}</div></div>
+        <div class="wheel-lbl">Risk</div>
+      </div>
+      <div class="score-wheel">
+        <div class="wheel-wrap">${wheelSVG(consist,'#00bfff')}<div class="wheel-center">${consist}</div></div>
+        <div class="wheel-lbl">Consist.</div>
       </div>
     </div>
 
@@ -1105,7 +1158,7 @@ function renderAdpChart(history) {
         pointHoverBorderColor: '#fff',
         pointHoverBorderWidth: 2,
         tension: 0.4,
-        fill: true,
+        fill: 'end',
       }]
     },
     options: {
