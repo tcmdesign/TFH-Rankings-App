@@ -155,15 +155,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .draft-mode-toggle.active .draft-toggle-track{background:var(--green)}
 .draft-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left 0.2s;opacity:0.5}
 .draft-mode-toggle.active .draft-toggle-thumb{left:14px;opacity:1}
-/* Draft row states */
-tbody tr.draft-mine{border-color:rgba(0,217,122,0.5)!important;box-shadow:0 0 12px rgba(0,217,122,0.12)!important}
-tbody tr.draft-mine td{background:linear-gradient(90deg,rgba(0,217,122,0.13) 0%,rgba(0,217,122,0.04) 100%)!important}
-tbody tr.draft-gone{opacity:0.4;border-color:rgba(232,23,42,0.5)!important;box-shadow:0 0 12px rgba(232,23,42,0.1)!important}
-tbody tr.draft-gone td{background:linear-gradient(90deg,rgba(232,23,42,0.12) 0%,rgba(232,23,42,0.03) 100%)!important;text-decoration:line-through}
-tbody tr.draft-avoid{border-color:rgba(255,140,0,0.5)!important;box-shadow:0 0 12px rgba(255,140,0,0.12)!important}
-tbody tr.draft-avoid td{background:linear-gradient(90deg,rgba(255,140,0,0.13) 0%,rgba(255,140,0,0.04) 100%)!important}
-tbody tr.draft-target{border-color:rgba(74,158,255,0.6)!important;box-shadow:0 0 0 1px rgba(74,158,255,0.35),0 0 16px rgba(74,158,255,0.18)!important}
-tbody tr.draft-target td{background:linear-gradient(90deg,rgba(74,158,255,0.1) 0%,rgba(74,158,255,0.03) 100%)!important}
+/* Draft row states — gradient on tr, cells transparent so it spans full width */
+tbody tr.draft-mine{background:linear-gradient(90deg,rgba(0,217,122,0.15) 0%,rgba(0,217,122,0.04) 60%,transparent 100%)!important;border-color:rgba(0,217,122,0.5)!important;box-shadow:0 0 14px rgba(0,217,122,0.15)!important}
+tbody tr.draft-mine td{background:transparent!important}
+tbody tr.draft-gone{opacity:0.45;background:linear-gradient(90deg,rgba(232,23,42,0.15) 0%,rgba(232,23,42,0.04) 60%,transparent 100%)!important;border-color:rgba(232,23,42,0.5)!important;box-shadow:0 0 14px rgba(232,23,42,0.12)!important}
+tbody tr.draft-gone td{background:transparent!important;text-decoration:line-through}
+tbody tr.draft-avoid{background:linear-gradient(90deg,rgba(255,140,0,0.15) 0%,rgba(255,140,0,0.04) 60%,transparent 100%)!important;border-color:rgba(255,140,0,0.5)!important;box-shadow:0 0 14px rgba(255,140,0,0.15)!important}
+tbody tr.draft-avoid td{background:transparent!important}
+tbody tr.draft-target{border-color:rgba(74,158,255,0.65)!important;box-shadow:0 0 0 1px rgba(74,158,255,0.4),0 0 18px rgba(74,158,255,0.2)!important}
+tbody tr.draft-target:not(.draft-mine):not(.draft-gone):not(.draft-avoid){background:linear-gradient(90deg,rgba(74,158,255,0.12) 0%,rgba(74,158,255,0.03) 60%,transparent 100%)!important}
+tbody tr.draft-target td{background:transparent!important}
 /* Draft action buttons */
 .draft-cell{white-space:nowrap;padding:0 10px 0 4px}
 .draft-btn{border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.4px;padding:4px 10px;cursor:pointer;transition:all 0.15s;margin-right:4px;position:relative}
@@ -755,7 +756,7 @@ function renderTable() {
     const isGone  = state.draftGone.has(orig);
     const isAvoid = state.draftAvoid.has(orig);
     const draftClass = isMine ? 'draft-mine' : isGone ? 'draft-gone' : isAvoid ? 'draft-avoid' : '';
-    const targetClass = state.draftMode && isStarred && !isMine && !isGone ? 'draft-target' : '';
+    const targetClass = state.draftMode && isStarred ? 'draft-target' : '';
 
     return `<tr data-idx="${orig}" draggable="${state.draftMode ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${targetClass}">
       <td class="drag-cell" style="${state.draftMode ? 'display:none' : ''}">
