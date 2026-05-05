@@ -165,30 +165,29 @@ tbody tr.draft-mine .rank-cell{border-left:4px solid rgba(0,217,122,0.9)}
 tbody tr.draft-gone{opacity:0.45;background:linear-gradient(90deg,rgba(232,23,42,0.22) 0%,rgba(232,23,42,0.08) 45%,rgba(232,23,42,0.02) 100%)!important}
 tbody tr.draft-gone td{background:transparent!important;text-decoration:line-through}
 tbody tr.draft-gone .rank-cell{border-left:4px solid rgba(232,23,42,0.9)}
+/* Avoid: always-on orange treatment */
 tbody tr.draft-avoid{background:linear-gradient(90deg,rgba(255,140,0,0.22) 0%,rgba(255,140,0,0.08) 45%,rgba(255,140,0,0.02) 100%)!important}
 tbody tr.draft-avoid td{background:transparent!important}
 tbody tr.draft-avoid .rank-cell{border-left:4px solid rgba(255,140,0,0.9)}
-tbody tr.draft-target:not(.draft-mine):not(.draft-gone):not(.draft-avoid){background:linear-gradient(90deg,rgba(74,158,255,0.18) 0%,rgba(74,158,255,0.06) 45%,rgba(74,158,255,0.02) 100%)!important}
+tbody tr.draft-avoid .rank-circle{border-color:rgba(255,140,0,0.8)!important;color:#ff8c00!important;box-shadow:0 0 10px rgba(255,140,0,0.45)!important;background:rgba(255,140,0,0.1)!important}
+/* Target: always-on blue treatment */
+tbody tr.draft-target:not(.draft-mine):not(.draft-gone){background:linear-gradient(90deg,rgba(74,158,255,0.18) 0%,rgba(74,158,255,0.06) 45%,rgba(74,158,255,0.02) 100%)!important}
 tbody tr.draft-target td{background:transparent!important}
 tbody tr.draft-target .rank-cell{border-left:4px solid rgba(74,158,255,0.9)}
-/* Rank circle: grey in draft mode, colored when marked */
+tbody tr.draft-target:not(.draft-mine):not(.draft-gone) .rank-circle{border-color:rgba(74,158,255,0.8)!important;color:var(--blue)!important;box-shadow:0 0 10px rgba(74,158,255,0.45)!important;background:rgba(74,158,255,0.1)!important}
+/* Rank circle: grey rank-1/2/3 specials in draft mode, colored for mine/gone */
 .draft-active .rank-1,.draft-active .rank-2,.draft-active .rank-3{background:var(--bg3)!important;border-color:var(--border)!important;color:var(--text2)!important;box-shadow:none!important}
 .draft-active tbody tr.draft-mine .rank-circle{border-color:rgba(0,217,122,0.8)!important;color:var(--green)!important;box-shadow:0 0 10px rgba(0,217,122,0.45)!important;background:rgba(0,217,122,0.1)!important}
 .draft-active tbody tr.draft-gone .rank-circle{border-color:rgba(232,23,42,0.8)!important;color:var(--red2)!important;box-shadow:0 0 10px rgba(232,23,42,0.45)!important;background:rgba(232,23,42,0.1)!important}
-.draft-active tbody tr.draft-avoid .rank-circle{border-color:rgba(255,140,0,0.8)!important;color:#ff8c00!important;box-shadow:0 0 10px rgba(255,140,0,0.45)!important;background:rgba(255,140,0,0.1)!important}
-.draft-active tbody tr.draft-target:not(.draft-mine):not(.draft-gone):not(.draft-avoid) .rank-circle{border-color:rgba(74,158,255,0.8)!important;color:var(--blue)!important;box-shadow:0 0 10px rgba(74,158,255,0.45)!important;background:rgba(74,158,255,0.1)!important}
 /* Draft action buttons */
 .draft-cell{white-space:nowrap;padding:0 10px 0 4px}
-.draft-btn{border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.4px;padding:4px 10px;cursor:pointer;transition:all 0.15s;margin-right:4px}
+.draft-btn{border-radius:6px;padding:5px 8px;cursor:pointer;transition:all 0.15s;margin-right:4px;display:inline-flex;align-items:center;justify-content:center}
 .draft-btn-mine{background:rgba(0,217,122,0.07);color:var(--green);border:1px solid rgba(0,217,122,0.4);box-shadow:0 0 8px rgba(0,217,122,0.1)}
 .draft-btn-mine:hover{background:rgba(0,217,122,0.14);border-color:rgba(0,217,122,0.7);box-shadow:0 0 16px rgba(0,217,122,0.25)}
 .draft-btn-mine.active{background:rgba(0,217,122,0.16);border-color:rgba(0,217,122,0.9);box-shadow:0 0 18px rgba(0,217,122,0.4),inset 0 0 8px rgba(0,217,122,0.1)}
 .draft-btn-gone{background:rgba(232,23,42,0.07);color:var(--red2);border:1px solid rgba(232,23,42,0.4);box-shadow:0 0 8px rgba(232,23,42,0.1)}
 .draft-btn-gone:hover{background:rgba(232,23,42,0.14);border-color:rgba(232,23,42,0.7);box-shadow:0 0 16px rgba(232,23,42,0.25)}
 .draft-btn-gone.active{background:rgba(232,23,42,0.16);border-color:rgba(232,23,42,0.9);box-shadow:0 0 18px rgba(232,23,42,0.4),inset 0 0 8px rgba(232,23,42,0.1)}
-.draft-btn-avoid{background:rgba(255,140,0,0.07);color:#ff8c00;border:1px solid rgba(255,140,0,0.4);box-shadow:0 0 8px rgba(255,140,0,0.1)}
-.draft-btn-avoid:hover{background:rgba(255,140,0,0.14);border-color:rgba(255,140,0,0.7);box-shadow:0 0 16px rgba(255,140,0,0.25)}
-.draft-btn-avoid.active{background:rgba(255,140,0,0.16);border-color:rgba(255,140,0,0.9);box-shadow:0 0 18px rgba(255,140,0,0.4),inset 0 0 8px rgba(255,140,0,0.1)}
 /* Grey out non-active buttons when one is selected */
 .draft-cell:has(.draft-btn.active) .draft-btn:not(.active){opacity:0.18;filter:grayscale(1)}
 /* Draft legend */
@@ -274,13 +273,14 @@ td{padding:7px 8px;vertical-align:middle}
 .rank-1{background:rgba(232,23,42,0.12);border-color:rgba(232,23,42,0.5);color:var(--red2);box-shadow:0 0 10px rgba(232,23,42,0.25)}
 .rank-2{background:rgba(255,107,53,0.12);border-color:rgba(255,107,53,0.45);color:#ff6b35}
 .rank-3{background:rgba(255,154,60,0.12);border-color:rgba(255,154,60,0.4);color:#ff9a3c}
-.check-cell{width:28px;padding:7px 4px;text-align:center}
-.star-btn{
+.check-cell{width:52px;padding:7px 2px;text-align:center;white-space:nowrap}
+.target-btn,.avoid-btn{
   background:none;border:none;cursor:pointer;color:var(--text3);padding:2px;
   transition:color 0.15s;display:inline-flex;align-items:center;justify-content:center;
-  width:28px;height:28px;border-radius:4px;
+  width:24px;height:28px;border-radius:4px;
 }
-.star-btn:hover{color:var(--orange)}.star-btn.starred{color:var(--orange)}
+.target-btn:hover{color:var(--blue)}.target-btn.active{color:var(--blue)}
+.avoid-btn:hover{color:var(--orange)}.avoid-btn.active{color:var(--orange)}
 .photo-cell{width:44px;padding:7px 4px}
 .player-photo{
   width:38px;height:38px;border-radius:50%;
@@ -558,10 +558,10 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   <!-- Draft legend -->
   <div class="draft-legend" id="draftLegend">
     <span style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--green);margin-right:4px">DRAFT MODE</span>
-    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--green)"></span>Your pick</span>
-    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--red2)"></span>Off board</span>
+    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--green)"></span>My pick (✓)</span>
+    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--red2)"></span>Off board (✗)</span>
+    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--blue)"></span>Target</span>
     <span class="draft-legend-item"><span class="draft-legend-dot" style="background:#ff8c00"></span>Avoid</span>
-    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--blue);box-shadow:0 0 5px var(--blue)"></span>Target (starred)</span>
     <span style="flex:1"></span>
     <button class="btn" style="font-size:11px;padding:4px 12px" onclick="resetDraftMode()">Reset Draft</button>
   </div>
@@ -617,7 +617,7 @@ let state = {
   draftMode: false,
   draftMine: new Set(),
   draftGone: new Set(),
-  draftAvoid: new Set(),
+  avoided:   new Set(),  // name-based, persistent
 };
 // Persist custom order per tab so switching tabs doesn't lose customizations
 const tabOrders = {};
@@ -646,6 +646,7 @@ function loadFromURL() {
   if (p.has('order'))   try { state.order   = JSON.parse(atob(p.get('order'))); state.custom = true; } catch {}
   if (p.has('checked')) try { state.checked = new Set(JSON.parse(atob(p.get('checked')))); } catch {}
   if (p.has('starred')) try { state.starred = new Set(JSON.parse(atob(p.get('starred')))); } catch {}
+  if (p.has('avoided')) try { state.avoided = new Set(JSON.parse(atob(p.get('avoided')))); } catch {}
 }
 
 // ── Nav ──────────────────────────────────────────────────────────────────────
@@ -799,13 +800,14 @@ function renderTable() {
       ? `<span class="adp-val">${p.adp}</span>`
       : `<span class="adp-none">—</span>`;
 
-    const isMine  = state.draftMine.has(orig);
-    const isGone  = state.draftGone.has(orig);
-    const isAvoid = state.draftAvoid.has(orig);
-    const draftClass = isMine ? 'draft-mine' : isGone ? 'draft-gone' : isAvoid ? 'draft-avoid' : '';
-    const targetClass = state.draftMode && isStarred ? 'draft-target' : '';
+    const isMine    = state.draftMine.has(orig);
+    const isGone    = state.draftGone.has(orig);
+    const isAvoided = state.avoided.has(p.Player || '');
+    const draftClass  = isMine ? 'draft-mine' : isGone ? 'draft-gone' : '';
+    const avoidClass  = isAvoided ? 'draft-avoid' : '';
+    const targetClass = isStarred ? 'draft-target' : '';
 
-    return `<tr data-idx="${orig}" draggable="${noDrag ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${targetClass}">
+    return `<tr data-idx="${orig}" draggable="${noDrag ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${avoidClass} ${targetClass}">
       <td class="drag-cell" style="${noDrag ? 'display:none' : ''}">
         <div class="drag-handle"><span></span><span></span><span></span></div>
       </td>
@@ -813,9 +815,17 @@ function renderTable() {
         <span class="rank-circle ${rankClass(rank)}">${rank}</span>
       </td>
       <td class="check-cell">
-        <button class="star-btn ${isStarred ? 'starred' : ''}" onclick="toggleStar('${(p.Player||'').replace(/'/g,"\\'")}', this)" title="Star player">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="${isStarred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        <button class="target-btn ${isStarred ? 'active' : ''}" onclick="toggleStar('${(p.Player||'').replace(/'/g,"\\'")}');event.stopPropagation()" title="Target">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2" fill="${isStarred ? 'currentColor' : 'none'}" stroke="none"/>
+            <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+          </svg>
+        </button>
+        <button class="avoid-btn ${isAvoided ? 'active' : ''}" onclick="toggleAvoid('${(p.Player||'').replace(/'/g,"\\'")}');event.stopPropagation()" title="Avoid">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </button>
       </td>
@@ -831,9 +841,12 @@ function renderTable() {
       ${state.custom ? `<td class="tfh-rank-col">${p.Rank || '—'}</td>` : ''}
       ${state.draftMode ? `
       <td class="draft-cell">
-        <button class="draft-btn draft-btn-mine ${isMine ? 'active' : ''}" onclick="markDraft('mine',${orig});event.stopPropagation()">Mine</button>
-        <button class="draft-btn draft-btn-gone ${isGone ? 'active' : ''}" onclick="markDraft('gone',${orig});event.stopPropagation()">Gone</button>
-        <button class="draft-btn draft-btn-avoid ${isAvoid ? 'active' : ''}" onclick="markDraft('avoid',${orig});event.stopPropagation()">Avoid</button>
+        <button class="draft-btn draft-btn-mine ${isMine ? 'active' : ''}" onclick="markDraft('mine',${orig});event.stopPropagation()" title="My pick">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button class="draft-btn draft-btn-gone ${isGone ? 'active' : ''}" onclick="markDraft('gone',${orig});event.stopPropagation()" title="Off board">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </td>` : `
       <td class="adp-cell source-col">${adpHtml}</td>
       <td class="adp-cell source-col">${p.sleeperAdp
@@ -867,7 +880,7 @@ function renderTable() {
   updateCustomIndicator();
   document.querySelectorAll('#rankingsTbody tr').forEach(row => {
     row.addEventListener('click', e => {
-      if (e.target.closest('.drag-cell, .check-cell, .star-btn')) return;
+      if (e.target.closest('.drag-cell, .check-cell')) return;
       const playerName = row.dataset.player;
       if (playerName) openPanel(playerName, row);
     });
@@ -913,21 +926,18 @@ function clearAllStars() {
 }
 
 function resetDraftMode() {
-  state.draftMine.clear(); state.draftGone.clear(); state.draftAvoid.clear();
+  state.draftMine.clear(); state.draftGone.clear();
   renderTable();
 }
 
 function markDraft(type, orig) {
   const already = (type === 'mine' && state.draftMine.has(orig))
-               || (type === 'gone' && state.draftGone.has(orig))
-               || (type === 'avoid' && state.draftAvoid.has(orig));
+               || (type === 'gone' && state.draftGone.has(orig));
   state.draftMine.delete(orig);
   state.draftGone.delete(orig);
-  state.draftAvoid.delete(orig);
   if (!already) {
-    if (type === 'mine')  state.draftMine.add(orig);
-    if (type === 'gone')  state.draftGone.add(orig);
-    if (type === 'avoid') state.draftAvoid.add(orig);
+    if (type === 'mine') state.draftMine.add(orig);
+    if (type === 'gone') state.draftGone.add(orig);
   }
   renderTable();
 }
@@ -1021,12 +1031,18 @@ function initDragDrop() {
   });
 }
 
-// ── Star / check ─────────────────────────────────────────────────────────────
-function toggleStar(name, btn) {
-  if (state.starred.has(name)) { state.starred.delete(name); btn.classList.remove('starred'); btn.querySelector('svg').setAttribute('fill','none'); }
-  else                         { state.starred.add(name);    btn.classList.add('starred');    btn.querySelector('svg').setAttribute('fill','currentColor'); }
-  if (state.draftMode) renderTable();
+// ── Target / Avoid toggles ────────────────────────────────────────────────────
+function toggleStar(name) {
+  if (state.starred.has(name)) state.starred.delete(name);
+  else                         state.starred.add(name);
+  renderTable();
   updateStarBtn();
+}
+
+function toggleAvoid(name) {
+  if (state.avoided.has(name)) state.avoided.delete(name);
+  else                         state.avoided.add(name);
+  renderTable();
 }
 
 // ── Actions ───────────────────────────────────────────────────────────────────
@@ -1044,6 +1060,7 @@ function buildShareUrl() {
   if (state.custom)           p.set('order',   btoa(JSON.stringify(state.order)));
   if (state.checked.size > 0) p.set('checked', btoa(JSON.stringify([...state.checked])));
   if (state.starred.size > 0) p.set('starred', btoa(JSON.stringify([...state.starred])));
+  if (state.avoided.size > 0) p.set('avoided', btoa(JSON.stringify([...state.avoided])));
   return `${location.origin}${location.pathname}?${p.toString()}`;
 }
 
