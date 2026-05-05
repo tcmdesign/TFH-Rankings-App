@@ -105,7 +105,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .pos-tab[data-pos="WR"]     {--pc:74,158,255; --ph:var(--blue)}
 .pos-tab[data-pos="TE"]     {--pc:255,140,0;  --ph:#ff8c00}
 .pos-tab[data-pos="Overall"] {--pc:0,191,165;  --ph:#00e5c8}
-.pos-tab[data-pos="SF"]      {--pc:155,109,255;--ph:var(--purple)}
+.pos-tab[data-pos="SF"]      {--pc:0,191,165;  --ph:#00e5c8}
 .pos-tab[data-pos="Targets"] {--pc:255,165,0;  --ph:#ffa500}
 .tab-star-count{background:#ffa500;color:#000;border-radius:10px;font-size:10px;padding:0px 5px;font-weight:800;margin-left:3px;vertical-align:middle}
 .pos-tab:hover:not(.disabled):not(.active){
@@ -395,11 +395,17 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .topbar-app-sub{display:block;font-size:12px;color:var(--text3);margin-top:2px;letter-spacing:0.5px}
   .topbar-sub{display:none}
   .topbar-right{display:none}
-  .action-bar{overflow-x:auto;flex-wrap:nowrap;padding:8px 14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .action-bar{display:flex;flex-wrap:nowrap;padding:8px 14px;gap:6px}
   .action-bar::-webkit-scrollbar{display:none}
   .btn.primary{display:none}
   .btn-label{display:none}
   .action-bar .btn{padding:7px 10px}
+  .draft-toggle-label{display:none}
+  .player-count{display:none}
+  /* Draft legend: only show reset button */
+  #draftLegend{padding:4px 14px;justify-content:flex-end}
+  #draftLegend > span{display:none!important}
+  #draftLegend .btn{font-size:12px;padding:6px 16px}
   /* Pos-bar: flat nav style on mobile */
   .pos-bar{border-top:1px solid var(--border)}
   .pos-tab{border-radius:0!important;margin-top:0!important;font-size:12px;padding:10px 14px}
@@ -671,8 +677,8 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
     <div class="pos-tab" data-pos="RB">RB</div>
     <div class="pos-tab" data-pos="WR">WR</div>
     <div class="pos-tab" data-pos="TE">TE</div>
-    <div class="pos-tab" data-pos="Overall">Overall</div>
-    <div class="pos-tab" data-pos="SF">SF Overall</div>
+    <div class="pos-tab" data-pos="Overall" style="display:none">Overall</div>
+    <div class="pos-tab" data-pos="SF">Overall</div>
     <div class="pos-tab" data-pos="Targets" style="display:none">★ Targets<span class="tab-star-count" id="tabStarCount"></span></div>
   </div>
 
