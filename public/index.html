@@ -1075,7 +1075,7 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history) {
           <div class="panel-rank-lbl">Age</div>
         </div>
         <div class="panel-rank-box">
-          <div class="panel-rank-val" style="font-size:15px;padding-top:3px">${attrs?.height || '—'}</div>
+          <div class="panel-rank-val">${attrs?.height ? `${Math.floor(parseInt(attrs.height)/12)}'${parseInt(attrs.height)%12}"` : '—'}</div>
           <div class="panel-rank-lbl">Height</div>
         </div>
         <div class="panel-rank-box">
