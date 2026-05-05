@@ -351,10 +351,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
 .bottom-sheet.open{transform:translateY(0)}
 .bottom-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499}
 .bottom-sheet-overlay.visible{display:block}
-.bottom-sheet-handle{width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:12px auto 0}
-.bottom-sheet-header{display:flex;align-items:center;justify-content:flex-end;padding:4px 16px}
-.bs-close-btn{background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;line-height:0;border-radius:6px}
-.bs-close-btn:hover{color:var(--text)}
+.bottom-sheet-handle{width:40px;height:5px;background:rgba(255,255,255,0.2);border-radius:3px;margin:12px auto 8px;cursor:grab;touch-action:none}
 
 /* ── Swipe strip (mobile) — hidden on desktop ── */
 .swipe-strip-cell{display:none}
@@ -712,9 +709,6 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>
         <div class="panel-empty-text">Select a player<br>to view details</div>
       </div>
-      <button class="panel-close" id="panelClose" onclick="closePanel()" style="display:none" title="Close">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
       <div id="panelContent"></div>
     </div>
   </div>
@@ -724,12 +718,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
 <!-- Bottom sheet (mobile player detail) -->
 <div class="bottom-sheet-overlay" id="bsOverlay" onclick="closeBottomSheet()"></div>
 <div class="bottom-sheet" id="bottomSheet">
-  <div class="bottom-sheet-handle"></div>
-  <div class="bottom-sheet-header">
-    <button class="bs-close-btn" onclick="closeBottomSheet()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
+  <div class="bottom-sheet-handle" id="bsHandle"></div>
   <div id="bottomSheetContent"></div>
 </div>
 
@@ -1380,10 +1369,8 @@ let selectedRow = null;
 
 function closePanel() {
   const empty = document.getElementById('panelEmpty');
-  const close = document.getElementById('panelClose');
   const content = document.getElementById('panelContent');
   if (empty) empty.style.display = 'flex';
-  if (close) close.style.display = 'none';
   if (content) content.innerHTML = '';
   if (panelChart) { panelChart.destroy(); panelChart = null; }
   if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
@@ -1392,11 +1379,48 @@ function closePanel() {
 }
 
 function closeBottomSheet() {
+  const sheet = document.getElementById('bottomSheet');
+  if (sheet) { sheet.style.transition = ''; sheet.style.transform = ''; sheet.classList.remove('open'); }
   document.getElementById('bsOverlay')?.classList.remove('visible');
-  document.getElementById('bottomSheet')?.classList.remove('open');
   if (panelChart) { panelChart.destroy(); panelChart = null; }
   if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
 }
+
+// ── Bottom sheet swipe-down-to-dismiss ───────────────────────────────────────
+(function() {
+  let startY = 0, dragging = false;
+  const DISMISS_THRESHOLD = 100;
+
+  document.addEventListener('touchstart', e => {
+    const handle = e.target.closest('#bsHandle');
+    if (!handle) return;
+    const sheet = document.getElementById('bottomSheet');
+    if (!sheet?.classList.contains('open')) return;
+    startY = e.touches[0].clientY;
+    dragging = true;
+    sheet.style.transition = 'none';
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    const sheet = document.getElementById('bottomSheet');
+    const dy = Math.max(0, e.touches[0].clientY - startY);
+    sheet.style.transform = `translateY(${dy}px)`;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    if (!dragging) return;
+    dragging = false;
+    const sheet = document.getElementById('bottomSheet');
+    const dy = e.changedTouches[0].clientY - startY;
+    sheet.style.transition = '';
+    if (dy > DISMISS_THRESHOLD) {
+      closeBottomSheet();
+    } else {
+      sheet.style.transform = '';
+    }
+  }, { passive: true });
+})();
 
 async function _loadAndRender(playerName, containerId) {
   const [detailRes, historyRes] = await Promise.all([
@@ -1430,9 +1454,7 @@ async function openPanel(playerName, row) {
   selectedRow = row;
   row.classList.add('selected');
   const empty = document.getElementById('panelEmpty');
-  const close = document.getElementById('panelClose');
   if (empty) empty.style.display = 'none';
-  if (close) close.style.display = 'block';
   document.getElementById('panelContent').innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--text3);font-size:12px">Loading...</div>';
   // Tablet: slide panel in as overlay
   if (window.innerWidth < 1024) {
