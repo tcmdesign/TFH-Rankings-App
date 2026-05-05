@@ -287,6 +287,20 @@ app.post('/api/admin/sync-attrs', async (req, res) => {
   res.json(result);
 });
 
+// ── Sleeper player ID map (full roster, for photo fallback) ───────────────────
+async function initSleeperIdMap() {
+  try {
+    const res  = await fetch('https://api.sleeper.app/v1/players/nfl');
+    const json = await res.json();
+    const idMap = {};
+    Object.entries(json).forEach(([id, p]) => {
+      if (p.full_name) idMap[p.full_name.toLowerCase()] = id;
+    });
+    cache.__sleeperIds = idMap;
+    console.log(`Sleeper ID map loaded: ${Object.keys(idMap).length} players`);
+  } catch (e) { console.error('initSleeperIdMap failed:', e.message); }
+}
+
 // ── Sleeper ADP snapshots ─────────────────────────────────────────────────────
 async function ensureSourceColumn() {
   if (!db) return;
@@ -320,10 +334,14 @@ async function saveSleeperAdpSnapshots() {
 ensureSourceColumn().then(() => {
   app.listen(PORT, () => {
     console.log(`Rankings app running on port ${PORT}`);
+    initSleeperIdMap();
     saveSleeperAdpSnapshots();
     setInterval(saveSleeperAdpSnapshots, 60 * 60 * 1000);
   });
 }).catch(e => {
   console.error('DB migration failed, starting anyway:', e.message);
-  app.listen(PORT, () => console.log(`Rankings app running on port ${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`Rankings app running on port ${PORT}`);
+    initSleeperIdMap();
+  });
 });
