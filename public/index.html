@@ -102,8 +102,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .pos-tab[data-pos="RB"]     {--pc:0,217,122;  --ph:var(--green)}
 .pos-tab[data-pos="WR"]     {--pc:74,158,255; --ph:var(--blue)}
 .pos-tab[data-pos="TE"]     {--pc:155,109,255;--ph:var(--purple)}
-.pos-tab[data-pos="Overall"]{--pc:0,191,165;  --ph:#00e5c8}
-.pos-tab[data-pos="SF"]     {--pc:155,109,255;--ph:var(--purple)}
+.pos-tab[data-pos="Overall"] {--pc:0,191,165;  --ph:#00e5c8}
+.pos-tab[data-pos="SF"]      {--pc:155,109,255;--ph:var(--purple)}
+.pos-tab[data-pos="Targets"] {--pc:255,165,0;  --ph:#ffa500}
+.tab-star-count{background:#ffa500;color:#000;border-radius:10px;font-size:10px;padding:0px 5px;font-weight:800;margin-left:3px;vertical-align:middle}
 .pos-tab:hover:not(.disabled):not(.active){
   background:rgba(var(--pc),0.07);border-color:rgba(var(--pc),0.25);color:rgba(var(--pc),0.8);
 }
@@ -523,6 +525,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
     <div class="pos-tab" data-pos="TE">TE</div>
     <div class="pos-tab" data-pos="Overall">Overall</div>
     <div class="pos-tab" data-pos="SF">SF Overall</div>
+    <div class="pos-tab" data-pos="Targets" style="display:none">★ Targets<span class="tab-star-count" id="tabStarCount"></span></div>
   </div>
 
   <!-- Action bar -->
@@ -541,9 +544,9 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
     </button>
     <span class="custom-badge" id="customBadge">Viewing Custom Rankings</span>
     <span class="spacer"></span>
-    <button class="btn" id="starTargetsBtn" onclick="openStarredModal()" style="display:none">
+    <button class="btn" id="clearStarsBtn" onclick="clearAllStars()" style="display:none;color:var(--orange);border-color:rgba(255,165,0,0.4)">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      Targets <span id="starCount" style="background:var(--orange);color:#000;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:800"></span>
+      Clear All Stars
     </button>
     <button class="draft-mode-toggle" id="draftToggle" onclick="toggleDraftMode()">
       <span class="draft-toggle-track"><span class="draft-toggle-thumb"></span></span>
@@ -685,6 +688,7 @@ function updatePosTabs() {
   const populated = POPULATED[state.mode] || {};
   document.querySelectorAll('.pos-tab').forEach(el => {
     const pos = el.dataset.pos;
+    if (pos === 'Targets') return; // managed by updateStarBtn()
     const isPopulated = !!populated[pos];
     el.classList.toggle('disabled', !isPopulated);
     if (!isPopulated && el.classList.contains('active')) {
@@ -700,8 +704,31 @@ function updatePosTabs() {
 
 // ── Fetch ────────────────────────────────────────────────────────────────────
 async function loadRankings() {
-  const container  = document.getElementById('tableContainer');
-  const populated  = POPULATED[state.mode]?.[state.pos];
+  const container = document.getElementById('tableContainer');
+
+  // Targets tab — build list from cached tabData
+  if (state.pos === 'Targets') {
+    const seen = new Set();
+    const players = [];
+    Object.values(tabData).forEach(data => {
+      data.forEach(p => {
+        if (!state.starred.has(p.Player) || seen.has(p.Player)) return;
+        seen.add(p.Player);
+        players.push(p);
+      });
+    });
+    state.data  = players;
+    state.order = players.map((_, i) => i);
+    state.custom = false;
+    document.getElementById('clearStarsBtn').style.display = players.length ? 'flex' : 'none';
+    renderTable();
+    const firstRow = document.querySelector('#rankingsTbody tr');
+    if (firstRow && state.data[0]?.Player) openPanel(state.data[0].Player, firstRow);
+    return;
+  }
+
+  document.getElementById('clearStarsBtn').style.display = 'none';
+  const populated = POPULATED[state.mode]?.[state.pos];
   if (!populated) {
     container.innerHTML = '<div class="coming-soon-msg">Rankings Coming Soon</div>';
     document.getElementById('playerCount').textContent = '';
@@ -715,7 +742,6 @@ async function loadRankings() {
     restoreTabOrder();
     renderTable();
     updateLastUpdated();
-    // Auto-open top player in panel
     const firstRow = document.querySelector('#rankingsTbody tr');
     if (firstRow && state.data[state.order[0]]?.Player) {
       openPanel(state.data[state.order[0]].Player, firstRow);
@@ -741,7 +767,7 @@ async function updateLastUpdated() {
 function rankClass(rank) { return rank===1?"rank-1":rank===2?"rank-2":rank===3?"rank-3":""; }
 
 function renderTable() {
-  const isOverall = state.pos === 'Overall' || state.pos === 'SF';
+  const isOverall = state.pos === 'Overall' || state.pos === 'SF' || state.pos === 'Targets';
   let displayRows = state.order.map(i => ({ ...state.data[i], _orig: i }));
   if (state.sortCol) {
     const dir = state.sortDir === 'asc' ? 1 : -1;
@@ -753,6 +779,7 @@ function renderTable() {
   }
   document.getElementById('playerCount').textContent = `${displayRows.length} players`;
 
+  const noDrag = state.draftMode || isOverall;
   const tbody = displayRows.map((p, displayIdx) => {
     const orig      = p._orig;
     const rank      = displayIdx + 1;
@@ -778,8 +805,8 @@ function renderTable() {
     const draftClass = isMine ? 'draft-mine' : isGone ? 'draft-gone' : isAvoid ? 'draft-avoid' : '';
     const targetClass = state.draftMode && isStarred ? 'draft-target' : '';
 
-    return `<tr data-idx="${orig}" draggable="${state.draftMode ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${targetClass}">
-      <td class="drag-cell" style="${state.draftMode ? 'display:none' : ''}">
+    return `<tr data-idx="${orig}" draggable="${noDrag ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${targetClass}">
+      <td class="drag-cell" style="${noDrag ? 'display:none' : ''}">
         <div class="drag-handle"><span></span><span></span><span></span></div>
       </td>
       <td class="rank-cell">
@@ -819,7 +846,7 @@ function renderTable() {
     <table>
       <thead>
         <tr>
-          ${state.draftMode ? '' : '<th style="width:24px"></th>'}
+          ${noDrag ? '' : '<th style="width:24px"></th>'}
           <th class="center" style="width:44px">Rank</th>
           <th style="width:32px"></th>
           <th style="width:48px"></th>
@@ -868,68 +895,21 @@ function toggleDraftMode() {
 }
 
 function updateStarBtn() {
-  const btn = document.getElementById('starTargetsBtn');
   const count = state.starred.size;
-  btn.style.display = count > 0 ? 'flex' : 'none';
-  document.getElementById('starCount').textContent = count > 0 ? count : '';
-}
-
-function openStarredModal() {
-  const body = document.getElementById('starredModalBody');
-  if (state.starred.size === 0) {
-    body.innerHTML = '<p style="color:var(--text3);text-align:center;padding:24px 0">No starred players yet. Click ★ next to any player to add targets.</p>';
-    document.getElementById('starredModal').classList.add('open');
-    return;
+  const tab = document.querySelector('.pos-tab[data-pos="Targets"]');
+  tab.style.display = count > 0 ? '' : 'none';
+  document.getElementById('tabStarCount').textContent = count > 0 ? count : '';
+  // If on Targets tab and no more stars, switch to QB
+  if (count === 0 && state.pos === 'Targets') {
+    const qbTab = document.querySelector('.pos-tab[data-pos="QB"]');
+    qbTab?.click();
   }
-  const POS_COLORS = {QB:'#e05c2a',RB:'#00cc66',WR:'#00bfff',TE:'#ff8c00'};
-  const seen = new Set();
-  const byPos = {};
-  Object.values(tabData).forEach(data => {
-    data.forEach(p => {
-      if (!state.starred.has(p.Player) || seen.has(p.Player)) return;
-      seen.add(p.Player);
-      const pos = p.Pos || 'Other';
-      (byPos[pos] = byPos[pos] || []).push(p);
-    });
-  });
-  const order = ['QB','RB','WR','TE'];
-  const allPos = [...order, ...Object.keys(byPos).filter(k => !order.includes(k))];
-  let html = '';
-  allPos.forEach(pos => {
-    const players = byPos[pos];
-    if (!players?.length) return;
-    const col = POS_COLORS[pos] || '#aaa';
-    html += `<div style="margin-bottom:14px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:${col};text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid var(--border);margin-bottom:6px">${pos}</div>
-      ${players.map(p => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
-        <span class="pos-badge pos-${pos.toLowerCase()}">${pos}</span>
-        <span style="flex:1;font-size:14px;font-weight:600;color:var(--text)">${p.Player}</span>
-        <span style="font-size:12px;color:var(--text3)">${(p.Team||'').toUpperCase()}</span>
-        <button onclick="removeStarByName('${p.Player.replace(/'/g,"\\'")}');event.stopPropagation()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 4px;line-height:1" title="Unstar">✕</button>
-      </div>`).join('')}
-    </div>`;
-  });
-  body.innerHTML = html;
-  document.getElementById('starredModal').classList.add('open');
-}
-
-function closeStarredModal() {
-  document.getElementById('starredModal').classList.remove('open');
-}
-
-function removeStarByName(name) {
-  state.starred.delete(name);
-  updateStarBtn();
-  renderTable();
-  if (state.starred.size === 0) { closeStarredModal(); return; }
-  openStarredModal();
 }
 
 function clearAllStars() {
   state.starred.clear();
   updateStarBtn();
   renderTable();
-  closeStarredModal();
 }
 
 function resetDraftMode() {
@@ -1503,22 +1483,6 @@ if (activePosEl) {
 
 loadRankings();
 </script>
-
-<!-- Starred Targets Modal -->
-<div class="modal-overlay" id="starredModal" onclick="if(event.target===this) closeStarredModal()">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <span class="modal-title">★ Target Players</span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button class="btn" style="font-size:11px;padding:4px 12px;color:var(--red2);border-color:rgba(232,23,42,0.4)" onclick="clearAllStars()">Clear All</button>
-        <button class="modal-close" onclick="closeStarredModal()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-    </div>
-    <div class="modal-body" id="starredModalBody" style="max-height:70vh;overflow-y:auto"></div>
-  </div>
-</div>
 
 <!-- Save Rankings Modal -->
 <div class="modal-overlay" id="saveModal" onclick="if(event.target===this) closeSaveModal()">
