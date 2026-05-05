@@ -1039,7 +1039,7 @@ function renderTable() {
           ${state.draftMode
             ? `<th style="width:160px;color:rgba(0,217,122,0.6);font-size:9px;letter-spacing:1px">MARK PLAYER</th>`
             : `<th class="source-col sortable" style="width:80px" onclick="sortBy('adp')">MFL ADP<span class="sort-arrow">${state.sortCol==='adp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>
-          <th class="source-col sleeper-col sortable" style="width:80px" onclick="sortBy('sleeperAdp')">ADP<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>`
+          <th class="source-col sleeper-col sortable" style="width:80px" onclick="sortBy('sleeperAdp')">SLEEPER ADP<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>`
           }
         </tr>
       </thead>
