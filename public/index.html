@@ -162,19 +162,27 @@ tbody tr.draft-mine,tbody tr.draft-gone,tbody tr.draft-avoid,tbody tr.draft-targ
 tbody tr.draft-mine{background:linear-gradient(90deg,rgba(0,217,122,0.22) 0%,rgba(0,217,122,0.08) 45%,rgba(0,217,122,0.02) 100%)!important}
 tbody tr.draft-mine td{background:transparent!important}
 tbody tr.draft-mine .rank-cell{border-left:4px solid rgba(0,217,122,0.9)}
+tbody tr.draft-mine.drag-enabled .rank-cell{border-left:none}
+tbody tr.draft-mine.drag-enabled .drag-cell{border-left:4px solid rgba(0,217,122,0.9)}
 tbody tr.draft-gone{opacity:0.45;background:linear-gradient(90deg,rgba(232,23,42,0.22) 0%,rgba(232,23,42,0.08) 45%,rgba(232,23,42,0.02) 100%)!important}
 tbody tr.draft-gone td{background:transparent!important}
 tbody tr.draft-gone .player-name{text-decoration:line-through}
 tbody tr.draft-gone .rank-cell{border-left:4px solid rgba(232,23,42,0.9)}
+tbody tr.draft-gone.drag-enabled .rank-cell{border-left:none}
+tbody tr.draft-gone.drag-enabled .drag-cell{border-left:4px solid rgba(232,23,42,0.9)}
 /* Avoid: always-on orange treatment */
 tbody tr.draft-avoid{background:linear-gradient(90deg,rgba(255,140,0,0.22) 0%,rgba(255,140,0,0.08) 45%,rgba(255,140,0,0.02) 100%)!important}
 tbody tr.draft-avoid td{background:transparent!important}
 tbody tr.draft-avoid .rank-cell{border-left:4px solid rgba(255,140,0,0.9)}
+tbody tr.draft-avoid.drag-enabled .rank-cell{border-left:none}
+tbody tr.draft-avoid.drag-enabled .drag-cell{border-left:4px solid rgba(255,140,0,0.9)}
 tbody tr.draft-avoid .rank-circle{border-color:rgba(255,140,0,0.8)!important;color:#ff8c00!important;box-shadow:0 0 10px rgba(255,140,0,0.45)!important;background:rgba(255,140,0,0.1)!important}
 /* Target: always-on blue treatment */
 tbody tr.draft-target:not(.draft-mine):not(.draft-gone){background:linear-gradient(90deg,rgba(74,158,255,0.18) 0%,rgba(74,158,255,0.06) 45%,rgba(74,158,255,0.02) 100%)!important}
 tbody tr.draft-target td{background:transparent!important}
 tbody tr.draft-target .rank-cell{border-left:4px solid rgba(74,158,255,0.9)}
+tbody tr.draft-target.drag-enabled .rank-cell{border-left:none}
+tbody tr.draft-target.drag-enabled .drag-cell{border-left:4px solid rgba(74,158,255,0.9)}
 tbody tr.draft-target:not(.draft-mine):not(.draft-gone) .rank-circle{border-color:rgba(74,158,255,0.8)!important;color:var(--blue)!important;box-shadow:0 0 10px rgba(74,158,255,0.45)!important;background:rgba(74,158,255,0.1)!important}
 /* Rank circle: grey rank-1/2/3 specials in draft mode, colored for mine/gone */
 .draft-active .rank-1,.draft-active .rank-2,.draft-active .rank-3{background:var(--bg3)!important;border-color:var(--border)!important;color:var(--text2)!important;box-shadow:none!important}
@@ -944,7 +952,7 @@ function renderTable() {
     const avoidClass  = isAvoided ? 'draft-avoid' : '';
     const targetClass = isStarred ? 'draft-target' : '';
 
-    return `<tr data-idx="${orig}" draggable="${noDrag ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${avoidClass} ${targetClass}">
+    return `<tr data-idx="${orig}" draggable="${noDrag ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${avoidClass} ${targetClass} ${noDrag ? '' : 'drag-enabled'}">
       <td class="drag-cell" style="${noDrag ? 'display:none' : ''}">
         <div class="drag-handle"><span></span><span></span><span></span></div>
       </td>
