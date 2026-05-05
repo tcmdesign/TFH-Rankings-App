@@ -199,6 +199,8 @@ tbody tr.draft-target:not(.draft-mine):not(.draft-gone) .rank-circle{border-colo
 .draft-btn-gone.active{background:rgba(232,23,42,0.16);border-color:rgba(232,23,42,0.9);box-shadow:0 0 18px rgba(232,23,42,0.4),inset 0 0 8px rgba(232,23,42,0.1)}
 /* Grey out non-active buttons when one is selected */
 .draft-cell:has(.draft-btn.active) .draft-btn:not(.active){opacity:0.18;filter:grayscale(1)}
+/* Mobile-only target/avoid buttons inside draft-cell — hidden on desktop */
+.draft-sa-target,.draft-sa-avoid{display:none!important}
 /* Draft legend */
 .draft-legend{display:none;align-items:center;gap:14px;padding:6px 16px;background:rgba(0,217,122,0.04);border-bottom:1px solid rgba(0,217,122,0.15);font-size:11px;font-weight:600;flex-shrink:0}
 .draft-legend.visible{display:flex}
@@ -412,10 +414,16 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .table-wrap:not(.draft-active) td.sleeper-col{display:flex!important;width:48px;flex-shrink:0;justify-content:center;padding:10px 4px}
   /* Draft cell: show inline on mobile in draft mode (replaces ADP column) */
   .draft-cell{display:none!important}
-  .draft-active .draft-cell{display:flex!important;align-items:center;padding:0 8px 0 2px;flex-shrink:0}
-  .draft-active .draft-cell .draft-btn{padding:10px 11px}
+  .draft-active .draft-cell{display:flex!important;align-items:center;padding:0 4px 0 2px;flex-shrink:0;gap:2px}
+  .draft-active .draft-cell .draft-btn{padding:10px 9px}
+  .draft-active .draft-cell .draft-sa-target{color:var(--text3)}
+  .draft-active .draft-cell .draft-sa-target.active{color:var(--blue)}
+  .draft-active .draft-cell .draft-sa-avoid{color:var(--text3)}
+  .draft-active .draft-cell .draft-sa-avoid.active{color:var(--orange)}
   .draft-active .swipe-strip-cell{display:none!important}
-  .draft-active .check-cell{display:flex!important;padding:0 4px;gap:2px}
+  /* Hide the extra target/avoid in draft-cell on desktop (check-cell handles them) */
+  .draft-sa-target,.draft-sa-avoid{display:none}
+  .draft-active .draft-sa-target,.draft-active .draft-sa-avoid{display:flex}
   .tfh-rank-col{display:none!important}
   .photo-cell{width:46px;flex-shrink:0;padding:8px 4px}
   .player-photo,.photo-initials{width:38px;height:38px}
@@ -996,6 +1004,19 @@ function renderTable() {
         </button>
         <button class="draft-btn draft-btn-gone ${isGone ? 'active' : ''}" onclick="event.stopPropagation();markDraft('gone',${orig})" title="Off board">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <button class="draft-btn draft-sa-target ${isStarred ? 'active' : ''}" onclick="event.stopPropagation();toggleStar('${(p.Player||'').replace(/'/g,"\\'")}');" title="Target">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2" fill="${isStarred ? 'currentColor' : 'none'}" stroke="none"/>
+            <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+          </svg>
+        </button>
+        <button class="draft-btn draft-sa-avoid ${isAvoided ? 'active' : ''}" onclick="event.stopPropagation();toggleAvoid('${(p.Player||'').replace(/'/g,"\\'")}');" title="Avoid">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
         </button>
       </td>` : `
       <td class="adp-cell source-col">${adpHtml}</td>
