@@ -163,7 +163,8 @@ tbody tr.draft-mine{background:linear-gradient(90deg,rgba(0,217,122,0.22) 0%,rgb
 tbody tr.draft-mine td{background:transparent!important}
 tbody tr.draft-mine .rank-cell{border-left:4px solid rgba(0,217,122,0.9)}
 tbody tr.draft-gone{opacity:0.45;background:linear-gradient(90deg,rgba(232,23,42,0.22) 0%,rgba(232,23,42,0.08) 45%,rgba(232,23,42,0.02) 100%)!important}
-tbody tr.draft-gone td{background:transparent!important;text-decoration:line-through}
+tbody tr.draft-gone td{background:transparent!important}
+tbody tr.draft-gone .player-name{text-decoration:line-through}
 tbody tr.draft-gone .rank-cell{border-left:4px solid rgba(232,23,42,0.9)}
 /* Avoid: always-on orange treatment */
 tbody tr.draft-avoid{background:linear-gradient(90deg,rgba(255,140,0,0.22) 0%,rgba(255,140,0,0.08) 45%,rgba(255,140,0,0.02) 100%)!important}
@@ -235,7 +236,7 @@ tbody tr.draft-target:not(.draft-mine):not(.draft-gone) .rank-circle{border-colo
 .content-row{display:flex;flex:1;overflow:hidden}
 
 /* ── Table ── */
-.table-wrap{flex:1;min-width:0;overflow-y:auto;padding:8px 12px}
+.table-wrap{flex:1;min-width:0;overflow-y:auto;padding:8px 12px 8px 0}
 .coming-soon-msg{
   display:flex;align-items:center;justify-content:center;
   height:200px;font-size:14px;color:var(--text3);
@@ -270,9 +271,6 @@ td{padding:7px 8px;vertical-align:middle}
   font-family:'Bebas Neue',sans-serif;font-size:17px;
   background:var(--bg3);border:1px solid var(--border);color:var(--text2);
 }
-.rank-1{background:rgba(232,23,42,0.12);border-color:rgba(232,23,42,0.5);color:var(--red2);box-shadow:0 0 10px rgba(232,23,42,0.25)}
-.rank-2{background:rgba(255,107,53,0.12);border-color:rgba(255,107,53,0.45);color:#ff6b35}
-.rank-3{background:rgba(255,154,60,0.12);border-color:rgba(255,154,60,0.4);color:#ff9a3c}
 .check-cell{width:52px;padding:7px 2px;text-align:center;white-space:nowrap}
 .target-btn,.avoid-btn{
   background:none;border:none;cursor:pointer;color:var(--text3);padding:2px;
@@ -351,7 +349,8 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
 .bottom-sheet.open{transform:translateY(0)}
 .bottom-sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499}
 .bottom-sheet-overlay.visible{display:block}
-.bottom-sheet-handle{width:40px;height:5px;background:rgba(255,255,255,0.2);border-radius:3px;margin:12px auto 8px;cursor:grab;touch-action:none}
+.bottom-sheet-handle{width:100%;height:44px;display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;flex-shrink:0}
+.bottom-sheet-handle::after{content:'';display:block;width:40px;height:5px;background:rgba(255,255,255,0.2);border-radius:3px}
 
 /* ── Swipe strip (mobile) — hidden on desktop ── */
 .swipe-strip-cell{display:none}
@@ -407,6 +406,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .draft-cell{display:none!important}
   .draft-active .draft-cell{display:flex!important;align-items:center;padding:0 8px 0 2px;flex-shrink:0}
   .draft-active .draft-cell .draft-btn{padding:10px 11px}
+  .draft-active .swipe-strip-cell{display:none!important}
   .tfh-rank-col{display:none!important}
   .photo-cell{width:46px;flex-shrink:0;padding:8px 4px}
   .player-photo,.photo-initials{width:38px;height:38px}
@@ -1175,15 +1175,15 @@ function initDragDrop() {
 
 // ── Target / Avoid toggles ────────────────────────────────────────────────────
 function toggleStar(name) {
-  if (state.starred.has(name)) state.starred.delete(name);
-  else                         state.starred.add(name);
+  if (state.starred.has(name)) { state.starred.delete(name); }
+  else { state.starred.add(name); state.avoided.delete(name); }
   renderTable();
   updateStarBtn();
 }
 
 function toggleAvoid(name) {
-  if (state.avoided.has(name)) state.avoided.delete(name);
-  else                         state.avoided.add(name);
+  if (state.avoided.has(name)) { state.avoided.delete(name); }
+  else { state.avoided.add(name); state.starred.delete(name); }
   renderTable();
 }
 
@@ -1389,13 +1389,17 @@ function closeBottomSheet() {
 // ── Bottom sheet swipe-down-to-dismiss ───────────────────────────────────────
 (function() {
   let startY = 0, dragging = false;
-  const DISMISS_THRESHOLD = 100;
+  const DISMISS_THRESHOLD = 60;
 
   document.addEventListener('touchstart', e => {
-    const handle = e.target.closest('#bsHandle');
-    if (!handle) return;
     const sheet = document.getElementById('bottomSheet');
     if (!sheet?.classList.contains('open')) return;
+    const inSheet = e.target.closest('#bottomSheet');
+    if (!inSheet) return;
+    const content = document.getElementById('bottomSheetContent');
+    const atTop = !content || content.scrollTop === 0;
+    const onHandle = e.target.closest('#bsHandle');
+    if (!onHandle && !atTop) return;
     startY = e.touches[0].clientY;
     dragging = true;
     sheet.style.transition = 'none';
