@@ -156,14 +156,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .draft-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left 0.2s;opacity:0.5}
 .draft-mode-toggle.active .draft-toggle-thumb{left:14px;opacity:1}
 /* Draft row states */
-tbody tr.draft-mine{background:linear-gradient(90deg,rgba(0,217,122,0.22) 0%,rgba(0,217,122,0.06) 55%,transparent 100%)!important;border-color:rgba(0,217,122,0.75)!important;box-shadow:0 0 18px rgba(0,217,122,0.22)!important}
+tbody tr.draft-mine{background:linear-gradient(90deg,rgba(0,217,122,0.25) 0%,rgba(0,217,122,0.1) 50%,rgba(0,217,122,0.04) 100%)!important;border-color:rgba(0,217,122,0.75)!important;box-shadow:0 0 18px rgba(0,217,122,0.22)!important}
 tbody tr.draft-mine td{background:transparent!important}
-tbody tr.draft-gone{opacity:0.45;background:linear-gradient(90deg,rgba(232,23,42,0.22) 0%,rgba(232,23,42,0.06) 55%,transparent 100%)!important;border-color:rgba(232,23,42,0.75)!important;box-shadow:0 0 18px rgba(232,23,42,0.18)!important}
+tbody tr.draft-gone{opacity:0.45;background:linear-gradient(90deg,rgba(232,23,42,0.25) 0%,rgba(232,23,42,0.1) 50%,rgba(232,23,42,0.04) 100%)!important;border-color:rgba(232,23,42,0.75)!important;box-shadow:0 0 18px rgba(232,23,42,0.18)!important}
 tbody tr.draft-gone td{background:transparent!important;text-decoration:line-through}
-tbody tr.draft-avoid{background:linear-gradient(90deg,rgba(255,140,0,0.22) 0%,rgba(255,140,0,0.06) 55%,transparent 100%)!important;border-color:rgba(255,140,0,0.75)!important;box-shadow:0 0 18px rgba(255,140,0,0.22)!important}
+tbody tr.draft-avoid{background:linear-gradient(90deg,rgba(255,140,0,0.25) 0%,rgba(255,140,0,0.1) 50%,rgba(255,140,0,0.04) 100%)!important;border-color:rgba(255,140,0,0.75)!important;box-shadow:0 0 18px rgba(255,140,0,0.22)!important}
 tbody tr.draft-avoid td{background:transparent!important}
 tbody tr.draft-target{border-color:rgba(74,158,255,0.75)!important;box-shadow:0 0 0 1px rgba(74,158,255,0.5),0 0 20px rgba(74,158,255,0.25)!important}
-tbody tr.draft-target:not(.draft-mine):not(.draft-gone):not(.draft-avoid){background:linear-gradient(90deg,rgba(74,158,255,0.18) 0%,rgba(74,158,255,0.05) 55%,transparent 100%)!important}
+tbody tr.draft-target:not(.draft-mine):not(.draft-gone):not(.draft-avoid){background:linear-gradient(90deg,rgba(74,158,255,0.2) 0%,rgba(74,158,255,0.08) 50%,rgba(74,158,255,0.03) 100%)!important}
 tbody tr.draft-target td{background:transparent!important}
 /* Rank circle: grey in draft mode, colored when marked */
 .draft-active .rank-1,.draft-active .rank-2,.draft-active .rank-3{background:var(--bg3)!important;border-color:var(--border)!important;color:var(--text2)!important;box-shadow:none!important}
@@ -807,7 +807,7 @@ function renderTable() {
     <table>
       <thead>
         <tr>
-          <th style="width:24px"></th>
+          ${state.draftMode ? '' : '<th style="width:24px"></th>'}
           <th class="center" style="width:44px">Rank</th>
           <th style="width:32px"></th>
           <th style="width:48px"></th>
