@@ -74,9 +74,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 }
 .topbar-left{}
 .topbar-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.5px;line-height:1;color:var(--text)}
+.topbar-app-sub{display:none}
 .topbar-sub{font-size:13px;color:var(--text3);margin-top:3px;margin-bottom:12px}
 .topbar-right{display:flex;align-items:center;gap:6px;padding-top:6px}
 .last-updated{font-size:13px;color:var(--text3)}
+.beta-badge{display:inline-block;font-family:'Inter',sans-serif;font-size:9px;font-weight:800;letter-spacing:1px;background:rgba(232,23,42,0.18);color:var(--red2);border:1px solid rgba(232,23,42,0.4);border-radius:4px;padding:2px 5px;vertical-align:middle;margin-left:4px;line-height:1.4}
 
 /* ── Position tabs ── */
 .pos-bar{
@@ -383,13 +385,16 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .format-bar,.pos-bar{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .format-bar::-webkit-scrollbar,.pos-bar::-webkit-scrollbar{display:none}
   .topbar{padding:14px 16px 0}
-  .topbar-title{font-size:26px}
+  .topbar-title{font-size:28px}
 }
 
 /* ── Mobile (<768px) ── */
 @media (max-width:767px){
-  .topbar{padding:10px 14px;align-items:center}
-  .topbar-title{font-size:19px;white-space:nowrap}
+  .topbar{padding:calc(env(safe-area-inset-top,10px) + 10px) 16px 10px;position:relative;justify-content:center;align-items:center}
+  .hamburger-btn{position:absolute;left:16px;top:calc(env(safe-area-inset-top,10px) + 10px)}
+  .topbar-left{text-align:center}
+  .topbar-title{font-size:30px;letter-spacing:1px}
+  .topbar-app-sub{display:block;font-size:12px;color:var(--text3);margin-top:2px;letter-spacing:0.5px}
   .topbar-sub{display:none}
   .topbar-right{display:none}
   .action-bar{overflow-x:auto;flex-wrap:nowrap;padding:8px 14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -644,7 +649,8 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
     <div class="topbar-left">
-      <div class="topbar-title" id="topbarTitle">Rookie Rankings</div>
+      <div class="topbar-title" id="topbarTitle">TFH Rankings <span class="beta-badge">BETA</span></div>
+      <div class="topbar-app-sub">2026 Rookie Rankings</div>
       <div class="topbar-sub" id="topbarSub">2026 Dynasty · 1QB</div>
     </div>
     <div class="topbar-right">
