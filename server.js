@@ -85,8 +85,8 @@ async function fetchAdpMap() {
         SELECT p.name, s.adp, s.pulled_at
         FROM adp_snapshots s
         JOIN players p ON p.id = s.player_id
-        WHERE s.pulled_at = (SELECT MAX(pulled_at) FROM adp_snapshots WHERE season = 2026 AND COALESCE(source,'mfl')='mfl')
-          AND s.season = 2026 AND s.scoring = 'ppr' AND COALESCE(s.source,'mfl') = 'mfl'
+        WHERE s.pulled_at = (SELECT MAX(pulled_at) FROM adp_snapshots WHERE season = 2026 AND scoring = 'ppr')
+          AND s.season = 2026 AND s.scoring = 'ppr'
       `);
       const adpMap = {};
       rows.forEach(r => { adpMap[r.name.toLowerCase()] = parseFloat(r.adp).toFixed(1); });
