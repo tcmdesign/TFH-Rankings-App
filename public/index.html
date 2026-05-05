@@ -158,8 +158,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 /* Draft row states */
 tbody tr.draft-mine{border-color:rgba(0,217,122,0.5)!important;box-shadow:0 0 12px rgba(0,217,122,0.12)!important}
 tbody tr.draft-mine td{background:linear-gradient(90deg,rgba(0,217,122,0.13) 0%,rgba(0,217,122,0.04) 100%)!important}
-tbody tr.draft-gone{opacity:0.4;border-color:rgba(74,158,255,0.5)!important;box-shadow:0 0 12px rgba(74,158,255,0.1)!important}
-tbody tr.draft-gone td{background:linear-gradient(90deg,rgba(74,158,255,0.12) 0%,rgba(74,158,255,0.03) 100%)!important;text-decoration:line-through}
+tbody tr.draft-gone{opacity:0.4;border-color:rgba(232,23,42,0.5)!important;box-shadow:0 0 12px rgba(232,23,42,0.1)!important}
+tbody tr.draft-gone td{background:linear-gradient(90deg,rgba(232,23,42,0.12) 0%,rgba(232,23,42,0.03) 100%)!important;text-decoration:line-through}
 tbody tr.draft-avoid{border-color:rgba(255,140,0,0.5)!important;box-shadow:0 0 12px rgba(255,140,0,0.12)!important}
 tbody tr.draft-avoid td{background:linear-gradient(90deg,rgba(255,140,0,0.13) 0%,rgba(255,140,0,0.04) 100%)!important}
 tbody tr.draft-target{border-color:rgba(74,158,255,0.6)!important;box-shadow:0 0 0 1px rgba(74,158,255,0.35),0 0 16px rgba(74,158,255,0.18)!important}
@@ -170,9 +170,9 @@ tbody tr.draft-target td{background:linear-gradient(90deg,rgba(74,158,255,0.1) 0
 .draft-btn-mine{background:rgba(0,217,122,0.06);color:var(--green);border:1px solid rgba(0,217,122,0.3);box-shadow:0 0 8px rgba(0,217,122,0.08)}
 .draft-btn-mine:hover{background:rgba(0,217,122,0.12);border-color:rgba(0,217,122,0.6);box-shadow:0 0 14px rgba(0,217,122,0.2)}
 .draft-btn-mine.active{background:rgba(0,217,122,0.14);border-color:rgba(0,217,122,0.75);box-shadow:0 0 14px rgba(0,217,122,0.3),inset 0 0 8px rgba(0,217,122,0.08)}
-.draft-btn-gone{background:rgba(74,158,255,0.06);color:var(--blue);border:1px solid rgba(74,158,255,0.3);box-shadow:0 0 8px rgba(74,158,255,0.08)}
-.draft-btn-gone:hover{background:rgba(74,158,255,0.12);border-color:rgba(74,158,255,0.6);box-shadow:0 0 14px rgba(74,158,255,0.2)}
-.draft-btn-gone.active{background:rgba(74,158,255,0.14);border-color:rgba(74,158,255,0.75);box-shadow:0 0 14px rgba(74,158,255,0.3),inset 0 0 8px rgba(74,158,255,0.08)}
+.draft-btn-gone{background:rgba(232,23,42,0.06);color:var(--red2);border:1px solid rgba(232,23,42,0.3);box-shadow:0 0 8px rgba(232,23,42,0.08)}
+.draft-btn-gone:hover{background:rgba(232,23,42,0.12);border-color:rgba(232,23,42,0.6);box-shadow:0 0 14px rgba(232,23,42,0.2)}
+.draft-btn-gone.active{background:rgba(232,23,42,0.14);border-color:rgba(232,23,42,0.75);box-shadow:0 0 14px rgba(232,23,42,0.3),inset 0 0 8px rgba(232,23,42,0.08)}
 .draft-btn-avoid{background:rgba(255,140,0,0.06);color:#ff8c00;border:1px solid rgba(255,140,0,0.3);box-shadow:0 0 8px rgba(255,140,0,0.08)}
 .draft-btn-avoid:hover{background:rgba(255,140,0,0.12);border-color:rgba(255,140,0,0.6);box-shadow:0 0 14px rgba(255,140,0,0.2)}
 .draft-btn-avoid.active{background:rgba(255,140,0,0.14);border-color:rgba(255,140,0,0.75);box-shadow:0 0 14px rgba(255,140,0,0.3),inset 0 0 8px rgba(255,140,0,0.08)}
@@ -539,7 +539,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   <div class="draft-legend" id="draftLegend">
     <span style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--green);margin-right:4px">DRAFT MODE</span>
     <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--green)"></span>Your pick</span>
-    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--blue)"></span>Off board</span>
+    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--red2)"></span>Off board</span>
     <span class="draft-legend-item"><span class="draft-legend-dot" style="background:#ff8c00"></span>Avoid</span>
     <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--blue);box-shadow:0 0 5px var(--blue)"></span>Target (starred)</span>
   </div>
