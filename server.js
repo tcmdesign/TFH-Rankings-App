@@ -25,7 +25,7 @@ const TABLES = {
     WR:      'tblMz7V9Ey01cXITc',
     TE:      'tblvlw4JAdOe57rVp',
     Overall: 'tblhW63LJS2Bn0zdF',
-    SF:      'tbl6BrcC8Z8pVTybK',
+    SF:      'tbls95UbMeJ1RYkgm',
   },
 };
 
