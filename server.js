@@ -185,7 +185,16 @@ app.get('/api/player/:name', async (req, res) => {
   const name = decodeURIComponent(req.params.name).toLowerCase();
   const scout  = scoutMap[name]  || null;
   const injury = injuryMap[name] || null;
-  res.json({ scout, injury });
+  let attrs = null;
+  if (db) {
+    try {
+      const { rows } = await db.query(
+        'SELECT age, height, weight FROM players WHERE LOWER(name) = $1', [name]
+      );
+      if (rows[0]) attrs = rows[0];
+    } catch {}
+  }
+  res.json({ scout, injury, attrs });
 });
 
 app.get('/api/adp/history/:name', async (req, res) => {
@@ -213,6 +222,49 @@ app.get('/api/adp/last-updated', async (req, res) => {
     const { rows } = await db.query('SELECT MAX(pulled_at) AS ts FROM adp_snapshots WHERE season = 2026');
     res.json({ ts: rows[0]?.ts ? new Date(rows[0].ts).getTime() : null });
   } catch { res.json({ ts: null }); }
+});
+
+// ── Player attributes (age / height / weight from Sleeper, stored in DB) ──────
+async function ensureAttrsColumns() {
+  if (!db) return;
+  try {
+    await db.query(`
+      ALTER TABLE players
+        ADD COLUMN IF NOT EXISTS age     INT,
+        ADD COLUMN IF NOT EXISTS height  VARCHAR(20),
+        ADD COLUMN IF NOT EXISTS weight  INT
+    `);
+  } catch (e) { console.error('ensureAttrsColumns:', e.message); }
+}
+
+async function syncPlayerAttrs() {
+  if (!db) return { error: 'No DB' };
+  await ensureAttrsColumns();
+  try {
+    const res  = await fetch('https://api.sleeper.app/v1/players/nfl');
+    const json = await res.json();
+    const byName = {};
+    Object.values(json).forEach(p => {
+      if (p.full_name) byName[p.full_name.toLowerCase()] = p;
+    });
+    const { rows } = await db.query('SELECT id, name FROM players');
+    let updated = 0;
+    for (const row of rows) {
+      const s = byName[row.name.toLowerCase()];
+      if (!s) continue;
+      await db.query(
+        'UPDATE players SET age=$1, height=$2, weight=$3 WHERE id=$4',
+        [s.age || null, s.height || null, s.weight ? parseInt(s.weight) : null, row.id]
+      );
+      updated++;
+    }
+    return { updated, total: rows.length };
+  } catch (e) { return { error: e.message }; }
+}
+
+app.post('/api/admin/sync-attrs', async (req, res) => {
+  const result = await syncPlayerAttrs();
+  res.json(result);
 });
 
 app.listen(PORT, () => console.log(`Rankings app running on port ${PORT}`));

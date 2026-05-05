@@ -329,6 +329,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
 .panel-meta{font-size:13px;color:var(--text2);margin-top:5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .panel-pos-badge{font-size:12px;font-weight:800;letter-spacing:0.5px;padding:2px 6px;border-radius:3px;color:#fff}
 .panel-team-logo{width:16px;height:16px;object-fit:contain}
+.panel-draft-banner{background:#000;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;padding:7px 16px;text-align:center}
 .panel-ranks{display:flex;gap:6px;margin-top:12px;position:relative}
 .panel-rank-box{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 8px;text-align:center}
 .panel-rank-val{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--text);line-height:1}
@@ -989,7 +990,7 @@ async function openPanel(playerName, row) {
   const rank    = rankIdx >= 0 ? rankIdx + 1 : null;
   const adp     = state.data[state.order[rankIdx]]?.adp || null;
 
-  renderPanel(playerName, detail.scout, detail.injury, rank, adp, history);
+  renderPanel(playerName, detail.scout, detail.injury, detail.attrs || null, rank, adp, history);
 }
 
 function seededVal(name, offset, min, max) {
@@ -1009,7 +1010,7 @@ function wheelSVG(value, color) {
   </svg>`;
 }
 
-function renderPanel(name, scout, injury, rank, adp, history) {
+function renderPanel(name, scout, injury, attrs, rank, adp, history) {
   const pos  = scout?.position || '';
   const team = scout?.nfl_team || injury?.nfl_team || '';
   const abbrev = scout?.nfl_team_abbrev || injury?.nfl_team_abbrev || '';
@@ -1021,7 +1022,9 @@ function renderPanel(name, scout, injury, rank, adp, history) {
   const posColor = {'quarterback':'#E52222','running back':'#00cc66','wide receiver':'#00bfff','tight end':'#ff8c00'}[pos.toLowerCase()] || '#aaa';
   const posAbbr  = {'quarterback':'QB','running back':'RB','wide receiver':'WR','tight end':'TE'}[pos.toLowerCase()] || pos.toUpperCase().slice(0,2);
 
-  const draftSlot = scout?.round ? `Rd ${scout.round} · Pk ${scout.pick}` : '—';
+  const draftBanner = scout?.round
+    ? `<div class="panel-draft-banner">DRAFTED: ROUND ${scout.round} · PICK ${scout.pick}</div>`
+    : '';
   const riskLevel = injury?.re_injury_risk || null;
   const riskClass = riskLevel ? `risk-${riskLevel.toLowerCase()}` : '';
 
@@ -1052,6 +1055,7 @@ function renderPanel(name, scout, injury, rank, adp, history) {
     : '<div style="font-size:12px;color:var(--muted)">No major injuries reported.</div>';
 
   const html = `
+    ${draftBanner}
     <div class="panel-hero">
       <div class="panel-hero-top">
         <img class="panel-photo" id="panelPhoto" src="" style="display:none" alt="${name}">
@@ -1067,16 +1071,16 @@ function renderPanel(name, scout, injury, rank, adp, history) {
       </div>
       <div class="panel-ranks">
         <div class="panel-rank-box">
-          <div class="panel-rank-val red">${rank !== null ? '#'+rank : '—'}</div>
-          <div class="panel-rank-lbl">TFH Rank</div>
+          <div class="panel-rank-val">${attrs?.age ?? '—'}</div>
+          <div class="panel-rank-lbl">Age</div>
         </div>
         <div class="panel-rank-box">
-          <div class="panel-rank-val">${adp || '—'}</div>
-          <div class="panel-rank-lbl">MFL ADP</div>
+          <div class="panel-rank-val" style="font-size:15px;padding-top:3px">${attrs?.height || '—'}</div>
+          <div class="panel-rank-lbl">Height</div>
         </div>
         <div class="panel-rank-box">
-          <div class="panel-rank-val" style="font-size:14px;padding-top:4px">${draftSlot}</div>
-          <div class="panel-rank-lbl">Draft Slot</div>
+          <div class="panel-rank-val">${attrs?.weight ? attrs.weight + ' lbs' : '—'}</div>
+          <div class="panel-rank-lbl">Weight</div>
         </div>
       </div>
     </div>
