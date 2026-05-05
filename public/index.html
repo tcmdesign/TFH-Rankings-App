@@ -430,28 +430,28 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
     align-items:stretch;padding:0!important;z-index:2;
   }
   .swipe-strip{
-    display:flex;align-items:center;gap:4px;padding:0 8px;
+    display:flex;align-items:stretch;gap:0;padding:0;
     background:var(--bg3);border-left:1px solid var(--border);
-    width:104px;transform:translateX(104px);transition:transform 0.2s ease;
+    width:96px;transform:translateX(96px);transition:transform 0.2s ease;overflow:hidden;
   }
-  .draft-active .swipe-strip{width:168px;transform:translateX(168px)}
+  .draft-active .swipe-strip{width:192px;transform:translateX(192px)}
   tbody tr.swipe-open .swipe-strip{transform:translateX(0)!important}
   tbody tr.swipe-open .rank-cell,
   tbody tr.swipe-open .photo-cell,
-  tbody tr.swipe-open .player-cell{transform:translateX(-104px);transition:transform 0.2s ease}
+  tbody tr.swipe-open .player-cell{transform:translateX(-96px);transition:transform 0.2s ease}
   .draft-active tbody tr.swipe-open .rank-cell,
   .draft-active tbody tr.swipe-open .photo-cell,
-  .draft-active tbody tr.swipe-open .player-cell{transform:translateX(-168px)}
+  .draft-active tbody tr.swipe-open .player-cell{transform:translateX(-192px)}
   .sa-btn{
-    width:36px;height:36px;border-radius:50%;border:none;background:none;
+    width:48px;border:none;
     cursor:pointer;display:flex;align-items:center;justify-content:center;
-    flex-shrink:0;-webkit-tap-highlight-color:transparent;color:var(--text3);
-    transition:all 0.15s;
+    flex-shrink:0;-webkit-tap-highlight-color:transparent;
+    transition:filter 0.15s;color:#000;
   }
-  .sa-btn.sa-mine{color:var(--text3)}.sa-btn.sa-mine.active{color:var(--green);background:rgba(0,217,122,0.12)}
-  .sa-btn.sa-gone{color:var(--text3)}.sa-btn.sa-gone.active{color:var(--red2);background:rgba(232,23,42,0.12)}
-  .sa-btn.sa-target{color:var(--text3)}.sa-btn.sa-target.active{color:var(--blue);background:rgba(74,158,255,0.12)}
-  .sa-btn.sa-avoid{color:var(--text3)}.sa-btn.sa-avoid.active{color:var(--orange);background:rgba(255,140,0,0.12)}
+  .sa-btn.sa-mine{background:#00d97a}.sa-btn.sa-mine.active{filter:brightness(1.15)}
+  .sa-btn.sa-gone{background:#e8172a}.sa-btn.sa-gone.active{filter:brightness(1.15)}
+  .sa-btn.sa-target{background:#4a9eff}.sa-btn.sa-target.active{filter:brightness(1.15)}
+  .sa-btn.sa-avoid{background:#ff8c00}.sa-btn.sa-avoid.active{filter:brightness(1.15)}
   /* Draft-only swipe buttons hidden outside draft mode */
   .sa-btn.sa-mine,.sa-btn.sa-gone{display:none}
   .draft-active .sa-btn.sa-mine,.draft-active .sa-btn.sa-gone{display:flex}
@@ -995,10 +995,10 @@ function renderTable() {
       </td>
       ${state.custom ? `<td class="tfh-rank-col">${p.Rank || '—'}</td>` : ''}
       <td class="swipe-strip-cell" onclick="event.stopPropagation()"><div class="swipe-strip">
-        <button class="sa-btn sa-mine ${isMine ? 'active' : ''}" onclick="event.stopPropagation();markDraft('mine',${orig});this.closest('tr').classList.remove('swipe-open')" title="My pick"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
-        <button class="sa-btn sa-gone ${isGone ? 'active' : ''}" onclick="event.stopPropagation();markDraft('gone',${orig});this.closest('tr').classList.remove('swipe-open')" title="Off board"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        <button class="sa-btn sa-target ${isStarred ? 'active' : ''}" onclick="event.stopPropagation();toggleStar('${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="Target"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2" fill="${isStarred ? 'currentColor' : 'none'}" stroke="none"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></button>
-        <button class="sa-btn sa-avoid ${isAvoided ? 'active' : ''}" onclick="event.stopPropagation();toggleAvoid('${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="Avoid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+        <button class="sa-btn sa-mine ${isMine ? 'active' : ''}" onclick="event.stopPropagation();markDraft('mine',${orig});this.closest('tr').classList.remove('swipe-open')" title="My pick"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+        <button class="sa-btn sa-gone ${isGone ? 'active' : ''}" onclick="event.stopPropagation();markDraft('gone',${orig});this.closest('tr').classList.remove('swipe-open')" title="Off board"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <button class="sa-btn sa-target ${isStarred ? 'active' : ''}" onclick="event.stopPropagation();toggleStar('${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="Target"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></button>
+        <button class="sa-btn sa-avoid ${isAvoided ? 'active' : ''}" onclick="event.stopPropagation();toggleAvoid('${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="Avoid"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
       </div></td>
       ${state.draftMode ? `
       <td class="draft-cell">
