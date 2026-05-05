@@ -390,8 +390,8 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
 
 /* ── Mobile (<768px) ── */
 @media (max-width:767px){
-  .topbar{padding:calc(env(safe-area-inset-top,10px) + 10px) 16px 10px;position:relative;justify-content:center;align-items:center}
-  .hamburger-btn{position:absolute;left:16px;top:calc(env(safe-area-inset-top,10px) + 10px)}
+  .topbar{padding:max(env(safe-area-inset-top,0px),50px) 16px 10px;position:relative;justify-content:center;align-items:center}
+  .hamburger-btn{position:absolute;left:16px;top:max(env(safe-area-inset-top,0px),50px)}
   .topbar-left{text-align:center}
   .topbar-title{font-size:30px;letter-spacing:1px}
   .topbar-app-sub{display:block;font-size:12px;color:var(--text3);margin-top:2px;letter-spacing:0.5px}
