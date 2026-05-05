@@ -541,6 +541,10 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
     </button>
     <span class="custom-badge" id="customBadge">Viewing Custom Rankings</span>
     <span class="spacer"></span>
+    <button class="btn" id="starTargetsBtn" onclick="openStarredModal()" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Targets <span id="starCount" style="background:var(--orange);color:#000;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:800"></span>
+    </button>
     <button class="draft-mode-toggle" id="draftToggle" onclick="toggleDraftMode()">
       <span class="draft-toggle-track"><span class="draft-toggle-thumb"></span></span>
       <span class="draft-toggle-label">Draft Mode</span>
@@ -555,6 +559,8 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
     <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--red2)"></span>Off board</span>
     <span class="draft-legend-item"><span class="draft-legend-dot" style="background:#ff8c00"></span>Avoid</span>
     <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--blue);box-shadow:0 0 5px var(--blue)"></span>Target (starred)</span>
+    <span style="flex:1"></span>
+    <button class="btn" style="font-size:11px;padding:4px 12px" onclick="resetDraftMode()">Reset Draft</button>
   </div>
 
   <!-- Table + Panel -->
@@ -612,6 +618,7 @@ let state = {
 };
 // Persist custom order per tab so switching tabs doesn't lose customizations
 const tabOrders = {};
+const tabData   = {}; // caches loaded data per tab so starred view works across positions
 function tabKey() { return `${state.format}_${state.pos}`; }
 function saveTabOrder() {
   if (state.custom) tabOrders[tabKey()] = { order: [...state.order], custom: true };
@@ -704,6 +711,7 @@ async function loadRankings() {
   try {
     const res   = await fetch(`/api/rankings/${state.mode}/${state.pos}?format=${state.format}`);
     state.data  = await res.json();
+    tabData[tabKey()] = state.data;
     restoreTabOrder();
     renderTable();
     updateLastUpdated();
@@ -749,7 +757,7 @@ function renderTable() {
     const orig      = p._orig;
     const rank      = displayIdx + 1;
     const isChecked = state.checked.has(orig);
-    const isStarred = state.starred.has(orig);
+    const isStarred = state.starred.has(p.Player || '');
     const pos       = p.Pos || state.pos;
     const posColor  = POS_COLORS[pos] || '#aaa';
     const nameParts = (p.Player || '').split(' ');
@@ -778,7 +786,7 @@ function renderTable() {
         <span class="rank-circle ${rankClass(rank)}">${rank}</span>
       </td>
       <td class="check-cell">
-        <button class="star-btn ${isStarred ? 'starred' : ''}" onclick="toggleStar(${orig}, this)" title="Star player">
+        <button class="star-btn ${isStarred ? 'starred' : ''}" onclick="toggleStar('${(p.Player||'').replace(/'/g,"\\'")}', this)" title="Star player">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="${isStarred ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
           </svg>
@@ -856,9 +864,76 @@ function toggleDraftMode() {
   document.getElementById('draftToggle').classList.toggle('active', state.draftMode);
   document.getElementById('draftLegend').classList.toggle('visible', state.draftMode);
   document.querySelector('.table-wrap').classList.toggle('draft-active', state.draftMode);
-  if (!state.draftMode) {
-    state.draftMine.clear(); state.draftGone.clear(); state.draftAvoid.clear();
+  renderTable();
+}
+
+function updateStarBtn() {
+  const btn = document.getElementById('starTargetsBtn');
+  const count = state.starred.size;
+  btn.style.display = count > 0 ? 'flex' : 'none';
+  document.getElementById('starCount').textContent = count > 0 ? count : '';
+}
+
+function openStarredModal() {
+  const body = document.getElementById('starredModalBody');
+  if (state.starred.size === 0) {
+    body.innerHTML = '<p style="color:var(--text3);text-align:center;padding:24px 0">No starred players yet. Click ★ next to any player to add targets.</p>';
+    document.getElementById('starredModal').classList.add('open');
+    return;
   }
+  const POS_COLORS = {QB:'#e05c2a',RB:'#00cc66',WR:'#00bfff',TE:'#ff8c00'};
+  const seen = new Set();
+  const byPos = {};
+  Object.values(tabData).forEach(data => {
+    data.forEach(p => {
+      if (!state.starred.has(p.Player) || seen.has(p.Player)) return;
+      seen.add(p.Player);
+      const pos = p.Pos || 'Other';
+      (byPos[pos] = byPos[pos] || []).push(p);
+    });
+  });
+  const order = ['QB','RB','WR','TE'];
+  const allPos = [...order, ...Object.keys(byPos).filter(k => !order.includes(k))];
+  let html = '';
+  allPos.forEach(pos => {
+    const players = byPos[pos];
+    if (!players?.length) return;
+    const col = POS_COLORS[pos] || '#aaa';
+    html += `<div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:${col};text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid var(--border);margin-bottom:6px">${pos}</div>
+      ${players.map(p => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+        <span class="pos-badge pos-${pos.toLowerCase()}">${pos}</span>
+        <span style="flex:1;font-size:14px;font-weight:600;color:var(--text)">${p.Player}</span>
+        <span style="font-size:12px;color:var(--text3)">${(p.Team||'').toUpperCase()}</span>
+        <button onclick="removeStarByName('${p.Player.replace(/'/g,"\\'")}');event.stopPropagation()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 4px;line-height:1" title="Unstar">✕</button>
+      </div>`).join('')}
+    </div>`;
+  });
+  body.innerHTML = html;
+  document.getElementById('starredModal').classList.add('open');
+}
+
+function closeStarredModal() {
+  document.getElementById('starredModal').classList.remove('open');
+}
+
+function removeStarByName(name) {
+  state.starred.delete(name);
+  updateStarBtn();
+  renderTable();
+  if (state.starred.size === 0) { closeStarredModal(); return; }
+  openStarredModal();
+}
+
+function clearAllStars() {
+  state.starred.clear();
+  updateStarBtn();
+  renderTable();
+  closeStarredModal();
+}
+
+function resetDraftMode() {
+  state.draftMine.clear(); state.draftGone.clear(); state.draftAvoid.clear();
   renderTable();
 }
 
@@ -967,10 +1042,11 @@ function initDragDrop() {
 }
 
 // ── Star / check ─────────────────────────────────────────────────────────────
-function toggleStar(idx, btn) {
-  if (state.starred.has(idx)) { state.starred.delete(idx); btn.classList.remove('starred'); btn.querySelector('svg').setAttribute('fill','none'); }
-  else                        { state.starred.add(idx);    btn.classList.add('starred');    btn.querySelector('svg').setAttribute('fill','currentColor'); }
+function toggleStar(name, btn) {
+  if (state.starred.has(name)) { state.starred.delete(name); btn.classList.remove('starred'); btn.querySelector('svg').setAttribute('fill','none'); }
+  else                         { state.starred.add(name);    btn.classList.add('starred');    btn.querySelector('svg').setAttribute('fill','currentColor'); }
   if (state.draftMode) renderTable();
+  updateStarBtn();
 }
 
 // ── Actions ───────────────────────────────────────────────────────────────────
@@ -1427,6 +1503,22 @@ if (activePosEl) {
 
 loadRankings();
 </script>
+
+<!-- Starred Targets Modal -->
+<div class="modal-overlay" id="starredModal" onclick="if(event.target===this) closeStarredModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">★ Target Players</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn" style="font-size:11px;padding:4px 12px;color:var(--red2);border-color:rgba(232,23,42,0.4)" onclick="clearAllStars()">Clear All</button>
+        <button class="modal-close" onclick="closeStarredModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" id="starredModalBody" style="max-height:70vh;overflow-y:auto"></div>
+  </div>
+</div>
 
 <!-- Save Rankings Modal -->
 <div class="modal-overlay" id="saveModal" onclick="if(event.target===this) closeSaveModal()">
