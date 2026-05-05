@@ -952,14 +952,14 @@ function renderTable() {
         <span class="rank-circle ${rankClass(rank)}">${rank}</span>
       </td>
       <td class="check-cell">
-        <button class="target-btn ${isStarred ? 'active' : ''}" onclick="toggleStar('${(p.Player||'').replace(/'/g,"\\'")}');event.stopPropagation()" data-tip="Target">
+        <button class="target-btn ${isStarred ? 'active' : ''}" onclick="event.stopPropagation();toggleStar('${(p.Player||'').replace(/'/g,"\\'")}');" data-tip="Target">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2" fill="${isStarred ? 'currentColor' : 'none'}" stroke="none"/>
             <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
             <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
           </svg>
         </button>
-        <button class="avoid-btn ${isAvoided ? 'active' : ''}" onclick="toggleAvoid('${(p.Player||'').replace(/'/g,"\\'")}');event.stopPropagation()" data-tip="Avoid">
+        <button class="avoid-btn ${isAvoided ? 'active' : ''}" onclick="event.stopPropagation();toggleAvoid('${(p.Player||'').replace(/'/g,"\\'")}');" data-tip="Avoid">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
             <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
@@ -977,15 +977,15 @@ function renderTable() {
       </td>
       ${state.custom ? `<td class="tfh-rank-col">${p.Rank || '—'}</td>` : ''}
       <td class="swipe-strip-cell" onclick="event.stopPropagation()"><div class="swipe-strip">
-        <button class="sa-btn sa-target ${isStarred ? 'active' : ''}" onclick="toggleStar('${(p.Player||'').replace(/'/g,"\\'")}');event.stopPropagation()" title="Target"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2" fill="${isStarred ? 'currentColor' : 'none'}" stroke="none"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></button>
-        <button class="sa-btn sa-avoid ${isAvoided ? 'active' : ''}" onclick="toggleAvoid('${(p.Player||'').replace(/'/g,"\\'")}');event.stopPropagation()" title="Avoid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+        <button class="sa-btn sa-target ${isStarred ? 'active' : ''}" onclick="event.stopPropagation();toggleStar('${(p.Player||'').replace(/'/g,"\\'")}');" title="Target"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2" fill="${isStarred ? 'currentColor' : 'none'}" stroke="none"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></button>
+        <button class="sa-btn sa-avoid ${isAvoided ? 'active' : ''}" onclick="event.stopPropagation();toggleAvoid('${(p.Player||'').replace(/'/g,"\\'")}');" title="Avoid"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
       </div></td>
       ${state.draftMode ? `
       <td class="draft-cell">
-        <button class="draft-btn draft-btn-mine ${isMine ? 'active' : ''}" onclick="markDraft('mine',${orig});event.stopPropagation()" title="My pick">
+        <button class="draft-btn draft-btn-mine ${isMine ? 'active' : ''}" onclick="event.stopPropagation();markDraft('mine',${orig})" title="My pick">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </button>
-        <button class="draft-btn draft-btn-gone ${isGone ? 'active' : ''}" onclick="markDraft('gone',${orig});event.stopPropagation()" title="Off board">
+        <button class="draft-btn draft-btn-gone ${isGone ? 'active' : ''}" onclick="event.stopPropagation();markDraft('gone',${orig})" title="Off board">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </td>` : `
