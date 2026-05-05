@@ -218,8 +218,20 @@ app.get('/api/adp/history/:name', async (req, res) => {
                         .map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) }));
     res.json({ mfl, sleeper });
   } catch (err) {
-    console.error(err);
-    res.json({ mfl: [], sleeper: [] });
+    // Fallback: source column may not exist yet — run old MFL-only query
+    try {
+      const { rows } = await db.query(`
+        SELECT s.pulled_at AS ts, s.adp
+        FROM adp_snapshots s
+        JOIN players p ON p.id = s.player_id
+        WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.scoring = 'ppr'
+        ORDER BY s.pulled_at ASC
+      `, [name]);
+      res.json({ mfl: rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })), sleeper: [] });
+    } catch (err2) {
+      console.error('adp/history fallback failed:', err2.message);
+      res.json({ mfl: [], sleeper: [] });
+    }
   }
 });
 
@@ -304,13 +316,14 @@ async function saveSleeperAdpSnapshots() {
   } catch (e) { console.error('saveSleeperAdpSnapshots failed:', e.message); }
 }
 
-async function startSleeperTracking() {
-  await ensureSourceColumn();
-  await saveSleeperAdpSnapshots();
-  setInterval(saveSleeperAdpSnapshots, 60 * 60 * 1000);
-}
 
-app.listen(PORT, () => {
-  console.log(`Rankings app running on port ${PORT}`);
-  startSleeperTracking().catch(e => console.error('Sleeper tracking init failed:', e.message));
+ensureSourceColumn().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Rankings app running on port ${PORT}`);
+    saveSleeperAdpSnapshots();
+    setInterval(saveSleeperAdpSnapshots, 60 * 60 * 1000);
+  });
+}).catch(e => {
+  console.error('DB migration failed, starting anyway:', e.message);
+  app.listen(PORT, () => console.log(`Rankings app running on port ${PORT}`));
 });
