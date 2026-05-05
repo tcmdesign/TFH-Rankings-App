@@ -147,8 +147,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   color:#ff4455;box-shadow:0 0 18px rgba(232,23,42,0.35);transform:translateY(-1px);
 }
 .btn svg{flex-shrink:0}
+.btn-short{display:none}
 .spacer{flex:1}
 .player-count{font-size:14px;color:var(--text3);font-weight:500}
+/* Status badges — shown via CSS based on tr class */
+.sb{display:none;font-size:9px;font-weight:800;letter-spacing:0.4px;padding:1px 5px;border-radius:3px;margin-left:5px;vertical-align:middle;text-transform:uppercase}
+tr.draft-target .sb-target{display:inline;background:rgba(74,158,255,0.18);color:#4a9eff}
+tr.draft-avoid .sb-avoid{display:inline;background:rgba(255,140,0,0.18);color:#ff8c00}
+tr.draft-mine .sb-mine{display:inline;background:rgba(0,217,122,0.18);color:#00d97a}
+tr.draft-gone .sb-gone{display:inline;background:rgba(232,23,42,0.18);color:#e8172a}
 .copy-feedback{font-size:13px;color:var(--green);opacity:0;transition:opacity 0.3s}
 .copy-feedback.show{opacity:1}
 /* ── Draft Mode ── */
@@ -395,12 +402,13 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .topbar-app-sub{display:block;font-size:12px;color:var(--text3);margin-top:2px;letter-spacing:0.5px}
   .topbar-sub{display:none}
   .topbar-right{display:none}
-  .action-bar{display:flex;flex-wrap:nowrap;padding:8px 14px;gap:6px}
+  .action-bar{display:flex;flex-wrap:nowrap;padding:6px 14px;gap:6px;align-items:center}
   .action-bar::-webkit-scrollbar{display:none}
   .btn.primary{display:none}
   .btn-label{display:none}
-  .action-bar .btn{padding:7px 10px}
-  .draft-toggle-label{display:none}
+  .btn-short{display:inline;font-size:9px;letter-spacing:0.3px}
+  .action-bar .btn{flex-direction:column;gap:3px;padding:6px 10px;font-size:9px}
+  .draft-toggle-label{font-size:11px}
   .player-count{display:none}
   /* Draft legend: only show reset button */
   #draftLegend{padding:4px 14px;justify-content:flex-end}
@@ -408,7 +416,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   #draftLegend .btn{font-size:12px;padding:6px 16px}
   /* Pos-bar: flat nav style on mobile */
   .pos-bar{border-top:1px solid var(--border)}
-  .pos-tab{border-radius:0!important;margin-top:0!important;font-size:12px;padding:10px 14px}
+  .pos-tab{border-radius:0!important;margin-top:0!important;font-size:12px;padding:10px 14px;white-space:nowrap}
   .pos-tab::after{border-radius:0}
   /* Table: display:flex on rows for swipe support */
   thead{display:none}
@@ -690,11 +698,11 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
     </button>
     <button class="btn" onclick="resetOrder()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.6"/></svg>
-      <span class="btn-label">Reset Rankings</span>
+      <span class="btn-label">Reset Rankings</span><span class="btn-short">Reset</span>
     </button>
     <button class="btn" onclick="openSaveModal()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      <span class="btn-label">Save My Current Rankings</span>
+      <span class="btn-label">Save My Current Rankings</span><span class="btn-short">Save</span>
     </button>
     <span class="custom-badge" id="customBadge">Viewing Custom Rankings</span>
     <span class="spacer"></span>
@@ -997,7 +1005,7 @@ function renderTable() {
       </td>
       <td class="player-cell">
         <div class="player-name">${p.Player || '—'}</div>
-        <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team.toUpperCase()}` : ''}</div>
+        <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team.toUpperCase()}` : ''}<span class="sb sb-target">TARGET</span><span class="sb sb-avoid">AVOID</span><span class="sb sb-mine">MY PICK</span><span class="sb sb-gone">GONE</span></div>
       </td>
       ${state.custom ? `<td class="tfh-rank-col">${p.Rank || '—'}</td>` : ''}
       <td class="swipe-strip-cell" onclick="event.stopPropagation()"><div class="swipe-strip">
