@@ -201,37 +201,29 @@ app.get('/api/adp/history/:name', async (req, res) => {
   const name = decodeURIComponent(req.params.name).toLowerCase();
   if (!db) return res.json({ mfl: [], sleeper: [] });
   try {
-    const { rows } = await db.query(`
-      SELECT s.pulled_at AS ts, s.adp, COALESCE(s.source, 'mfl') AS source
-      FROM adp_snapshots s
-      JOIN players p ON p.id = s.player_id
-      WHERE LOWER(p.name) = $1 AND s.season = 2026
-        AND (
-          (COALESCE(s.source, 'mfl') = 'mfl'    AND s.scoring = 'ppr')
-          OR (s.source = 'sleeper' AND s.scoring = 'dynasty_ppr')
-        )
-      ORDER BY s.pulled_at ASC
-    `, [name]);
-    const mfl     = rows.filter(r => r.source === 'mfl')
-                        .map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) }));
-    const sleeper = rows.filter(r => r.source === 'sleeper')
-                        .map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) }));
-    res.json({ mfl, sleeper });
-  } catch (err) {
-    // Fallback: source column may not exist yet — run old MFL-only query
-    try {
-      const { rows } = await db.query(`
+    const [mflRes, sleeperRes] = await Promise.all([
+      db.query(`
         SELECT s.pulled_at AS ts, s.adp
         FROM adp_snapshots s
         JOIN players p ON p.id = s.player_id
         WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.scoring = 'ppr'
         ORDER BY s.pulled_at ASC
-      `, [name]);
-      res.json({ mfl: rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })), sleeper: [] });
-    } catch (err2) {
-      console.error('adp/history fallback failed:', err2.message);
-      res.json({ mfl: [], sleeper: [] });
-    }
+      `, [name]),
+      db.query(`
+        SELECT s.pulled_at AS ts, s.adp
+        FROM adp_snapshots s
+        JOIN players p ON p.id = s.player_id
+        WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.scoring = 'dynasty_ppr'
+        ORDER BY s.pulled_at ASC
+      `, [name]),
+    ]);
+    res.json({
+      mfl:     mflRes.rows.map(r     => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })),
+      sleeper: sleeperRes.rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })),
+    });
+  } catch (err) {
+    console.error('adp/history failed:', err.message);
+    res.json({ mfl: [], sleeper: [] });
   }
 });
 
