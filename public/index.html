@@ -382,13 +382,15 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
 
 /* ── Mobile (<768px) ── */
 @media (max-width:767px){
-  .topbar{padding:12px 14px 0;align-items:center}
-  .topbar-left{display:flex;align-items:center;gap:0}
-  .topbar-title{font-size:20px}
-  .topbar-sub{font-size:11px;margin-bottom:8px}
+  .topbar{padding:10px 14px;align-items:center}
+  .topbar-title{font-size:19px;white-space:nowrap}
+  .topbar-sub{display:none}
+  .topbar-right{display:none}
   .action-bar{overflow-x:auto;flex-wrap:nowrap;padding:8px 14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .action-bar::-webkit-scrollbar{display:none}
   .btn.primary{display:none}
+  .btn-label{display:none}
+  .action-bar .btn{padding:7px 10px}
   /* Table: display:flex on rows for swipe support */
   thead{display:none}
   tbody tr{display:flex;align-items:center;position:relative;overflow:hidden;border-radius:10px;margin-bottom:2px}
@@ -657,15 +659,15 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   <div class="action-bar">
     <button class="btn primary" onclick="printCheatSheet()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-      Print Cheat Sheet
+      <span class="btn-label">Print Cheat Sheet</span>
     </button>
     <button class="btn" onclick="resetOrder()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.6"/></svg>
-      Reset Rankings
+      <span class="btn-label">Reset Rankings</span>
     </button>
     <button class="btn" onclick="openSaveModal()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      Save My Current Rankings
+      <span class="btn-label">Save My Current Rankings</span>
     </button>
     <span class="custom-badge" id="customBadge">Viewing Custom Rankings</span>
     <span class="spacer"></span>
