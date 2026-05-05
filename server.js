@@ -126,6 +126,7 @@ async function fetchSleeperAdpMap() {
     const res  = await fetch(url);
     const json = await res.json();
     const adpMap = {};
+    const idMap  = {};
     (Array.isArray(json) ? json : []).forEach(entry => {
       const s = entry.stats || {};
       const v = f => (f != null && f < 999) ? parseFloat(f).toFixed(1) : null;
@@ -136,11 +137,13 @@ async function fetchSleeperAdpMap() {
         dynastyPpr: v(s.adp_dynasty_ppr),
         dynasty2qb: v(s.adp_dynasty_2qb),
       };
-      if (!Object.values(vals).some(x => x)) return;
       const name = `${entry.player?.first_name || ''} ${entry.player?.last_name || ''}`.trim().toLowerCase();
-      if (name) adpMap[name] = vals;
+      if (!name) return;
+      if (Object.values(vals).some(x => x)) adpMap[name] = vals;
+      if (entry.player_id) idMap[name] = entry.player_id;
     });
     cache.__sleeperAdp = { ts: now, data: adpMap };
+    cache.__sleeperIds = idMap;
     return adpMap;
   } catch (e) {
     console.error('Sleeper ADP fetch failed:', e.message);
@@ -194,7 +197,12 @@ app.get('/api/player/:name', async (req, res) => {
       if (rows[0]) attrs = rows[0];
     } catch {}
   }
-  res.json({ scout, injury, attrs });
+  const sleeperId = cache.__sleeperIds?.[name] || null;
+  res.json({ scout, injury, attrs, sleeperId });
+});
+
+app.get('/api/sleeper-ids', (req, res) => {
+  res.json(cache.__sleeperIds || {});
 });
 
 app.get('/api/adp/history/:name', async (req, res) => {

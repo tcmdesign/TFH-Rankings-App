@@ -1134,12 +1134,16 @@ function sortBy(col) {
 // ── Photos ───────────────────────────────────────────────────────────────────
 async function loadPhotos() {
   const photoCache = window._photoCache = window._photoCache || {};
+  // Fetch Sleeper ID map once (cached globally)
+  if (!window._sleeperIds) {
+    try { window._sleeperIds = await fetch('/api/sleeper-ids').then(r => r.json()); } catch { window._sleeperIds = {}; }
+  }
+  const sleeperIds = window._sleeperIds;
   const imgs = [...document.querySelectorAll('.player-photo[data-name]')];
   await Promise.allSettled(imgs.map(async img => {
     const name = img.dataset.name;
     const slug = img.dataset.slug;
     if (!name) return;
-    // Use cache to avoid re-fetching same player
     let url = photoCache[name];
     if (!url) {
       try {
@@ -1149,15 +1153,16 @@ async function loadPhotos() {
         for (const h of hits) {
           const m = (h.uid || '').match(/a:(\d+)/);
           if (!m) continue;
-          const id = m[1];
-          for (const league of ['nfl', 'college-football']) {
-            url = `https://a.espncdn.com/combiner/i?img=/i/headshots/${league}/players/full/${id}.png&w=350&h=254`;
-            break;
-          }
+          url = `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${m[1]}.png&w=350&h=254`;
           break;
         }
-        if (url) photoCache[name] = url;
       } catch {}
+      // Sleeper CDN fallback
+      if (!url) {
+        const sid = sleeperIds[name.toLowerCase()];
+        if (sid) url = `https://sleepercdn.com/content/nfl/players/${sid}.jpg`;
+      }
+      if (url) photoCache[name] = url;
     }
     if (url) {
       img.src = url;
@@ -1472,7 +1477,7 @@ async function _loadAndRender(playerName, containerId) {
   const rankIdx = state.order.findIndex(i => (state.data[i]?.Player || '') === playerName);
   const rank    = rankIdx >= 0 ? rankIdx + 1 : null;
   const adp     = state.data[state.order[rankIdx]]?.adp || null;
-  renderPanel(playerName, detail.scout, detail.injury, detail.attrs || null, rank, adp, history, containerId);
+  renderPanel(playerName, detail.scout, detail.injury, detail.attrs || null, rank, adp, history, containerId, detail.sleeperId || null);
 }
 
 async function openPanel(playerName, row) {
@@ -1521,7 +1526,7 @@ function wheelSVG(value, color) {
   </svg>`;
 }
 
-function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId = 'panelContent') {
+function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId = 'panelContent', sleeperId = null) {
   const pos  = scout?.position || '';
   const team = scout?.nfl_team || injury?.nfl_team || '';
   const abbrev = scout?.nfl_team_abbrev || injury?.nfl_team_abbrev || '';
@@ -1663,18 +1668,27 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
   document.getElementById(containerId).innerHTML = html;
 
   // Load photo
-  loadPanelPhoto(name, slug);
+  loadPanelPhoto(name, slug, sleeperId);
 
   // Render chart
   if (history.mfl?.length >= 2 || history.sleeper?.length >= 2) renderAdpChart(history);
 }
 
-function loadPanelPhoto(name, slug) {
+function loadPanelPhoto(name, slug, sleeperId) {
   const cached = window._photoCache?.[name];
   const img    = document.getElementById('panelPhoto');
   const inits  = document.getElementById('panelInitials');
   if (!img) return;
   const applyUrl = url => {
+    img.src = url;
+    img.style.display = 'block';
+    img.onload  = () => { if(inits) inits.style.display = 'none'; };
+    img.onerror = () => { img.style.display = 'none'; };
+  };
+  const trySleeperFallback = () => {
+    if (!sleeperId) return;
+    const url = `https://sleepercdn.com/content/nfl/players/${sleeperId}.jpg`;
+    if (window._photoCache) window._photoCache[name] = url;
     img.src = url;
     img.style.display = 'block';
     img.onload  = () => { if(inits) inits.style.display = 'none'; };
@@ -1691,9 +1705,10 @@ function loadPanelPhoto(name, slug) {
         const url = `https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${id}.png&w=350&h=254`;
         if (window._photoCache) window._photoCache[name] = url;
         applyUrl(url);
-        break;
+        return;
       }
-    }).catch(()=>{});
+      trySleeperFallback();
+    }).catch(() => trySleeperFallback());
 }
 
 function renderAdpChart(history) {
