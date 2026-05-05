@@ -147,6 +147,38 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .player-count{font-size:14px;color:var(--text3);font-weight:500}
 .copy-feedback{font-size:13px;color:var(--green);opacity:0;transition:opacity 0.3s}
 .copy-feedback.show{opacity:1}
+/* ── Draft Mode ── */
+.draft-mode-toggle{display:flex;align-items:center;gap:7px;background:none;border:1px solid var(--border);border-radius:20px;padding:5px 12px 5px 8px;cursor:pointer;color:var(--text3);font-size:12px;font-weight:700;letter-spacing:0.5px;transition:all 0.2s}
+.draft-mode-toggle:hover{border-color:rgba(255,255,255,0.2);color:var(--text2)}
+.draft-mode-toggle.active{border-color:rgba(0,217,122,0.6);color:var(--green);background:rgba(0,217,122,0.06)}
+.draft-toggle-track{width:28px;height:16px;background:rgba(255,255,255,0.1);border-radius:8px;position:relative;transition:background 0.2s;flex-shrink:0}
+.draft-mode-toggle.active .draft-toggle-track{background:var(--green)}
+.draft-toggle-thumb{position:absolute;top:2px;left:2px;width:12px;height:12px;background:#fff;border-radius:50%;transition:left 0.2s;opacity:0.5}
+.draft-mode-toggle.active .draft-toggle-thumb{left:14px;opacity:1}
+/* Draft row states */
+tbody tr.draft-mine td{background:rgba(0,217,122,0.06)!important}
+tbody tr.draft-mine{border-left:3px solid var(--green)!important;border-color:rgba(0,217,122,0.35)!important}
+tbody tr.draft-gone{opacity:0.3;border-left:3px solid rgba(74,158,255,0.6)!important}
+tbody tr.draft-gone td{background:rgba(74,158,255,0.04)!important;text-decoration:line-through}
+tbody tr.draft-avoid td{background:rgba(255,140,0,0.06)!important}
+tbody tr.draft-avoid{border-left:3px solid rgba(255,140,0,0.7)!important;border-color:rgba(255,140,0,0.35)!important}
+tbody tr.draft-target{box-shadow:0 0 0 1px rgba(74,158,255,0.7),0 0 12px rgba(74,158,255,0.2)!important;border-color:rgba(74,158,255,0.5)!important}
+/* Draft action buttons */
+.draft-cell{white-space:nowrap;padding:0 8px 0 4px}
+.draft-btn{border:none;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:0.5px;padding:3px 7px;cursor:pointer;opacity:0.45;transition:opacity 0.15s,background 0.15s;margin-right:3px}
+.draft-btn:hover{opacity:0.85}
+.draft-btn.active{opacity:1}
+.draft-btn-mine{background:rgba(0,217,122,0.2);color:var(--green)}
+.draft-btn-mine.active{background:rgba(0,217,122,0.35)}
+.draft-btn-gone{background:rgba(74,158,255,0.2);color:var(--blue)}
+.draft-btn-gone.active{background:rgba(74,158,255,0.35)}
+.draft-btn-avoid{background:rgba(255,140,0,0.2);color:#ff8c00}
+.draft-btn-avoid.active{background:rgba(255,140,0,0.35)}
+/* Draft legend */
+.draft-legend{display:none;align-items:center;gap:14px;padding:6px 16px;background:rgba(0,217,122,0.04);border-bottom:1px solid rgba(0,217,122,0.15);font-size:11px;font-weight:600;flex-shrink:0}
+.draft-legend.visible{display:flex}
+.draft-legend-item{display:flex;align-items:center;gap:5px;color:var(--text3)}
+.draft-legend-dot{width:9px;height:9px;border-radius:50%}
 /* ── Save Modal ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s}
 .modal-overlay.open{opacity:1;pointer-events:all}
@@ -494,7 +526,20 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
     </button>
     <span class="custom-badge" id="customBadge">Viewing Custom Rankings</span>
     <span class="spacer"></span>
+    <button class="draft-mode-toggle" id="draftToggle" onclick="toggleDraftMode()">
+      <span class="draft-toggle-track"><span class="draft-toggle-thumb"></span></span>
+      <span class="draft-toggle-label">Draft Mode</span>
+    </button>
     <span class="player-count" id="playerCount"></span>
+  </div>
+
+  <!-- Draft legend -->
+  <div class="draft-legend" id="draftLegend">
+    <span style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--green);margin-right:4px">DRAFT MODE</span>
+    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--green)"></span>Your pick</span>
+    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--blue)"></span>Off board</span>
+    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:#ff8c00"></span>Avoid</span>
+    <span class="draft-legend-item"><span class="draft-legend-dot" style="background:var(--blue);box-shadow:0 0 5px var(--blue)"></span>Target (starred)</span>
   </div>
 
   <!-- Table + Panel -->
@@ -542,9 +587,13 @@ let state = {
   order:   [],
   starred: new Set(),
   checked: new Set(),
-  custom:  false,
-  sortCol: null,
-  sortDir: 'asc',
+  custom:   false,
+  sortCol:  null,
+  sortDir:  'asc',
+  draftMode: false,
+  draftMine: new Set(),
+  draftGone: new Set(),
+  draftAvoid: new Set(),
 };
 // Persist custom order per tab so switching tabs doesn't lose customizations
 const tabOrders = {};
@@ -700,8 +749,14 @@ function renderTable() {
       ? `<span class="adp-val">${p.adp}</span>`
       : `<span class="adp-none">—</span>`;
 
-    return `<tr data-idx="${orig}" draggable="true" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''}">
-      <td class="drag-cell">
+    const isMine  = state.draftMine.has(orig);
+    const isGone  = state.draftGone.has(orig);
+    const isAvoid = state.draftAvoid.has(orig);
+    const draftClass = isMine ? 'draft-mine' : isGone ? 'draft-gone' : isAvoid ? 'draft-avoid' : '';
+    const targetClass = state.draftMode && isStarred && !isMine && !isGone ? 'draft-target' : '';
+
+    return `<tr data-idx="${orig}" draggable="${state.draftMode ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${targetClass}">
+      <td class="drag-cell" style="${state.draftMode ? 'display:none' : ''}">
         <div class="drag-handle"><span></span><span></span><span></span></div>
       </td>
       <td class="rank-cell">
@@ -724,10 +779,16 @@ function renderTable() {
         <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team.toUpperCase()}` : ''}</div>
       </td>
       ${state.custom ? `<td class="tfh-rank-col">${p.Rank || '—'}</td>` : ''}
+      ${state.draftMode ? `
+      <td class="draft-cell">
+        <button class="draft-btn draft-btn-mine ${isMine ? 'active' : ''}" onclick="markDraft('mine',${orig});event.stopPropagation()">Mine</button>
+        <button class="draft-btn draft-btn-gone ${isGone ? 'active' : ''}" onclick="markDraft('gone',${orig});event.stopPropagation()">Gone</button>
+        <button class="draft-btn draft-btn-avoid ${isAvoid ? 'active' : ''}" onclick="markDraft('avoid',${orig});event.stopPropagation()">Avoid</button>
+      </td>` : `
       <td class="adp-cell source-col">${adpHtml}</td>
       <td class="adp-cell source-col">${p.sleeperAdp
         ? `<span class="adp-val">${p.sleeperAdp}</span>`
-        : `<span class="adp-none">—</span>`}</td>
+        : `<span class="adp-none">—</span>`}</td>`}
     </tr>`;
   }).join('');
 
@@ -741,8 +802,11 @@ function renderTable() {
           <th style="width:48px"></th>
           <th>Player</th>
           ${state.custom ? `<th class="tfh-rank-th">TFH</th>` : ''}
-          <th class="source-col sortable" style="width:80px" onclick="sortBy('adp')">MFL ADP<span class="sort-arrow">${state.sortCol==='adp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>
-          <th class="source-col sortable" style="width:80px" onclick="sortBy('sleeperAdp')">Sleeper<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>
+          ${state.draftMode
+            ? `<th style="width:160px;color:rgba(0,217,122,0.6);font-size:9px;letter-spacing:1px">MARK PLAYER</th>`
+            : `<th class="source-col sortable" style="width:80px" onclick="sortBy('adp')">MFL ADP<span class="sort-arrow">${state.sortCol==='adp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>
+          <th class="source-col sortable" style="width:80px" onclick="sortBy('sleeperAdp')">Sleeper<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>`
+          }
         </tr>
       </thead>
       <tbody id="rankingsTbody">${tbody}</tbody>
@@ -770,6 +834,32 @@ function updateCustomIndicator() {
     resetBtn?.classList.remove('reset-glow');
     customBadge?.classList.remove('show');
   }
+}
+
+function toggleDraftMode() {
+  state.draftMode = !state.draftMode;
+  document.getElementById('draftToggle').classList.toggle('active', state.draftMode);
+  document.getElementById('draftLegend').classList.toggle('visible', state.draftMode);
+  if (!state.draftMode) {
+    // Clear draft state when turning off
+    state.draftMine.clear(); state.draftGone.clear(); state.draftAvoid.clear();
+  }
+  renderTable();
+}
+
+function markDraft(type, orig) {
+  const already = (type === 'mine' && state.draftMine.has(orig))
+               || (type === 'gone' && state.draftGone.has(orig))
+               || (type === 'avoid' && state.draftAvoid.has(orig));
+  state.draftMine.delete(orig);
+  state.draftGone.delete(orig);
+  state.draftAvoid.delete(orig);
+  if (!already) {
+    if (type === 'mine')  state.draftMine.add(orig);
+    if (type === 'gone')  state.draftGone.add(orig);
+    if (type === 'avoid') state.draftAvoid.add(orig);
+  }
+  renderTable();
 }
 
 function sortBy(col) {
