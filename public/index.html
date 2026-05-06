@@ -1041,7 +1041,7 @@ function renderTable() {
           <th class="player-cell">Player</th>
           ${state.custom ? `<th class="tfh-rank-th">TFH</th>` : ''}
           ${state.draftMode
-            ? `<th style="width:160px;color:rgba(0,217,122,0.6);font-size:9px;letter-spacing:1px"><span class="name-full">MARK PLAYER</span><span class="name-short">SWIPE LEFT TO MARK PLAYER</span></th>`
+            ? `<th style="width:160px;color:rgba(0,217,122,0.6);font-size:9px;letter-spacing:1px;white-space:nowrap"><span class="name-full">MARK PLAYER</span><span class="name-short">SWIPE LEFT TO MARK PLAYER</span></th>`
             : `<th class="sleeper-col sortable" onclick="sortBy('sleeperAdp')">ADP<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>`
           }
         </tr>
