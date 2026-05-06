@@ -316,6 +316,7 @@ async function ensureSourceColumn() {
   if (!db) return;
   try {
     await db.query(`ALTER TABLE adp_snapshots ADD COLUMN IF NOT EXISTS source VARCHAR(10) DEFAULT 'mfl'`);
+    await db.query(`ALTER TABLE adp_snapshots ALTER COLUMN scoring TYPE VARCHAR(20)`);
   } catch (e) { console.error('ensureSourceColumn:', e.message); }
 }
 
