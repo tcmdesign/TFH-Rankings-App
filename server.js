@@ -7,6 +7,16 @@ const { Pool } = require('pg');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+// ── Referer blocking ──────────────────────────────────────────────────────────
+const BLOCKED_REFERERS = ['reddit.com', 'discord.com', 'discord.gg', 'redd.it'];
+app.use((req, res, next) => {
+  const referer = req.headers.referer || req.headers.referrer || '';
+  if (BLOCKED_REFERERS.some(domain => referer.includes(domain))) {
+    return res.status(403).sendFile(path.join(__dirname, 'public', 'blocked.html'));
+  }
+  next();
+});
+
 const AIRTABLE_TOKEN   = process.env.AIRTABLE_TOKEN;
 const AIRTABLE_BASE_ID = 'appuyQz7Xw85M0FdJ';
 
@@ -118,7 +128,7 @@ async function fetchAdpMap() {
 
 // ── Sleeper ADP ───────────────────────────────────────────────────────────────
 async function fetchSleeperAdpMap() {
-  const TTL = 5 * 60 * 1000;
+  const TTL = 24 * 60 * 60 * 1000;
   const now = Date.now();
   if (cache.__sleeperAdp && now - cache.__sleeperAdp.ts < TTL) return cache.__sleeperAdp.data;
   try {
@@ -336,7 +346,7 @@ ensureSourceColumn().then(() => {
     console.log(`Rankings app running on port ${PORT}`);
     initSleeperIdMap();
     saveSleeperAdpSnapshots();
-    setInterval(saveSleeperAdpSnapshots, 60 * 60 * 1000);
+    setInterval(saveSleeperAdpSnapshots, 24 * 60 * 60 * 1000);
   });
 }).catch(e => {
   console.error('DB migration failed, starting anyway:', e.message);
