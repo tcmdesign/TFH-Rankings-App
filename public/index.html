@@ -428,6 +428,9 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .photo-initials{font-size:14px}
   .player-cell{flex:1;min-width:0;padding:14px 8px 14px 4px}
   .player-name{font-size:15px;max-width:none}
+  .name-short{display:none}
+  tr.draft-target .name-short,tr.draft-avoid .name-short{display:inline}
+  tr.draft-target .name-full,tr.draft-avoid .name-full{display:none}
   .player-meta{font-size:11px;margin-top:5px}
   /* Swipe strip — always visible on mobile, width grows in draft mode */
   .swipe-strip-cell{
@@ -953,6 +956,7 @@ function renderTable() {
     const nameParts = (p.Player || '').split(' ');
     const initials  = nameParts.slice(0,2).map(w => w[0] || '').join('').toUpperCase();
     const slug      = (p.Player || '').trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+    const shortName = nameParts.length > 1 ? `${nameParts[0][0]}. ${nameParts.slice(1).join(' ')}` : (p.Player || '—');
 
     const posClassMap = {QB:'pos-qb',RB:'pos-rb',WR:'pos-wr',TE:'pos-te'};
     const posClass = posClassMap[pos] || '';
@@ -997,7 +1001,7 @@ function renderTable() {
         <div class="photo-initials" data-init="${slug}">${initials}</div>
       </td>
       <td class="player-cell">
-        <div class="player-name">${p.Player || '—'}</div>
+        <div class="player-name"><span class="name-full">${p.Player || '—'}</span><span class="name-short">${shortName}</span></div>
         <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team.toUpperCase()}` : ''}<span class="sb sb-target">TARGET</span><span class="sb sb-avoid">AVOID</span><span class="sb sb-mine">MY PICK</span><span class="sb sb-gone">GONE</span></div>
       </td>
       ${state.custom ? `<td class="tfh-rank-col">${p.Rank || '—'}</td>` : ''}
