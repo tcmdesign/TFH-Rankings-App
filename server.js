@@ -231,7 +231,7 @@ app.get('/api/adp/history/:name', async (req, res) => {
         SELECT s.pulled_at AS ts, s.adp
         FROM adp_snapshots s
         JOIN players p ON p.id = s.player_id
-        WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.scoring = 'dynasty_ppr'
+        WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.source = 'sleeper'
         ORDER BY s.pulled_at ASC
       `, [name]),
     ]);

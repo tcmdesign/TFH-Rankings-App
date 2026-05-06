@@ -1722,7 +1722,7 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
     <div class="panel-section">
       <div class="panel-section-title">ADP Trend</div>
       <div class="panel-chart-wrap">
-        ${(history.mfl?.length >= 2 || history.sleeper?.length >= 2)
+        ${(history.mfl?.length >= 2 || history.sleeper?.length >= 1)
           ? `<canvas id="adpChart"></canvas>`
           : `<div class="panel-chart-empty">Current ADP: <strong style="color:var(--text)">${adp || '—'}</strong><br><span style="font-size:10px">Trend data accumulates hourly</span></div>`
         }
@@ -1774,7 +1774,7 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
   loadPanelPhoto(name, slug, sleeperId);
 
   // Render chart
-  if (history.mfl?.length >= 2 || history.sleeper?.length >= 2) renderAdpChart(history);
+  if (history.mfl?.length >= 2 || history.sleeper?.length >= 1) renderAdpChart(history);
 }
 
 function loadPanelPhoto(name, slug, sleeperId) {
@@ -1871,7 +1871,7 @@ function renderAdpChart(history) {
 
   const datasets = [];
   if (mflData.length >= 2)     datasets.push(makeDataset(mflValues,     mflColor,     'MFL',     !multiLine));
-  if (sleeperData.length >= 2) datasets.push(makeDataset(sleeperValues, sleeperColor, 'Sleeper', !multiLine));
+  if (sleeperData.length >= 1) datasets.push(makeDataset(sleeperValues, sleeperColor, 'Sleeper', !multiLine));
 
   panelChart = new Chart(canvas, {
     type: 'line',
