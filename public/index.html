@@ -945,7 +945,7 @@ function renderTable() {
   }
   document.getElementById('playerCount').textContent = `${displayRows.length} players`;
 
-  const noDrag = state.draftMode || isOverall;
+  const noDrag = state.draftMode;
   const tbody = displayRows.map((p, displayIdx) => {
     const orig      = p._orig;
     const rank      = displayIdx + 1;
