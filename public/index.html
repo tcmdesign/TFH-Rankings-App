@@ -122,7 +122,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;
   font-size:11px;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;
   cursor:pointer;transition:all 0.15s;white-space:nowrap;
-  background:rgba(255,255,255,0.04);color:var(--text2);border:1px solid rgba(255,255,255,0.07);
+  background:transparent;color:var(--text2);border:1px solid transparent;
 }
 .btn:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.18);color:var(--text);transform:translateY(-1px)}
 .btn:active{transform:translateY(0)}
@@ -319,7 +319,6 @@ td{padding:7px 8px;vertical-align:middle}
 .adp-cell{width:80px;text-align:center}
 .adp-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text2)}
 .adp-none{font-size:14px;color:var(--text3)}
-.adp-lbl{display:none;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:1px}
 /* ── Source columns (comparison) ── */
 .source-group-th{
   font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--blue);text-transform:uppercase;
@@ -409,7 +408,8 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .pos-bar{border-top:1px solid var(--border);padding:6px 12px}
   .pos-tab{font-size:11px;padding:5px 12px}
   /* Table: display:flex on rows for swipe support */
-  thead{display:none}
+  thead tr{display:flex;align-items:center;border-bottom:1px solid var(--border2);margin-bottom:2px}
+  thead th{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;padding:4px 6px;background:transparent;border:none}
   tbody tr{display:flex;align-items:center;position:relative;overflow:hidden;border-radius:0;margin-bottom:1px}
   .table-wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
   tbody tr td{display:flex;align-items:center;padding:14px 6px}
@@ -421,8 +421,8 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .drag-handle span{width:14px;height:2px}
   .source-col{display:none!important}
   /* ADP column: show on mobile when not in draft mode */
-  .table-wrap:not(.draft-active) td.sleeper-col{display:flex!important;flex-direction:column;align-items:center;width:48px;flex-shrink:0;justify-content:center;padding:10px 4px}
-  .table-wrap:not(.draft-active) td.sleeper-col .adp-lbl{display:block}
+  .table-wrap:not(.draft-active) td.sleeper-col{display:flex!important;align-items:center;width:48px;flex-shrink:0;justify-content:center;padding:10px 4px}
+  .table-wrap:not(.draft-active) thead th.sleeper-col{display:flex!important;width:48px;flex-shrink:0;justify-content:center;padding:4px 4px}
   /* Draft cell hidden on mobile — all actions via swipe strip */
   .draft-cell{display:none!important}
   .tfh-rank-col{display:none!important}
@@ -1021,7 +1021,7 @@ function renderTable() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </td>` : `
-      <td class="adp-cell sleeper-col"><span class="adp-lbl">ADP</span>${p.sleeperAdp
+      <td class="adp-cell sleeper-col">${p.sleeperAdp
         ? `<span class="adp-val">${p.sleeperAdp}</span>`
         : `<span class="adp-none">—</span>`}</td>`}
     </tr>`;
@@ -1031,11 +1031,11 @@ function renderTable() {
     <table>
       <thead>
         <tr>
-          ${noDrag ? '' : '<th style="width:24px"></th>'}
-          <th class="center" style="width:44px">Rank</th>
-          <th style="width:32px"></th>
-          <th style="width:48px"></th>
-          <th>Player</th>
+          ${noDrag ? '' : '<th class="drag-cell"></th>'}
+          <th class="rank-cell center">Rank</th>
+          <th class="check-cell"></th>
+          <th class="photo-cell"></th>
+          <th class="player-cell">Player</th>
           ${state.custom ? `<th class="tfh-rank-th">TFH</th>` : ''}
           ${state.draftMode
             ? `<th style="width:160px;color:rgba(0,217,122,0.6);font-size:9px;letter-spacing:1px">MARK PLAYER</th>`
