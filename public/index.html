@@ -73,8 +73,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
   display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;
 }
 .topbar-left{}
-.topbar-title{line-height:1}
-.topbar-logo{height:52px;width:auto;display:block}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.5px;line-height:1;color:var(--text)}
 .topbar-app-sub{display:none}
 .topbar-sub{font-size:13px;color:var(--text3);margin-top:3px;margin-bottom:12px}
 .topbar-right{display:flex;align-items:center;gap:6px;padding-top:6px}
@@ -382,7 +381,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .format-bar,.pos-bar{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .format-bar::-webkit-scrollbar,.pos-bar::-webkit-scrollbar{display:none}
   .topbar{padding:14px 16px 0}
-  .topbar-logo{height:44px}
+  .topbar-title{font-size:28px}
 }
 
 /* ── Mobile (<768px) ── */
@@ -390,7 +389,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .topbar{padding:max(env(safe-area-inset-top,0px),50px) 16px 10px;position:relative;justify-content:center;align-items:center}
   .hamburger-btn{position:absolute;left:16px;top:max(env(safe-area-inset-top,0px),50px)}
   .topbar-left{text-align:center}
-  .topbar-logo{height:38px;margin:0 auto}
+  .topbar-title{font-size:30px;letter-spacing:1px}
   .topbar-app-sub{display:block;font-size:12px;color:var(--text3);margin-top:2px;letter-spacing:0.5px}
   .topbar-sub{display:none}
   .topbar-right{display:none}
@@ -659,7 +658,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
     <div class="topbar-left">
-      <div class="topbar-title" id="topbarTitle"><img src="/logo.png" alt="TFH Rankings Dashboard" class="topbar-logo"></div>
+      <div class="topbar-title" id="topbarTitle">TFH Rankings <span class="beta-badge">BETA</span></div>
       <div class="topbar-app-sub">2026 Rookie Rankings</div>
       <div class="topbar-sub" id="topbarSub">2026 Dynasty</div>
     </div>
