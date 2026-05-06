@@ -319,6 +319,7 @@ td{padding:7px 8px;vertical-align:middle}
 .adp-cell{width:80px;text-align:center}
 .adp-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text2)}
 .adp-none{font-size:14px;color:var(--text3)}
+.adp-lbl{display:none;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:1px}
 /* ── Source columns (comparison) ── */
 .source-group-th{
   font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--blue);text-transform:uppercase;
@@ -419,8 +420,9 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
   .drag-handle{gap:3px}
   .drag-handle span{width:14px;height:2px}
   .source-col{display:none!important}
-  /* Sleeper ADP column: show on mobile when not in draft mode */
-  .table-wrap:not(.draft-active) td.sleeper-col{display:flex!important;width:48px;flex-shrink:0;justify-content:center;padding:10px 4px}
+  /* ADP column: show on mobile when not in draft mode */
+  .table-wrap:not(.draft-active) td.sleeper-col{display:flex!important;flex-direction:column;align-items:center;width:48px;flex-shrink:0;justify-content:center;padding:10px 4px}
+  .table-wrap:not(.draft-active) td.sleeper-col .adp-lbl{display:block}
   /* Draft cell hidden on mobile — all actions via swipe strip */
   .draft-cell{display:none!important}
   .tfh-rank-col{display:none!important}
@@ -924,7 +926,7 @@ async function updateLastUpdated() {
     if (json.ts) {
       const d = new Date(json.ts);
       document.getElementById('lastUpdated').textContent =
-        `MFL ADP updated: ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`;
+        `ADP updated: ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`;
     }
   } catch {}
 }
@@ -964,9 +966,6 @@ function renderTable() {
     const posClass = posClassMap[pos] || '';
     const posBadge = `<span class="pos-badge ${posClass}">${pos}</span>`;
 
-    const adpHtml = p.adp
-      ? `<span class="adp-val">${p.adp}</span>`
-      : `<span class="adp-none">—</span>`;
 
     const isMine    = state.draftMine.has(orig);
     const isGone    = state.draftGone.has(orig);
@@ -1022,8 +1021,7 @@ function renderTable() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </td>` : `
-      <td class="adp-cell source-col">${adpHtml}</td>
-      <td class="adp-cell source-col sleeper-col">${p.sleeperAdp
+      <td class="adp-cell sleeper-col"><span class="adp-lbl">ADP</span>${p.sleeperAdp
         ? `<span class="adp-val">${p.sleeperAdp}</span>`
         : `<span class="adp-none">—</span>`}</td>`}
     </tr>`;
@@ -1041,8 +1039,7 @@ function renderTable() {
           ${state.custom ? `<th class="tfh-rank-th">TFH</th>` : ''}
           ${state.draftMode
             ? `<th style="width:160px;color:rgba(0,217,122,0.6);font-size:9px;letter-spacing:1px">MARK PLAYER</th>`
-            : `<th class="source-col sortable" style="width:80px" onclick="sortBy('adp')">MFL ADP<span class="sort-arrow">${state.sortCol==='adp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>
-          <th class="source-col sleeper-col sortable" style="width:80px" onclick="sortBy('sleeperAdp')">SLEEPER ADP<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>`
+            : `<th class="sleeper-col sortable" style="width:80px;text-align:center" onclick="sortBy('sleeperAdp')">ADP<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>`
           }
         </tr>
       </thead>
@@ -1577,7 +1574,7 @@ async function _loadAndRender(playerName, containerId) {
   const history = await historyRes.json();
   const rankIdx = state.order.findIndex(i => (state.data[i]?.Player || '') === playerName);
   const rank    = rankIdx >= 0 ? rankIdx + 1 : null;
-  const adp     = state.data[state.order[rankIdx]]?.adp || null;
+  const adp     = state.data[state.order[rankIdx]]?.sleeperAdp || null;
   renderPanel(playerName, detail.scout, detail.injury, detail.attrs || null, rank, adp, history, containerId, detail.sleeperId || null);
 }
 
@@ -1722,7 +1719,7 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
     <div class="panel-section">
       <div class="panel-section-title">ADP Trend</div>
       <div class="panel-chart-wrap">
-        ${(history.mfl?.length >= 2 || history.sleeper?.length >= 1)
+        ${history.sleeper?.length >= 1
           ? `<canvas id="adpChart"></canvas>`
           : `<div class="panel-chart-empty">Current ADP: <strong style="color:var(--text)">${adp || '—'}</strong><br><span style="font-size:10px">Trend data accumulates hourly</span></div>`
         }
@@ -1819,46 +1816,34 @@ function renderAdpChart(history) {
   if (!canvas) return;
   if (panelChart) { panelChart.destroy(); panelChart = null; }
 
-  const mflData     = history.mfl     || [];
   const sleeperData = history.sleeper || [];
 
-  // Union of all timestamps as x-axis
-  const allTs = [...new Set([...mflData.map(h=>h.ts), ...sleeperData.map(h=>h.ts)])].sort((a,b)=>a-b);
+  const allTs = sleeperData.map(h=>h.ts).sort((a,b)=>a-b);
   const labels = allTs.map(ts => { const d = new Date(ts); return `${d.getMonth()+1}/${d.getDate()}`; });
 
-  const mflByTs     = Object.fromEntries(mflData.map(h=>[h.ts, h.adp]));
   const sleeperByTs = Object.fromEntries(sleeperData.map(h=>[h.ts, h.adp]));
-
-  const mflValues     = allTs.map(ts => mflByTs[ts]     ?? null);
   const sleeperValues = allTs.map(ts => sleeperByTs[ts] ?? null);
 
-  // MFL line color based on trend direction
-  const primary = mflData.length >= 2 ? mflData : sleeperData;
-  const first = primary[0]?.adp, last = primary[primary.length-1]?.adp;
-  const mflColor = last < first ? '#00cc66' : last > first ? '#E52222' : '#888888';
-  const sleeperColor = '#9b6dff';
+  const first = sleeperData[0]?.adp, last = sleeperData[sleeperData.length-1]?.adp;
+  const color = last < first ? '#00cc66' : last > first ? '#E52222' : '#9b6dff';
 
-  const allValues = [...mflValues, ...sleeperValues].filter(v => v !== null);
+  const allValues = sleeperValues.filter(v => v !== null);
   const min = Math.min(...allValues), max = Math.max(...allValues);
   const pad = Math.max((max - min) * 0.4, 3);
 
-  const multiLine = mflData.length >= 2 && sleeperData.length >= 2;
-
-  const makeDataset = (values, color, label, withFill) => ({
-    label,
-    data: values,
+  const datasets = [{
+    label: 'ADP',
+    data: sleeperValues,
     borderColor: color,
-    backgroundColor: withFill
-      ? (ctx) => {
-          const { ctx: c, chartArea } = ctx.chart;
-          if (!chartArea) return 'transparent';
-          const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-          g.addColorStop(0,   color + '44');
-          g.addColorStop(1,   color + '00');
-          return g;
-        }
-      : 'transparent',
-    fill: withFill ? 'start' : false,
+    backgroundColor: (ctx) => {
+      const { ctx: c, chartArea } = ctx.chart;
+      if (!chartArea) return 'transparent';
+      const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+      g.addColorStop(0, color + '44');
+      g.addColorStop(1, color + '00');
+      return g;
+    },
+    fill: 'start',
     borderWidth: 2,
     pointRadius: 0,
     pointHoverRadius: 4,
@@ -1867,11 +1852,7 @@ function renderAdpChart(history) {
     pointHoverBorderWidth: 2,
     tension: 0.4,
     spanGaps: true,
-  });
-
-  const datasets = [];
-  if (mflData.length >= 2)     datasets.push(makeDataset(mflValues,     mflColor,     'MFL',     !multiLine));
-  if (sleeperData.length >= 1) datasets.push(makeDataset(sleeperValues, sleeperColor, 'Sleeper', !multiLine));
+  }];
 
   panelChart = new Chart(canvas, {
     type: 'line',
@@ -1882,7 +1863,7 @@ function renderAdpChart(history) {
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: {
-          display: multiLine,
+          display: false,
           labels: { color: '#666', font: { size: 10 }, boxWidth: 16, padding: 8 },
         },
         tooltip: {
@@ -1893,10 +1874,10 @@ function renderAdpChart(history) {
           bodyColor: '#fff',
           bodyFont: { weight: '700', size: 13 },
           padding: 10,
-          displayColors: multiLine,
+          displayColors: false,
           callbacks: {
             title: items => labels[items[0].dataIndex],
-            label: item => item.raw != null ? `${item.dataset.label} ADP: ${item.raw.toFixed(1)}` : null,
+            label: item => item.raw != null ? `ADP: ${item.raw.toFixed(1)}` : null,
           }
         }
       },
