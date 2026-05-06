@@ -581,8 +581,8 @@
       "school": "Nebraska",
       "round": 5,
       "pick": 21,
-      "nfl_team": "Seattle Seahawks",
-      "nfl_team_abbrev": "sea",
+      "nfl_team": "Kansas City Chiefs",
+      "nfl_team_abbrev": "kc",
       "strengths": [
         "Stays at top speed through breaks and cuts",
         "Goes north-south quick",
@@ -596,22 +596,17 @@
       "depth_chart": [
         {
           "label": "RB1",
-          "name": "Zach Charbonnet",
+          "name": "Kenneth Walker",
           "is_prospect": false
         },
         {
           "label": "RB2",
-          "name": "Robbie Ouzts",
+          "name": "Emari Demercado",
           "is_prospect": false
         },
         {
           "label": "RB3",
-          "name": "Emanuel Wilson",
-          "is_prospect": false
-        },
-        {
-          "label": "RB4",
-          "name": "George Holani",
+          "name": "Brashard Smith",
           "is_prospect": false
         }
       ]
@@ -704,8 +699,8 @@
       "school": "Penn State",
       "round": 6,
       "pick": 6,
-      "nfl_team": "Tampa Bay Buccaneers",
-      "nfl_team_abbrev": "tb",
+      "nfl_team": "Washington Commanders",
+      "nfl_team_abbrev": "was",
       "strengths": [
         "Built like and hits like a truck",
         "Vision and patience allows blocks and openings to develop"
@@ -718,22 +713,22 @@
       "depth_chart": [
         {
           "label": "RB1",
-          "name": "Bucky Irving",
+          "name": "Jacory Croskey-Merritt",
           "is_prospect": false
         },
         {
           "label": "RB2",
-          "name": "Kenneth Gainwell",
+          "name": "Jerome Ford",
           "is_prospect": false
         },
         {
           "label": "RB3",
-          "name": "Sean Tucker",
+          "name": "Rachaad White",
           "is_prospect": false
         },
         {
           "label": "RB4",
-          "name": "Josh Williams",
+          "name": "Jeremy McNichols",
           "is_prospect": false
         }
       ]
@@ -1466,8 +1461,8 @@
       "school": "Georgia",
       "round": 3,
       "pick": 15,
-      "nfl_team": "Pittsburgh Steelers",
-      "nfl_team_abbrev": "pit",
+      "nfl_team": "Atlanta Falcons",
+      "nfl_team_abbrev": "atl",
       "strengths": [
         "Can turn short gains into huge plays",
         "Catching in traffic",
@@ -1481,22 +1476,22 @@
       "depth_chart": [
         {
           "label": "WR1",
-          "name": "DK Metcalf",
+          "name": "Drake London",
           "is_prospect": false
         },
         {
           "label": "WR2",
-          "name": "Michael Pittman",
+          "name": "Jahan Dotson",
           "is_prospect": false
         },
         {
           "label": "WR3",
-          "name": "Roman Wilson",
+          "name": "Olamide Zaccheaus",
           "is_prospect": false
         },
         {
           "label": "WR4",
-          "name": "Ben Skowronek",
+          "name": "Dylan Drummond",
           "is_prospect": false
         }
       ]
@@ -1640,8 +1635,8 @@
       "school": "",
       "round": 3,
       "pick": 25,
-      "nfl_team": "Detroit Lions",
-      "nfl_team_abbrev": "det",
+      "nfl_team": "Chicago Bears",
+      "nfl_team_abbrev": "chi",
       "strengths": [
         "Punt and kick return ability",
         "Vision and burst with ball in hand"
@@ -1654,22 +1649,22 @@
       "depth_chart": [
         {
           "label": "WR1",
-          "name": "Amon-Ra St. Brown",
+          "name": "Rome Odunze",
           "is_prospect": false
         },
         {
           "label": "WR2",
-          "name": "Jameson Williams",
+          "name": "Luther Burden",
           "is_prospect": false
         },
         {
           "label": "WR3",
-          "name": "Isaac TeSlaa",
+          "name": "Kalif Raymond",
           "is_prospect": false
         },
         {
           "label": "WR4",
-          "name": "Greg Dortch",
+          "name": "Maurice Alexander",
           "is_prospect": false
         }
       ]
@@ -1855,8 +1850,8 @@
       "school": "UConn",
       "round": 4,
       "pick": 25,
-      "nfl_team": "Chicago Bears",
-      "nfl_team_abbrev": "chi",
+      "nfl_team": "Buffalo Bills",
+      "nfl_team_abbrev": "buf",
       "strengths": [
         "Quick out of cuts",
         "Accelerates fast past press coverage",
@@ -1871,22 +1866,22 @@
       "depth_chart": [
         {
           "label": "WR1",
-          "name": "Rome Odunze",
+          "name": "DJ Moore",
           "is_prospect": false
         },
         {
           "label": "WR2",
-          "name": "Luther Burden",
+          "name": "Keon Coleman",
           "is_prospect": false
         },
         {
           "label": "WR3",
-          "name": "Kalif Raymond",
+          "name": "Khalil Shakir",
           "is_prospect": false
         },
         {
           "label": "WR4",
-          "name": "Maurice Alexander",
+          "name": "Joshua Palmer",
           "is_prospect": false
         }
       ]
