@@ -346,8 +346,7 @@ ensureSourceColumn().then(() => {
   app.listen(PORT, () => {
     console.log(`Rankings app running on port ${PORT}`);
     initSleeperIdMap();
-    saveSleeperAdpSnapshots();
-    setInterval(saveSleeperAdpSnapshots, 24 * 60 * 60 * 1000);
+    setInterval(saveSleeperAdpSnapshots, 2 * 60 * 60 * 1000);
   });
 }).catch(e => {
   console.error('DB migration failed, starting anyway:', e.message);
