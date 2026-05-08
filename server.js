@@ -219,6 +219,7 @@ app.get('/api/adp/history/:name', async (req, res) => {
   const name = decodeURIComponent(req.params.name).toLowerCase();
   if (!db) return res.json({ mfl: [], sleeper: [] });
   try {
+    const sleeperId = cache.__sleeperIds?.[name];
     const [mflRes, sleeperRes] = await Promise.all([
       db.query(`
         SELECT s.pulled_at AS ts, s.adp
@@ -227,16 +228,17 @@ app.get('/api/adp/history/:name', async (req, res) => {
         WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.scoring = 'ppr'
         ORDER BY s.pulled_at ASC
       `, [name]),
-      db.query(`
-        SELECT s.pulled_at AS ts, s.adp
-        FROM adp_snapshots s
-        JOIN players p ON p.id = s.player_id
-        WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.source = 'sleeper'
-        ORDER BY s.pulled_at ASC
-      `, [name]),
+      sleeperId
+        ? db.query(`
+            SELECT pulled_at AS ts, adp
+            FROM sleeper_adp_history
+            WHERE sleeper_player_id = $1 AND season = 2026
+            ORDER BY pulled_at ASC
+          `, [sleeperId])
+        : Promise.resolve({ rows: [] }),
     ]);
     res.json({
-      mfl:     mflRes.rows.map(r     => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })),
+      mfl:     mflRes.rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })),
       sleeper: sleeperRes.rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })),
     });
   } catch (err) {
@@ -317,24 +319,43 @@ async function ensureSourceColumn() {
   try {
     await db.query(`ALTER TABLE adp_snapshots ADD COLUMN IF NOT EXISTS source VARCHAR(10) DEFAULT 'mfl'`);
     await db.query(`ALTER TABLE adp_snapshots ALTER COLUMN scoring TYPE VARCHAR(20)`);
-    await db.query(`ALTER TABLE adp_snapshots ALTER COLUMN overall_rank DROP NOT NULL`);
   } catch (e) { console.error('ensureSourceColumn:', e.message); }
+}
+
+async function ensureSleeperHistoryTable() {
+  if (!db) return;
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS sleeper_adp_history (
+        id               SERIAL PRIMARY KEY,
+        sleeper_player_id VARCHAR(20) NOT NULL,
+        adp              DECIMAL(6,1) NOT NULL,
+        pulled_at        TIMESTAMP NOT NULL,
+        season           INT NOT NULL DEFAULT 2026
+      )
+    `);
+    await db.query(`
+      CREATE INDEX IF NOT EXISTS idx_sleeper_adp_hist
+      ON sleeper_adp_history(sleeper_player_id, season, pulled_at)
+    `);
+  } catch (e) { console.error('ensureSleeperHistoryTable:', e.message); }
 }
 
 async function saveSleeperAdpSnapshots() {
   if (!db) return;
   try {
-    const sleeperMap = await fetchSleeperAdpMap();
-    const { rows: players } = await db.query('SELECT id, name FROM players');
+    delete cache.__sleeperAdp; // force fresh fetch so each snapshot reflects current Sleeper data
+    const sleeperMap = await fetchSleeperAdpMap(); // also populates cache.__sleeperIds
+    const idMap = cache.__sleeperIds || {};
     const now = new Date();
     let saved = 0;
-    for (const player of players) {
-      const entry = sleeperMap[player.name.toLowerCase()];
-      if (!entry?.dynastyPpr) continue;
+    for (const [name, vals] of Object.entries(sleeperMap)) {
+      const sleeperId = idMap[name];
+      if (!sleeperId || !vals.dynastyPpr) continue;
       await db.query(
-        `INSERT INTO adp_snapshots (player_id, adp, pulled_at, season, scoring, source)
-         VALUES ($1, $2, $3, 2026, 'dynasty_ppr', 'sleeper')`,
-        [player.id, parseFloat(entry.dynastyPpr), now]
+        `INSERT INTO sleeper_adp_history (sleeper_player_id, adp, pulled_at, season)
+         VALUES ($1, $2, $3, 2026)`,
+        [sleeperId, parseFloat(vals.dynastyPpr), now]
       );
       saved++;
     }
@@ -343,7 +364,7 @@ async function saveSleeperAdpSnapshots() {
 }
 
 
-ensureSourceColumn().then(() => {
+Promise.all([ensureSourceColumn(), ensureSleeperHistoryTable()]).then(() => {
   app.listen(PORT, () => {
     console.log(`Rankings app running on port ${PORT}`);
     initSleeperIdMap();
