@@ -317,6 +317,7 @@ async function ensureSourceColumn() {
   try {
     await db.query(`ALTER TABLE adp_snapshots ADD COLUMN IF NOT EXISTS source VARCHAR(10) DEFAULT 'mfl'`);
     await db.query(`ALTER TABLE adp_snapshots ALTER COLUMN scoring TYPE VARCHAR(20)`);
+    await db.query(`ALTER TABLE adp_snapshots ALTER COLUMN overall_rank DROP NOT NULL`);
   } catch (e) { console.error('ensureSourceColumn:', e.message); }
 }
 
@@ -346,6 +347,7 @@ ensureSourceColumn().then(() => {
   app.listen(PORT, () => {
     console.log(`Rankings app running on port ${PORT}`);
     initSleeperIdMap();
+    saveSleeperAdpSnapshots();
     setInterval(saveSleeperAdpSnapshots, 2 * 60 * 60 * 1000);
   });
 }).catch(e => {
