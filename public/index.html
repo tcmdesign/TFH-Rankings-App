@@ -970,8 +970,8 @@ function renderTable() {
     const posBadge = `<span class="pos-badge ${posClass}">${pos}</span>`;
 
 
-    const isMine    = state.draftMine.has(orig);
-    const isGone    = state.draftGone.has(orig);
+    const isMine    = state.draftMine.has(p.Player || '');
+    const isGone    = state.draftGone.has(p.Player || '');
     const isAvoided = state.avoided.has(p.Player || '');
     const draftClass  = isMine ? 'draft-mine' : isGone ? 'draft-gone' : '';
     const avoidClass  = isAvoided ? 'draft-avoid' : '';
@@ -1010,17 +1010,17 @@ function renderTable() {
       </td>
       ${state.custom ? `<td class="tfh-rank-col">${p.Rank || '—'}</td>` : ''}
       <td class="swipe-strip-cell" onclick="event.stopPropagation()"><div class="swipe-strip">
-        <button class="sa-btn sa-mine ${isMine ? 'active' : ''}" onclick="event.stopPropagation();markDraft('mine',${orig});this.closest('tr').classList.remove('swipe-open')" title="My pick"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
-        <button class="sa-btn sa-gone ${isGone ? 'active' : ''}" onclick="event.stopPropagation();markDraft('gone',${orig});this.closest('tr').classList.remove('swipe-open')" title="Off board"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <button class="sa-btn sa-mine ${isMine ? 'active' : ''}" onclick="event.stopPropagation();markDraft('mine','${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="My pick"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+        <button class="sa-btn sa-gone ${isGone ? 'active' : ''}" onclick="event.stopPropagation();markDraft('gone','${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="Off board"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         <button class="sa-btn sa-target ${isStarred ? 'active' : ''}" onclick="event.stopPropagation();toggleStar('${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="Target"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg></button>
         <button class="sa-btn sa-avoid ${isAvoided ? 'active' : ''}" onclick="event.stopPropagation();toggleAvoid('${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="Avoid"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
       </div></td>
       ${state.draftMode ? `
       <td class="draft-cell">
-        <button class="draft-btn draft-btn-mine ${isMine ? 'active' : ''}" onclick="event.stopPropagation();markDraft('mine',${orig})" title="My pick">
+        <button class="draft-btn draft-btn-mine ${isMine ? 'active' : ''}" onclick="event.stopPropagation();markDraft('mine','${(p.Player||'').replace(/'/g,"\\'")}');" title="My pick">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </button>
-        <button class="draft-btn draft-btn-gone ${isGone ? 'active' : ''}" onclick="event.stopPropagation();markDraft('gone',${orig})" title="Off board">
+        <button class="draft-btn draft-btn-gone ${isGone ? 'active' : ''}" onclick="event.stopPropagation();markDraft('gone','${(p.Player||'').replace(/'/g,"\\'")}');" title="Off board">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </td>` : `
@@ -1106,14 +1106,14 @@ function resetDraftMode() {
   renderTable();
 }
 
-function markDraft(type, orig) {
-  const already = (type === 'mine' && state.draftMine.has(orig))
-               || (type === 'gone' && state.draftGone.has(orig));
-  state.draftMine.delete(orig);
-  state.draftGone.delete(orig);
+function markDraft(type, name) {
+  const already = (type === 'mine' && state.draftMine.has(name))
+               || (type === 'gone' && state.draftGone.has(name));
+  state.draftMine.delete(name);
+  state.draftGone.delete(name);
   if (!already) {
-    if (type === 'mine') state.draftMine.add(orig);
-    if (type === 'gone') state.draftGone.add(orig);
+    if (type === 'mine') state.draftMine.add(name);
+    if (type === 'gone') state.draftGone.add(name);
   }
   renderTable();
 }
