@@ -218,6 +218,18 @@ app.get('/api/sleeper-ids', (req, res) => {
 app.get('/api/adp/history/:name', async (req, res) => {
   const name = decodeURIComponent(req.params.name).toLowerCase();
   if (!db) return res.json({ mfl: [], sleeper: [] });
+
+  // Map app format key → which column to use
+  const format = req.query.format || 'dynasty_1qb';
+  const formatColMap = {
+    dynasty_1qb:  'adp',
+    dynasty_2qb:  'adp_dynasty_2qb',
+    redraft_ppr:  'adp_ppr',
+    redraft_half: 'adp_half_ppr',
+    redraft_std:  'adp_std',
+  };
+  const adpCol = formatColMap[format] || 'adp';
+
   try {
     const sleeperId = cache.__sleeperIds?.[name];
     const [mflRes, sleeperRes] = await Promise.all([
@@ -230,9 +242,10 @@ app.get('/api/adp/history/:name', async (req, res) => {
       `, [name]),
       sleeperId
         ? db.query(`
-            SELECT pulled_at AS ts, adp
+            SELECT pulled_at AS ts, ${adpCol} AS adp
             FROM sleeper_adp_history
             WHERE sleeper_player_id = $1 AND season = 2026
+              AND ${adpCol} IS NOT NULL
             ORDER BY pulled_at ASC
           `, [sleeperId])
         : Promise.resolve({ rows: [] }),
@@ -338,6 +351,14 @@ async function ensureSleeperHistoryTable() {
       CREATE INDEX IF NOT EXISTS idx_sleeper_adp_hist
       ON sleeper_adp_history(sleeper_player_id, season, pulled_at)
     `);
+    // Add per-format columns (safe to run repeatedly — no-op if already exist)
+    await db.query(`
+      ALTER TABLE sleeper_adp_history
+        ADD COLUMN IF NOT EXISTS adp_ppr          DECIMAL(6,1),
+        ADD COLUMN IF NOT EXISTS adp_half_ppr     DECIMAL(6,1),
+        ADD COLUMN IF NOT EXISTS adp_std          DECIMAL(6,1),
+        ADD COLUMN IF NOT EXISTS adp_dynasty_2qb  DECIMAL(6,1)
+    `);
   } catch (e) { console.error('ensureSleeperHistoryTable:', e.message); }
 }
 
@@ -351,11 +372,22 @@ async function saveSleeperAdpSnapshots() {
     let saved = 0;
     for (const [name, vals] of Object.entries(sleeperMap)) {
       const sleeperId = idMap[name];
-      if (!sleeperId || !vals.dynastyPpr) continue;
+      if (!sleeperId) continue;
+      // Require at least one ADP value to be present
+      if (!vals.dynastyPpr && !vals.ppr && !vals.halfPpr && !vals.std && !vals.dynasty2qb) continue;
       await db.query(
-        `INSERT INTO sleeper_adp_history (sleeper_player_id, adp, pulled_at, season)
-         VALUES ($1, $2, $3, 2026)`,
-        [sleeperId, parseFloat(vals.dynastyPpr), now]
+        `INSERT INTO sleeper_adp_history
+           (sleeper_player_id, adp, adp_ppr, adp_half_ppr, adp_std, adp_dynasty_2qb, pulled_at, season)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 2026)`,
+        [
+          sleeperId,
+          vals.dynastyPpr ? parseFloat(vals.dynastyPpr) : null,
+          vals.ppr        ? parseFloat(vals.ppr)        : null,
+          vals.halfPpr    ? parseFloat(vals.halfPpr)    : null,
+          vals.std        ? parseFloat(vals.std)        : null,
+          vals.dynasty2qb ? parseFloat(vals.dynasty2qb) : null,
+          now,
+        ]
       );
       saved++;
     }

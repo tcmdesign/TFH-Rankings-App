@@ -1571,7 +1571,7 @@ function closeBottomSheet() {
 async function _loadAndRender(playerName, containerId) {
   const [detailRes, historyRes] = await Promise.all([
     fetch(`/api/player/${encodeURIComponent(playerName)}`),
-    fetch(`/api/adp/history/${encodeURIComponent(playerName)}`),
+    fetch(`/api/adp/history/${encodeURIComponent(playerName)}?format=${encodeURIComponent(state.format)}`),
   ]);
   const detail  = await detailRes.json();
   const history = await historyRes.json();
