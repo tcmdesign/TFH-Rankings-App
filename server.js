@@ -163,6 +163,103 @@ async function fetchSleeperAdpMap() {
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
+// ── Airtable metadata: resolve table name → ID ───────────────────────────────
+let atTableMeta = null;
+let atTableMetaTs = 0;
+const AT_META_TTL = 10 * 60 * 1000;
+
+async function resolveAtTableId(name) {
+  const now = Date.now();
+  if (!atTableMeta || now - atTableMetaTs > AT_META_TTL) {
+    const res  = await fetch(`https://api.airtable.com/v0/meta/bases/${AIRTABLE_BASE_ID}/tables`, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+    });
+    const json = await res.json();
+    atTableMeta = {};
+    (json.tables || []).forEach(t => { atTableMeta[t.name] = t.id; });
+    atTableMetaTs = now;
+  }
+  return atTableMeta[name] || null;
+}
+
+async function fetchTableByName(name) {
+  const id = await resolveAtTableId(name);
+  if (!id) return [];
+  return fetchTable(id);
+}
+
+// Map frontend pos values → Airtable table suffix used by FantasyPro backend
+const POS_AT_SUFFIX = { QB: 'QB', RB: 'RB', WR: 'WR', TE: 'TE', Overall: 'OVERALL', SF: 'FLEX' };
+
+// ── GET /api/rankings/redraft-consensus/:pos ──────────────────────────────────
+// Returns consensus rankings for a position with per-creator rank columns.
+// Pulls from Airtable tables written by the FantasyPro rankings admin on publish.
+app.get('/api/rankings/redraft-consensus/:pos', async (req, res) => {
+  const { pos } = req.params;
+  const scoring = req.query.scoring || 'HalfPPR';
+  const suffix  = POS_AT_SUFFIX[pos];
+  if (!suffix) return res.status(400).json({ error: 'Invalid position' });
+
+  try {
+    // Get creator names from DB (same DB the FantasyPro backend uses)
+    let creators = [];
+    if (db) {
+      try {
+        const { rows } = await db.query(
+          `SELECT auth_id, name FROM user_profiles WHERE role = 'creator' ORDER BY name ASC`
+        );
+        creators = rows.map(r => ({ id: r.auth_id, label: (r.name || r.auth_id).split(' ')[0] }));
+      } catch (e) { console.error('creator lookup failed:', e.message); }
+    }
+
+    const conName      = `CON-${scoring}-${suffix}`;
+    const creatorNames = creators.map(c => `${c.label}-${scoring}-${suffix}`);
+
+    const [conData, ...creatorRows] = await Promise.all([
+      fetchTableByName(conName),
+      ...creatorNames.map(n => fetchTableByName(n).catch(() => [])),
+    ]);
+
+    // Build per-creator rank maps: lower-cased player name → rank
+    const creatorMaps = creators.map((c, i) => {
+      const m = {};
+      (creatorRows[i] || []).forEach(p => { if (p.Player) m[p.Player.toLowerCase()] = p.Rank; });
+      return { label: c.label, map: m };
+    });
+
+    // Enrich consensus rows with creator ranks
+    const enriched = conData.map(p => {
+      const key = (p.Player || '').toLowerCase();
+      const extra = {};
+      creatorMaps.forEach(c => { extra[c.label] = c.map[key] ?? null; });
+      // Normalise position field (FantasyPro writes "Position", dynasty tables use "Pos")
+      return { ...p, Pos: p.Pos || p.Position || pos, creatorRanks: extra };
+    });
+
+    // Get publish info from DB
+    let publishInfo = null;
+    if (db) {
+      try {
+        const { rows } = await db.query(`
+          SELECT publish_label, publish_version, MAX(published_at) AS published_at
+          FROM weekly_rankings
+          WHERE season = 2026
+            AND publish_version = (SELECT MAX(publish_version) FROM weekly_rankings WHERE season = 2026)
+          GROUP BY publish_label, publish_version
+          LIMIT 1
+        `);
+        if (rows[0]) publishInfo = { label: rows[0].publish_label, version: rows[0].publish_version, publishedAt: rows[0].published_at };
+      } catch (e) { console.error('publishInfo failed:', e.message); }
+    }
+
+    res.json({ players: enriched, creators: creators.map(c => c.label), publishInfo });
+  } catch (err) {
+    console.error('/api/rankings/redraft-consensus error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 app.get('/api/rankings/:mode/:pos', async (req, res) => {
   const { mode, pos } = req.params;
@@ -326,6 +423,14 @@ async function initSleeperIdMap() {
   } catch (e) { console.error('initSleeperIdMap failed:', e.message); }
 }
 
+// ── Add published_at to weekly_rankings (FantasyPro shared table) ───────────
+async function ensurePublishedAt() {
+  if (!db) return;
+  try {
+    await db.query(`ALTER TABLE weekly_rankings ADD COLUMN IF NOT EXISTS published_at TIMESTAMP DEFAULT NOW()`);
+  } catch (e) { console.error('ensurePublishedAt:', e.message); }
+}
+
 // ── Sleeper ADP snapshots ─────────────────────────────────────────────────────
 async function ensureSourceColumn() {
   if (!db) return;
@@ -396,7 +501,7 @@ async function saveSleeperAdpSnapshots() {
 }
 
 
-Promise.all([ensureSourceColumn(), ensureSleeperHistoryTable()]).then(() => {
+Promise.all([ensureSourceColumn(), ensureSleeperHistoryTable(), ensurePublishedAt()]).then(() => {
   app.listen(PORT, () => {
     console.log(`Rankings app running on port ${PORT}`);
     initSleeperIdMap();

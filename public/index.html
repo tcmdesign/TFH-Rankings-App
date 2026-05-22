@@ -334,6 +334,9 @@ thead th.sleeper-col{width:80px;text-align:center}
 .sort-arrow{display:inline-block;margin-left:2px;font-size:10px;}
 thead th.tfh-rank-th{color:var(--red2);font-size:9px;font-weight:700;letter-spacing:1.5px;text-align:center;width:52px;border-right:1px solid var(--border2);}
 td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red2);opacity:0.7;border-right:1px solid var(--border);}
+thead th.creator-rank-th{color:var(--text2);font-size:9px;font-weight:700;letter-spacing:1.5px;text-align:center;width:52px;border-left:1px solid var(--border2);}
+td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--text2);border-left:1px solid var(--border);}
+.format-pill.disabled{opacity:0.25;cursor:not-allowed}
 .pos-dot{display:none}
 
 /* ── Hamburger ── */
@@ -641,9 +644,8 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
       Best Ball
       <span class="sidebar-soon">Soon</span>
     </div>
-    <div class="sidebar-item disabled" data-tool="redraft">
+    <div class="sidebar-item" data-tool="redraft">
       Redraft Rankings
-      <span class="sidebar-soon">Soon</span>
     </div>
   </div>
 
@@ -757,7 +759,7 @@ td.tfh-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-serif
 
 <script>
 const POPULATED = {
-  redraft: { QB: true, RB: true, WR: true, TE: true, Overall: false, SF: false },
+  redraft: { QB: true, RB: true, WR: true, TE: true, Overall: true, SF: false },
   dynasty: { QB: true, RB: true, WR: true, TE: true, Overall: false, SF: true },
 };
 
@@ -786,6 +788,8 @@ let state = {
   draftMine: new Set(),
   draftGone: new Set(),
   avoided:   new Set(),  // name-based, persistent
+  creators:  [],          // creator names for redraft consensus columns
+  publishInfo: null,      // last redraft publish metadata
 };
 // Persist custom order per tab so switching tabs doesn't lose customizations
 const tabOrders = {};
@@ -822,11 +826,38 @@ document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
   el.addEventListener('click', () => {
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
+    const tool = el.dataset.tool;
+    if (tool === 'redraft') {
+      document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
+      document.querySelector('.format-pill[data-format="redraft_half"]')?.classList.add('active');
+      saveTabOrder();
+      state.format  = 'redraft_half';
+      state.mode    = 'redraft';
+      state.custom  = false;
+      state.checked = new Set();
+      document.getElementById('topbarSub').textContent = FORMAT_CONFIG['redraft_half']?.label || '';
+      updateFormatBar();
+      updatePosTabs();
+      loadRankings();
+    } else if (tool === 'rookie') {
+      document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
+      document.querySelector('.format-pill[data-format="dynasty_1qb"]')?.classList.add('active');
+      saveTabOrder();
+      state.format  = 'dynasty_1qb';
+      state.mode    = 'dynasty';
+      state.custom  = false;
+      state.checked = new Set();
+      document.getElementById('topbarSub').textContent = FORMAT_CONFIG['dynasty_1qb']?.label || '';
+      updateFormatBar();
+      updatePosTabs();
+      loadRankings();
+    }
   });
 });
 
 document.querySelectorAll('.format-pill').forEach(el => {
   el.addEventListener('click', () => {
+    if (el.classList.contains('disabled')) return;
     document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
     saveTabOrder();
@@ -835,6 +866,7 @@ document.querySelectorAll('.format-pill').forEach(el => {
     state.custom  = false;
     state.checked = new Set();
     document.getElementById('topbarSub').textContent = FORMAT_CONFIG[state.format]?.label || '';
+    updateFormatBar();
     updatePosTabs();
     loadRankings();
   });
@@ -853,8 +885,26 @@ document.querySelectorAll('.pos-tab').forEach(el => {
   });
 });
 
+function updateFormatBar() {
+  document.querySelectorAll('.format-pill').forEach(p => {
+    const fmt = p.dataset.format;
+    if (state.mode === 'redraft' && (fmt === 'redraft_ppr' || fmt === 'redraft_std')) {
+      p.classList.add('disabled');
+    } else {
+      p.classList.remove('disabled');
+    }
+  });
+}
+
 function updatePosTabs() {
   const populated = POPULATED[state.mode] || {};
+
+  // Show Overall tab for redraft, SF tab for dynasty
+  const overallTab = document.querySelector('.pos-tab[data-pos="Overall"]');
+  const sfTab      = document.querySelector('.pos-tab[data-pos="SF"]');
+  if (overallTab) overallTab.style.display = state.mode === 'redraft' ? '' : 'none';
+  if (sfTab)      sfTab.style.display      = state.mode === 'dynasty' ? '' : 'none';
+
   document.querySelectorAll('.pos-tab').forEach(el => {
     const pos = el.dataset.pos;
     if (pos === 'Targets') return; // managed by updateStarBtn()
@@ -907,8 +957,18 @@ async function loadRankings() {
   }
   container.innerHTML = '<div class="coming-soon-msg">Loading...</div>';
   try {
-    const res   = await fetch(`/api/rankings/${state.mode}/${state.pos}?format=${state.format}`);
-    state.data  = await res.json();
+    if (state.mode === 'redraft') {
+      const res  = await fetch(`/api/rankings/redraft-consensus/${state.pos}`);
+      const json = await res.json();
+      state.data        = json.players || [];
+      state.creators    = json.creators || [];
+      state.publishInfo = json.publishInfo || null;
+    } else {
+      const res  = await fetch(`/api/rankings/${state.mode}/${state.pos}?format=${state.format}`);
+      state.data = await res.json();
+      state.creators    = [];
+      state.publishInfo = null;
+    }
     tabData[tabKey()] = state.data;
     restoreTabOrder();
     renderTable();
@@ -923,6 +983,16 @@ async function loadRankings() {
 }
 
 async function updateLastUpdated() {
+  if (state.mode === 'redraft') {
+    const el = document.getElementById('lastUpdated');
+    if (state.publishInfo?.publishedAt) {
+      const d = new Date(state.publishInfo.publishedAt);
+      el.textContent = `Published: ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}`;
+    } else {
+      el.textContent = '';
+    }
+    return;
+  }
   try {
     const res  = await fetch('/api/adp/last-updated');
     const json = await res.json();
@@ -1009,6 +1079,12 @@ function renderTable() {
         <div class="player-meta">${posBadge}${p.Team ? ` · ${p.Team.toUpperCase()}` : ''}<span class="sb sb-target">TARGET</span><span class="sb sb-avoid">AVOID</span><span class="sb sb-mine">MY PICK</span><span class="sb sb-gone">GONE</span></div>
       </td>
       ${state.custom ? `<td class="tfh-rank-col">${p.Rank || '—'}</td>` : ''}
+      ${state.mode === 'redraft' && state.creators.length > 0
+        ? state.creators.map(c => {
+            const val = p.creatorRanks?.[c];
+            return `<td class="creator-rank-col">${val != null ? val : '—'}</td>`;
+          }).join('')
+        : ''}
       <td class="swipe-strip-cell" onclick="event.stopPropagation()"><div class="swipe-strip">
         <button class="sa-btn sa-mine ${isMine ? 'active' : ''}" onclick="event.stopPropagation();markDraft('mine','${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="My pick"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
         <button class="sa-btn sa-gone ${isGone ? 'active' : ''}" onclick="event.stopPropagation();markDraft('gone','${(p.Player||'').replace(/'/g,"\\'")}');this.closest('tr').classList.remove('swipe-open')" title="Off board"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -1040,6 +1116,9 @@ function renderTable() {
           <th class="photo-cell"></th>
           <th class="player-cell">Player</th>
           ${state.custom ? `<th class="tfh-rank-th">TFH</th>` : ''}
+          ${state.mode === 'redraft' && state.creators.length > 0
+            ? state.creators.map(c => `<th class="creator-rank-th">${c}</th>`).join('')
+            : ''}
           ${state.draftMode
             ? `<th style="width:160px;color:rgba(0,217,122,0.6);font-size:9px;letter-spacing:1px;white-space:nowrap"><span class="name-full">MARK PLAYER</span><span class="name-short">SWIPE LEFT TO MARK PLAYER</span></th>`
             : `<th class="sleeper-col sortable" onclick="sortBy('sleeperAdp')">ADP<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>`
@@ -1906,6 +1985,7 @@ function renderAdpChart(history) {
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
 loadFromURL();
+updateFormatBar();
 updatePosTabs();
 
 // Activate format pill
