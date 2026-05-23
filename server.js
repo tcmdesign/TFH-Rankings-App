@@ -342,7 +342,7 @@ app.get('/api/adp/history/:name', async (req, res) => {
     const sleeperId = cache.__sleeperIds?.[name];
     const [mflRes, sleeperRes] = await Promise.all([
       db.query(`
-        SELECT s.pulled_at AS ts, s.adp
+        SELECT s.pulled_at AS ts, s.adp, s.overall_rank
         FROM adp_snapshots s
         JOIN players p ON p.id = s.player_id
         WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.scoring = 'ppr'
@@ -359,7 +359,7 @@ app.get('/api/adp/history/:name', async (req, res) => {
         : Promise.resolve({ rows: [] }),
     ]);
     res.json({
-      mfl:     mflRes.rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })),
+      mfl:     mflRes.rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp), overall_rank: r.overall_rank ? parseInt(r.overall_rank) : null })),
       sleeper: sleeperRes.rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })),
     });
   } catch (err) {

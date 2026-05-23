@@ -1822,11 +1822,12 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
 
     <!-- ADP Trend -->
     <div class="panel-section">
-      <div class="panel-section-title">ADP Trend</div>
-      <div class="panel-chart-wrap">
-        ${history.sleeper?.length >= 1
-          ? `<canvas id="adpChart"></canvas>`
-          : `<div class="panel-chart-empty">Current ADP: <strong style="color:var(--text)">${adp || '—'}</strong><br><span style="font-size:10px">Trend data accumulates hourly</span></div>`
+      <div class="panel-section-title">ADP Tracker · 2026 Season</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Overall rank trajectory · Source: MFL mock drafts</div>
+      <div class="panel-chart-wrap" id="adpChartWrap">
+        ${history.mfl?.length >= 1
+          ? `<div id="adpSvgChart"></div>`
+          : `<div class="panel-chart-empty">No ADP history yet<br><span style="font-size:10px">Check back after the next sync</span></div>`
         }
       </div>
     </div>
@@ -1876,7 +1877,7 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
   loadPanelPhoto(name, slug, sleeperId);
 
   // Render chart
-  if (history.mfl?.length >= 2 || history.sleeper?.length >= 1) renderAdpChart(history);
+  if (history.mfl?.length >= 1) renderAdpChart(history);
 }
 
 function loadPanelPhoto(name, slug, sleeperId) {
@@ -1917,92 +1918,111 @@ function loadPanelPhoto(name, slug, sleeperId) {
 }
 
 function renderAdpChart(history) {
-  const canvas = document.getElementById('adpChart');
-  if (!canvas) return;
-  if (panelChart) { panelChart.destroy(); panelChart = null; }
+  const wrap = document.getElementById('adpSvgChart');
+  if (!wrap) return;
 
-  const sleeperData = history.sleeper || [];
+  const sorted = [...(history.mfl || [])].sort((a, b) => a.ts - b.ts);
+  if (!sorted.length) return;
 
-  const allTs = sleeperData.map(h=>h.ts).sort((a,b)=>a-b);
-  const labels = allTs.map(ts => { const d = new Date(ts); return `${d.getMonth()+1}/${d.getDate()}`; });
+  const WEEK1 = new Date('2026-09-06').getTime();
+  const MONTH  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-  const sleeperByTs = Object.fromEntries(sleeperData.map(h=>[h.ts, h.adp]));
-  const sleeperValues = allTs.map(ts => sleeperByTs[ts] ?? null);
+  const W = 560, H = 200;
+  const PAD = { top: 20, right: 28, bottom: 40, left: 46 };
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top  - PAD.bottom;
 
-  const first = sleeperData[0]?.adp, last = sleeperData[sleeperData.length-1]?.adp;
-  const color = last < first ? '#00cc66' : last > first ? '#E52222' : '#9b6dff';
+  const xMin = sorted[0].ts;
+  const xMax = Math.max(WEEK1, sorted[sorted.length - 1].ts);
 
-  const allValues = sleeperValues.filter(v => v !== null);
-  const min = Math.min(...allValues), max = Math.max(...allValues);
-  const pad = Math.max((max - min) * 0.4, 3);
+  const ranks   = sorted.map(d => d.overall_rank).filter(r => r != null);
+  if (!ranks.length) { wrap.innerHTML = '<div class="panel-chart-empty">No rank data</div>'; return; }
+  const rMin    = Math.max(1, Math.min(...ranks) - 4);
+  const rMax    = Math.min(250, Math.max(...ranks) + 8);
+  const rRange  = rMax - rMin || 1;
 
-  const datasets = [{
-    label: 'ADP',
-    data: sleeperValues,
-    borderColor: color,
-    backgroundColor: (ctx) => {
-      const { ctx: c, chartArea } = ctx.chart;
-      if (!chartArea) return 'transparent';
-      const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-      g.addColorStop(0, color + '44');
-      g.addColorStop(1, color + '00');
-      return g;
-    },
-    fill: 'start',
-    borderWidth: 2,
-    pointRadius: 0,
-    pointHoverRadius: 4,
-    pointHoverBackgroundColor: color,
-    pointHoverBorderColor: '#fff',
-    pointHoverBorderWidth: 2,
-    tension: 0.4,
-    spanGaps: true,
-  }];
+  const xp = ts  => PAD.left + ((ts  - xMin) / (xMax - xMin)) * cW;
+  const yp = r   => PAD.top  + ((r   - rMin) / rRange)         * cH;
 
-  panelChart = new Chart(canvas, {
-    type: 'line',
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: {
-          display: false,
-          labels: { color: '#666', font: { size: 10 }, boxWidth: 16, padding: 8 },
-        },
-        tooltip: {
-          backgroundColor: '#1a1a20',
-          borderColor: '#333',
-          borderWidth: 1,
-          titleColor: '#888',
-          bodyColor: '#fff',
-          bodyFont: { weight: '700', size: 13 },
-          padding: 10,
-          displayColors: false,
-          callbacks: {
-            title: items => labels[items[0].dataIndex],
-            label: item => item.raw != null ? `ADP: ${item.raw.toFixed(1)}` : null,
-          }
-        }
-      },
-      scales: {
-        y: {
-          reverse: true,
-          grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-          border: { display: false },
-          ticks: { color: '#444', font: { size: 10 }, maxTicksLimit: 4 },
-          suggestedMin: Math.max(1, min - pad),
-          suggestedMax: max + pad,
-        },
-        x: {
-          grid: { display: false },
-          border: { display: false },
-          ticks: { color: '#444', font: { size: 10 }, maxTicksLimit: 5 },
-        }
-      }
+  // Line path
+  const pts  = sorted.filter(d => d.overall_rank != null).map(d => `${xp(d.ts).toFixed(1)},${yp(d.overall_rank).toFixed(1)}`);
+  const last = sorted.filter(d => d.overall_rank != null);
+  const lineD = `M ${pts.join(' L ')}`;
+  const areaD = `M ${pts[0]} L ${pts.join(' L ')} L ${xp(last[last.length-1].ts).toFixed(1)},${(PAD.top+cH).toFixed(1)} L ${xp(last[0].ts).toFixed(1)},${(PAD.top+cH).toFixed(1)} Z`;
+
+  // Week 1 line
+  const w1x = xp(WEEK1);
+  const showW1 = WEEK1 > xMin && WEEK1 <= xMax;
+  const latestRank = last[last.length - 1].overall_rank;
+
+  // Y ticks
+  const tickStep  = rRange <= 20 ? 5 : rRange <= 50 ? 10 : 25;
+  const tickStart = Math.ceil(rMin / tickStep) * tickStep;
+  const yTicks = [];
+  for (let r = tickStart; r <= rMax; r += tickStep) yTicks.push(r);
+
+  // X ticks (monthly)
+  const xTicks = [];
+  const d0 = new Date(xMin), d1 = new Date(xMax);
+  for (let y = d0.getFullYear(); y <= d1.getFullYear(); y++) {
+    for (let m = 0; m < 12; m++) {
+      const t = new Date(y, m, 1).getTime();
+      if (t >= xMin && t <= xMax) xTicks.push(t);
     }
-  });
+  }
+
+  wrap.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;max-width:${W}px;min-width:260px">
+      <defs>
+        <linearGradient id="rAdpFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="#E0613A" stop-opacity="0.28"/>
+          <stop offset="100%" stop-color="#E0613A" stop-opacity="0.02"/>
+        </linearGradient>
+        <clipPath id="rAdpClip">
+          <rect x="${PAD.left}" y="${PAD.top}" width="${cW}" height="${cH}"/>
+        </clipPath>
+      </defs>
+      ${yTicks.map(r => `
+        <line x1="${PAD.left}" y1="${yp(r).toFixed(1)}" x2="${PAD.left+cW}" y2="${yp(r).toFixed(1)}"
+              stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="${PAD.left-4}" y1="${yp(r).toFixed(1)}" x2="${PAD.left}" y2="${yp(r).toFixed(1)}"
+              stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <text x="${PAD.left-7}" y="${(yp(r)+4).toFixed(1)}"
+              fill="rgba(255,255,255,0.35)" font-size="9" text-anchor="end"
+              font-family="'Barlow Condensed',sans-serif">${r}</text>
+      `).join('')}
+      ${showW1 ? `
+        <line x1="${w1x.toFixed(1)}" y1="${PAD.top}" x2="${w1x.toFixed(1)}" y2="${PAD.top+cH}"
+              stroke="rgba(224,97,58,0.35)" stroke-width="1" stroke-dasharray="4 3"/>
+        <text x="${(w1x+4).toFixed(1)}" y="${PAD.top+11}"
+              fill="#E0613A" font-size="9" font-weight="700" letter-spacing="0.5"
+              font-family="'Barlow Condensed',sans-serif">WK1</text>
+        <text x="${(w1x+4).toFixed(1)}" y="${PAD.top+22}"
+              fill="#E0613A" font-size="11" font-weight="700"
+              font-family="'Barlow Condensed',sans-serif">#${latestRank}</text>
+      ` : ''}
+      <path d="${areaD}" fill="url(#rAdpFill)" clip-path="url(#rAdpClip)"/>
+      <path d="${lineD}" fill="none" stroke="#E0613A" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round" clip-path="url(#rAdpClip)"/>
+      ${sorted.filter(d => d.overall_rank != null).map(d => `
+        <circle cx="${xp(d.ts).toFixed(1)}" cy="${yp(d.overall_rank).toFixed(1)}" r="3.5"
+                fill="var(--bg,#0d0d12)" stroke="#E0613A" stroke-width="2"
+                clip-path="url(#rAdpClip)"/>
+      `).join('')}
+      <text x="${PAD.left - 8}" y="${PAD.top + cH/2}"
+            fill="rgba(255,255,255,0.3)" font-size="9" text-anchor="middle" letter-spacing="0.5"
+            font-family="'Barlow Condensed',sans-serif"
+            transform="rotate(-90,${PAD.left-28},${PAD.top+cH/2})">OVERALL RANK</text>
+      ${xTicks.map(t => {
+        const x = xp(t).toFixed(1);
+        const mo = new Date(t).getMonth();
+        return `
+          <line x1="${x}" y1="${PAD.top+cH}" x2="${x}" y2="${PAD.top+cH+4}"
+                stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+          <text x="${x}" y="${PAD.top+cH+14}" fill="rgba(255,255,255,0.35)" font-size="9"
+                text-anchor="middle" font-family="'Barlow Condensed',sans-serif">${MONTH[mo]}</text>`;
+      }).join('')}
+    </svg>`;
 }
 
 
