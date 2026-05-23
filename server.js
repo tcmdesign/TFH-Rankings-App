@@ -296,27 +296,84 @@ app.get('/api/player/:name', async (req, res) => {
   const scout  = scoutMap[name]  || null;
   const injury = injuryMap[name] || null;
   let attrs = null;
+  let weeklyStats = [];
+  let statRanks = {};
   if (db) {
     try {
       const { rows } = await db.query(`
-        SELECT p.age, p.height, p.weight, p.position, p.team, p.status,
-               ROUND(AVG(ps.fantasy_pts)::numeric, 1) AS avg_pts_2025,
-               SUM(ps.targets)  AS targets_2025,
-               SUM(ps.carries)  AS carries_2025,
-               SUM(ps.rec_yards + ps.rush_yards) AS scrimmage_yards_2025,
-               SUM(ps.pass_yards) AS pass_yards_2025,
-               SUM(ps.pass_tds + ps.rush_tds + ps.rec_tds) AS tds_2025,
-               COUNT(ps.week) AS games_2025
+        SELECT p.id, p.age, p.height, p.weight, p.position, p.team, p.status
         FROM players p
-        LEFT JOIN player_stats ps ON ps.player_id = p.id AND ps.season = 2025 AND ps.fantasy_pts > 0
         WHERE LOWER(p.name) = $1
-        GROUP BY p.id
       `, [name]);
-      if (rows[0]) attrs = rows[0];
-    } catch {}
+      if (rows[0]) {
+        attrs = rows[0];
+        const pid = rows[0].id;
+        const pos = rows[0].position;
+
+        // Weekly fantasy points for 2025
+        const wsRes = await db.query(`
+          SELECT week, fantasy_pts, opponent
+          FROM player_stats
+          WHERE player_id = $1 AND season = 2025
+          ORDER BY week ASC
+        `, [pid]);
+        weeklyStats = wsRes.rows;
+
+        // Stat ranks vs position peers for 2025
+        if (pos) {
+          const srRes = await db.query(`
+            SELECT
+              avg_targets, targets_rank,
+              avg_receptions, receptions_rank,
+              avg_rec_yards, rec_yards_rank,
+              total_rec_tds, rec_tds_rank,
+              avg_carries, carries_rank,
+              avg_rush_yards, rush_yards_rank,
+              total_rush_tds, rush_tds_rank,
+              avg_pass_yards, pass_yards_rank,
+              total_pass_tds, pass_tds_rank,
+              total_ints, int_rank,
+              avg_snap_pct, snap_pct_rank
+            FROM (
+              SELECT
+                ps.player_id,
+                ROUND(AVG(NULLIF(ps.targets,0))::NUMERIC,    1) AS avg_targets,
+                RANK() OVER (ORDER BY AVG(ps.targets)     DESC NULLS LAST) AS targets_rank,
+                ROUND(AVG(NULLIF(ps.receptions,0))::NUMERIC, 1) AS avg_receptions,
+                RANK() OVER (ORDER BY AVG(ps.receptions)  DESC NULLS LAST) AS receptions_rank,
+                ROUND(AVG(NULLIF(ps.rec_yards,0))::NUMERIC,  1) AS avg_rec_yards,
+                RANK() OVER (ORDER BY AVG(ps.rec_yards)   DESC NULLS LAST) AS rec_yards_rank,
+                SUM(COALESCE(ps.rec_tds,0))                          AS total_rec_tds,
+                RANK() OVER (ORDER BY SUM(COALESCE(ps.rec_tds,0))   DESC NULLS LAST) AS rec_tds_rank,
+                ROUND(AVG(NULLIF(ps.carries,0))::NUMERIC,    1) AS avg_carries,
+                RANK() OVER (ORDER BY AVG(ps.carries)     DESC NULLS LAST) AS carries_rank,
+                ROUND(AVG(NULLIF(ps.rush_yards,0))::NUMERIC, 1) AS avg_rush_yards,
+                RANK() OVER (ORDER BY AVG(ps.rush_yards)  DESC NULLS LAST) AS rush_yards_rank,
+                SUM(COALESCE(ps.rush_tds,0))                          AS total_rush_tds,
+                RANK() OVER (ORDER BY SUM(COALESCE(ps.rush_tds,0))   DESC NULLS LAST) AS rush_tds_rank,
+                ROUND(AVG(NULLIF(ps.pass_yards,0))::NUMERIC, 1) AS avg_pass_yards,
+                RANK() OVER (ORDER BY AVG(ps.pass_yards)  DESC NULLS LAST) AS pass_yards_rank,
+                SUM(COALESCE(ps.pass_tds,0))                          AS total_pass_tds,
+                RANK() OVER (ORDER BY SUM(COALESCE(ps.pass_tds,0))   DESC NULLS LAST) AS pass_tds_rank,
+                SUM(COALESCE(ps.interceptions,0))                     AS total_ints,
+                RANK() OVER (ORDER BY SUM(COALESCE(ps.interceptions,0)) ASC NULLS LAST) AS int_rank,
+                ROUND(AVG(NULLIF(ps.snap_pct,0))::NUMERIC,   1) AS avg_snap_pct,
+                RANK() OVER (ORDER BY AVG(ps.snap_pct)    DESC NULLS LAST) AS snap_pct_rank
+              FROM player_stats ps
+              JOIN players p ON p.id = ps.player_id
+              WHERE p.position = $1 AND ps.season = 2025
+              GROUP BY ps.player_id
+              HAVING COUNT(*) >= 2
+            ) ranked
+            WHERE player_id = $2
+          `, [pos, pid]);
+          statRanks = srRes.rows[0] || {};
+        }
+      }
+    } catch (e) { console.error('player detail query failed:', e.message); }
   }
   const sleeperId = cache.__sleeperIds?.[name] || null;
-  res.json({ scout, injury, attrs, sleeperId });
+  res.json({ scout, injury, attrs, sleeperId, weeklyStats, statRanks });
 });
 
 app.get('/api/sleeper-ids', (req, res) => {

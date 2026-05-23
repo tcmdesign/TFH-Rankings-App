@@ -1664,7 +1664,7 @@ async function _loadAndRender(playerName, containerId) {
   const rankIdx = state.order.findIndex(i => (state.data[i]?.Player || '') === playerName);
   const rank    = rankIdx >= 0 ? rankIdx + 1 : null;
   const adp     = state.data[state.order[rankIdx]]?.sleeperAdp || null;
-  renderPanel(playerName, detail.scout, detail.injury, detail.attrs || null, rank, adp, history, containerId, detail.sleeperId || null, state.mode);
+  renderPanel(playerName, detail.scout, detail.injury, detail.attrs || null, rank, adp, history, containerId, detail.sleeperId || null, state.mode, detail.weeklyStats || [], detail.statRanks || {});
 }
 
 async function openPanel(playerName, row) {
@@ -1713,7 +1713,7 @@ function wheelSVG(value, color) {
   </svg>`;
 }
 
-function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId = 'panelContent', sleeperId = null, mode = 'dynasty') {
+function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId = 'panelContent', sleeperId = null, mode = 'dynasty', weeklyStats = [], statRanks = {}) {
   const pos  = scout?.position || attrs?.position || '';
   const team = scout?.nfl_team || injury?.nfl_team || attrs?.team || '';
   const abbrev = scout?.nfl_team_abbrev || injury?.nfl_team_abbrev || attrs?.team || '';
@@ -1795,30 +1795,17 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
       </div>
     </div>` : ''}
 
-    ${mode === 'redraft' && attrs?.avg_pts_2025 != null ? (() => {
-      const p = attrs;
-      const isQB = posAbbr === 'QB';
-      const isRB = posAbbr === 'RB';
-      const isWR = posAbbr === 'WR';
-      const isTE = posAbbr === 'TE';
-      const games = parseInt(p.games_2025) || 1;
-      const statBoxes = [];
-      statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${p.avg_pts_2025}</div><div class="panel-rank-lbl">Avg Pts</div></div>`);
-      if (isQB) {
-        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.pass_yards_2025 / games)}</div><div class="panel-rank-lbl">Pass Yds/G</div></div>`);
-        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.tds_2025 / games * 10) / 10}</div><div class="panel-rank-lbl">TD/G</div></div>`);
-      } else if (isRB) {
-        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.carries_2025 / games * 10) / 10}</div><div class="panel-rank-lbl">Car/G</div></div>`);
-        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.scrimmage_yards_2025 / games)}</div><div class="panel-rank-lbl">Scrim Yds/G</div></div>`);
-      } else {
-        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.targets_2025 / games * 10) / 10}</div><div class="panel-rank-lbl">Tgt/G</div></div>`);
-        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.scrimmage_yards_2025 / games)}</div><div class="panel-rank-lbl">Rec Yds/G</div></div>`);
-      }
-      return `<div class="panel-section">
-        <div class="panel-section-title">2025 Season</div>
-        <div class="panel-ranks" style="margin-top:0">${statBoxes.join('')}</div>
-      </div>`;
-    })() : ''}
+    ${mode === 'redraft' && weeklyStats.length > 0 ? `
+    <div class="panel-section">
+      <div class="panel-section-title">Fantasy Points — 2025 Season · ${weeklyStats.length} Weeks</div>
+      <div id="fpChartWrap"></div>
+    </div>` : ''}
+
+    ${mode === 'redraft' && Object.keys(statRanks).length > 0 ? `
+    <div class="panel-section">
+      <div class="panel-section-title">Season Stats &amp; Rankings</div>
+      <div id="statRanksGrid"></div>
+    </div>` : ''}
 
     <!-- ADP Trend -->
     <div class="panel-section">
@@ -1876,7 +1863,13 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
   // Load photo
   loadPanelPhoto(name, slug, sleeperId);
 
-  // Render chart
+  // Fantasy points bar chart (redraft)
+  if (mode === 'redraft' && weeklyStats.length > 0) renderFpChart(weeklyStats, posAbbr);
+
+  // Stat ranks grid (redraft)
+  if (mode === 'redraft' && Object.keys(statRanks).length > 0) renderStatRanks(statRanks, posAbbr);
+
+  // ADP chart
   if (history.mfl?.length >= 1) renderAdpChart(history);
 }
 
@@ -1915,6 +1908,130 @@ function loadPanelPhoto(name, slug, sleeperId) {
       }
       trySleeperFallback();
     }).catch(() => trySleeperFallback());
+}
+
+const FP_THRESHOLDS = { QB: 20, RB: 12, WR: 15, TE: 10 };
+function fpBarStyle(pts, pos) {
+  if (pts === 0) return { fill: 'rgba(240,16,106,0.75)', valColor: '#F0106A' };
+  const t = FP_THRESHOLDS[pos] || 12;
+  if (pts >= t * 1.5) return { fill: 'rgba(27,240,60,0.85)',   valColor: '#1BF03C' };
+  if (pts >= t)       return { fill: 'rgba(41,201,240,0.80)',  valColor: 'rgba(41,201,240,0.95)' };
+  if (pts >= t * 0.6) return { fill: 'rgba(94,134,168,0.65)',  valColor: 'rgba(94,134,168,0.9)' };
+  return                     { fill: 'rgba(240,16,106,0.70)',  valColor: '#F0106A' };
+}
+
+function renderFpChart(weeks, pos) {
+  const wrap = document.getElementById('fpChartWrap');
+  if (!wrap || !weeks.length) return;
+  const ptsArr = weeks.map(w => parseFloat(w.fantasy_pts) || 0);
+  const maxPts = Math.max(...ptsArr, 1);
+  const avg    = ptsArr.reduce((a, b) => a + b, 0) / ptsArr.length;
+
+  const W = 560, H = 210;
+  const PL = 34, PR = 6, PT = 24, PB = 38;
+  const cW = W - PL - PR, cH = H - PT - PB;
+
+  function niceMax(v) { if (v<=10) return Math.max(Math.ceil(v/2)*2,4); if (v<=30) return Math.ceil(v/5)*5; return Math.ceil(v/10)*10; }
+  function gridStep(m) { if (m<=10) return 2; if (m<=20) return 5; if (m<=40) return 10; return 20; }
+  const yMax = niceMax(maxPts);
+  const step = gridStep(yMax);
+  const grids = [];
+  for (let v = 0; v <= yMax; v += step) grids.push(v);
+
+  const yToSvg = v => PT + cH * (1 - v / yMax);
+  const avgY   = yToSvg(avg);
+  const n      = weeks.length;
+  const barGap = Math.max(2, Math.min(5, (cW / n) * 0.14));
+  const barW   = (cW - (n - 1) * barGap) / n;
+  const xLeft  = i => PL + i * (barW + barGap);
+  const xMid   = i => xLeft(i) + barW / 2;
+  const valFs  = n > 13 ? 8 : n > 9 ? 9 : 10;
+
+  const gridLines = grids.map(v => {
+    const y = yToSvg(v).toFixed(1);
+    return `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}"
+              stroke="${v===0 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)'}"
+              stroke-width="${v===0?1:0.8}" stroke-dasharray="${v===0?'':'3,5'}"/>
+            <text x="${PL-4}" y="${(parseFloat(y)+3.5).toFixed(1)}" text-anchor="end"
+              font-size="8" fill="rgba(255,255,255,0.22)" font-family="system-ui,sans-serif">${v}</text>`;
+  }).join('');
+
+  const bars = weeks.map((w, i) => {
+    const pts = ptsArr[i];
+    const { fill, valColor } = fpBarStyle(pts, pos);
+    const bH  = pts === 0 ? 3 : Math.max(3, cH * (pts / yMax));
+    const bY  = (PT + cH - bH).toFixed(1);
+    const xc  = xMid(i).toFixed(1);
+    const xl  = xLeft(i).toFixed(1);
+    const disp = pts % 1 === 0 ? pts.toFixed(0) : pts.toFixed(1);
+    const opp  = w.opponent ? `@${w.opponent}` : '';
+    return `<rect x="${xl}" y="${bY}" width="${barW.toFixed(1)}" height="${bH.toFixed(1)}" fill="${fill}" rx="2"/>
+            <text x="${xc}" y="${(parseFloat(bY)-4).toFixed(1)}" text-anchor="middle"
+              font-size="${valFs}" font-weight="800" fill="${valColor}"
+              font-family="'Barlow Condensed',sans-serif">${disp}</text>
+            <text x="${xc}" y="${(PT+cH+12).toFixed(1)}" text-anchor="middle"
+              font-size="8" fill="rgba(255,255,255,0.38)" font-family="system-ui,sans-serif">Wk${w.week}</text>
+            <text x="${xc}" y="${(PT+cH+23).toFixed(1)}" text-anchor="middle"
+              font-size="7" fill="rgba(94,134,168,0.55)" font-family="system-ui,sans-serif">${opp}</text>`;
+  }).join('');
+
+  wrap.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;max-width:${W}px">
+    ${gridLines}
+    <line x1="${PL}" y1="${avgY.toFixed(1)}" x2="${W-PR}" y2="${avgY.toFixed(1)}"
+      stroke="rgba(255,255,255,0.28)" stroke-width="1.5" stroke-dasharray="5,5"/>
+    <rect x="1" y="${(avgY-8).toFixed(1)}" width="${PL-3}" height="14" rx="3" fill="rgba(255,255,255,0.08)"/>
+    <text x="${PL-5}" y="${(avgY+4).toFixed(1)}" text-anchor="end" font-size="8" font-weight="700"
+      fill="rgba(255,255,255,0.6)" font-family="'Barlow Condensed',sans-serif">${avg.toFixed(1)}</text>
+    ${bars}
+  </svg>`;
+}
+
+const STAT_DEFS = {
+  WR: [
+    { key: 'avg_targets',    rankKey: 'targets_rank',    label: 'Avg Targets',  decimals: 1 },
+    { key: 'avg_receptions', rankKey: 'receptions_rank', label: 'Avg Rec',      decimals: 1 },
+    { key: 'avg_rec_yards',  rankKey: 'rec_yards_rank',  label: 'Avg Rec Yds',  decimals: 1 },
+    { key: 'total_rec_tds',  rankKey: 'rec_tds_rank',    label: 'Rec TDs',      total: true },
+    { key: 'avg_snap_pct',   rankKey: 'snap_pct_rank',   label: 'Snap %',       pct: true },
+  ],
+  TE: [
+    { key: 'avg_targets',    rankKey: 'targets_rank',    label: 'Avg Targets',  decimals: 1 },
+    { key: 'avg_receptions', rankKey: 'receptions_rank', label: 'Avg Rec',      decimals: 1 },
+    { key: 'avg_rec_yards',  rankKey: 'rec_yards_rank',  label: 'Avg Rec Yds',  decimals: 1 },
+    { key: 'total_rec_tds',  rankKey: 'rec_tds_rank',    label: 'Rec TDs',      total: true },
+  ],
+  RB: [
+    { key: 'avg_carries',    rankKey: 'carries_rank',    label: 'Avg Carries',  decimals: 1 },
+    { key: 'avg_rush_yards', rankKey: 'rush_yards_rank', label: 'Avg Rush Yds', decimals: 1 },
+    { key: 'total_rush_tds', rankKey: 'rush_tds_rank',   label: 'Rush TDs',     total: true },
+    { key: 'avg_targets',    rankKey: 'targets_rank',    label: 'Avg Targets',  decimals: 1 },
+    { key: 'avg_rec_yards',  rankKey: 'rec_yards_rank',  label: 'Avg Rec Yds',  decimals: 1 },
+  ],
+  QB: [
+    { key: 'avg_pass_yards', rankKey: 'pass_yards_rank', label: 'Avg Pass Yds', decimals: 1 },
+    { key: 'total_pass_tds', rankKey: 'pass_tds_rank',   label: 'Pass TDs',     total: true },
+    { key: 'total_ints',     rankKey: 'int_rank',        label: 'INTs',         total: true },
+    { key: 'avg_snap_pct',   rankKey: 'snap_pct_rank',   label: 'Snap %',       pct: true },
+  ],
+};
+
+function renderStatRanks(ranks, pos) {
+  const wrap = document.getElementById('statRanksGrid');
+  if (!wrap) return;
+  const defs = STAT_DEFS[pos] || STAT_DEFS.WR;
+  const cells = defs.map(({ key, rankKey, label, decimals, total, pct }) => {
+    const raw = ranks[key];
+    if (raw == null) return '';
+    const val = parseFloat(raw);
+    const display = pct ? `${Math.round(val)}%` : total ? Math.round(val) : val.toFixed(decimals ?? 1);
+    const rank = ranks[rankKey];
+    return `<div style="background:var(--bg3,#1a1a20);border:1px solid var(--border,rgba(255,255,255,0.07));border-radius:10px;padding:10px 12px">
+      <div style="font-size:9px;font-weight:700;color:var(--text3,#555);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px">${label}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:var(--text,#f0f0f0);line-height:1;margin-bottom:5px">${display}</div>
+      ${rank ? `<div style="font-size:10px;color:var(--text3,#555)">#${rank} among ${pos}s</div>` : ''}
+    </div>`;
+  }).join('');
+  wrap.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">${cells}</div>`;
 }
 
 function renderAdpChart(history) {
