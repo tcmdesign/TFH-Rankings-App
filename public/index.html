@@ -886,9 +886,16 @@ document.querySelectorAll('.pos-tab').forEach(el => {
 });
 
 function updateFormatBar() {
+  const dynastyPill = document.querySelector('.format-pill[data-format="dynasty_1qb"]');
+  const formatSep   = document.querySelector('.format-sep');
+  const isRedraft   = state.mode === 'redraft';
+
+  if (dynastyPill) dynastyPill.style.display = isRedraft ? 'none' : '';
+  if (formatSep)   formatSep.style.display   = isRedraft ? 'none' : '';
+
   document.querySelectorAll('.format-pill').forEach(p => {
     const fmt = p.dataset.format;
-    if (state.mode === 'redraft' && (fmt === 'redraft_ppr' || fmt === 'redraft_std')) {
+    if (isRedraft && (fmt === 'redraft_ppr' || fmt === 'redraft_std')) {
       p.classList.add('disabled');
     } else {
       p.classList.remove('disabled');
@@ -1657,7 +1664,7 @@ async function _loadAndRender(playerName, containerId) {
   const rankIdx = state.order.findIndex(i => (state.data[i]?.Player || '') === playerName);
   const rank    = rankIdx >= 0 ? rankIdx + 1 : null;
   const adp     = state.data[state.order[rankIdx]]?.sleeperAdp || null;
-  renderPanel(playerName, detail.scout, detail.injury, detail.attrs || null, rank, adp, history, containerId, detail.sleeperId || null);
+  renderPanel(playerName, detail.scout, detail.injury, detail.attrs || null, rank, adp, history, containerId, detail.sleeperId || null, state.mode);
 }
 
 async function openPanel(playerName, row) {
@@ -1706,10 +1713,10 @@ function wheelSVG(value, color) {
   </svg>`;
 }
 
-function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId = 'panelContent', sleeperId = null) {
-  const pos  = scout?.position || '';
-  const team = scout?.nfl_team || injury?.nfl_team || '';
-  const abbrev = scout?.nfl_team_abbrev || injury?.nfl_team_abbrev || '';
+function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId = 'panelContent', sleeperId = null, mode = 'dynasty') {
+  const pos  = scout?.position || attrs?.position || '';
+  const team = scout?.nfl_team || injury?.nfl_team || attrs?.team || '';
+  const abbrev = scout?.nfl_team_abbrev || injury?.nfl_team_abbrev || attrs?.team || '';
   const school = scout?.school || injury?.school || '';
   const nameParts = name.split(' ');
   const initials  = nameParts.slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
@@ -1780,22 +1787,38 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
         </div>
       </div>
     </div>
+    ${mode !== 'redraft' ? `
     <div class="score-wheels">
-      <!-- Upside and Consistency wheels hidden until data is ready
-      <div class="score-wheel">
-        <div class="wheel-wrap">${wheelSVG(upside,'#ff8c00')}<div class="wheel-center">${upside}</div></div>
-        <div class="wheel-lbl">Upside</div>
-      </div>
-      -->
       <div class="score-wheel">
         <div class="wheel-wrap">${wheelSVG(riskFill,'#E52222')}<div class="wheel-center" style="font-size:16px">${riskDisplay}</div></div>
         <div class="wheel-lbl">Inj. Risk</div>
       </div>
-      <!-- <div class="score-wheel">
-        <div class="wheel-wrap">${wheelSVG(consist,'#00bfff')}<div class="wheel-center">${consist}</div></div>
-        <div class="wheel-lbl">Consist.</div>
-      </div> -->
-    </div>
+    </div>` : ''}
+
+    ${mode === 'redraft' && attrs?.avg_pts_2025 != null ? (() => {
+      const p = attrs;
+      const isQB = posAbbr === 'QB';
+      const isRB = posAbbr === 'RB';
+      const isWR = posAbbr === 'WR';
+      const isTE = posAbbr === 'TE';
+      const games = parseInt(p.games_2025) || 1;
+      const statBoxes = [];
+      statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${p.avg_pts_2025}</div><div class="panel-rank-lbl">Avg Pts</div></div>`);
+      if (isQB) {
+        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.pass_yards_2025 / games)}</div><div class="panel-rank-lbl">Pass Yds/G</div></div>`);
+        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.tds_2025 / games * 10) / 10}</div><div class="panel-rank-lbl">TD/G</div></div>`);
+      } else if (isRB) {
+        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.carries_2025 / games * 10) / 10}</div><div class="panel-rank-lbl">Car/G</div></div>`);
+        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.scrimmage_yards_2025 / games)}</div><div class="panel-rank-lbl">Scrim Yds/G</div></div>`);
+      } else {
+        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.targets_2025 / games * 10) / 10}</div><div class="panel-rank-lbl">Tgt/G</div></div>`);
+        statBoxes.push(`<div class="panel-rank-box"><div class="panel-rank-val">${Math.round(p.scrimmage_yards_2025 / games)}</div><div class="panel-rank-lbl">Rec Yds/G</div></div>`);
+      }
+      return `<div class="panel-section">
+        <div class="panel-section-title">2025 Season</div>
+        <div class="panel-ranks" style="margin-top:0">${statBoxes.join('')}</div>
+      </div>`;
+    })() : ''}
 
     <!-- ADP Trend -->
     <div class="panel-section">

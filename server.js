@@ -298,9 +298,20 @@ app.get('/api/player/:name', async (req, res) => {
   let attrs = null;
   if (db) {
     try {
-      const { rows } = await db.query(
-        'SELECT age, height, weight FROM players WHERE LOWER(name) = $1', [name]
-      );
+      const { rows } = await db.query(`
+        SELECT p.age, p.height, p.weight, p.position, p.team, p.status,
+               ROUND(AVG(ps.fantasy_pts)::numeric, 1) AS avg_pts_2025,
+               SUM(ps.targets)  AS targets_2025,
+               SUM(ps.carries)  AS carries_2025,
+               SUM(ps.rec_yards + ps.rush_yards) AS scrimmage_yards_2025,
+               SUM(ps.pass_yards) AS pass_yards_2025,
+               SUM(ps.pass_tds + ps.rush_tds + ps.rec_tds) AS tds_2025,
+               COUNT(ps.week) AS games_2025
+        FROM players p
+        LEFT JOIN player_stats ps ON ps.player_id = p.id AND ps.season = 2025 AND ps.fantasy_pts > 0
+        WHERE LOWER(p.name) = $1
+        GROUP BY p.id
+      `, [name]);
       if (rows[0]) attrs = rows[0];
     } catch {}
   }
