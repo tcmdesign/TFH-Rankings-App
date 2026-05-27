@@ -431,6 +431,8 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
   .table-wrap:not(.draft-active) thead th.sleeper-col{display:flex!important;width:48px;flex-shrink:0;justify-content:center;padding:4px 4px}
   /* Draft cell hidden on mobile — all actions via swipe strip */
   .draft-cell{display:none!important}
+  /* Creator rank columns hidden on mobile — too wide */
+  .creator-rank-th,.creator-rank-col{display:none!important}
   .tfh-rank-col{display:none!important}
   .photo-cell{width:46px;flex-shrink:0;padding:8px 4px}
   .player-photo,.photo-initials{width:38px;height:38px}
@@ -1127,7 +1129,7 @@ function renderTable() {
             ? state.creators.map(c => `<th class="creator-rank-th">${c}</th>`).join('')
             : ''}
           ${state.draftMode
-            ? `<th style="width:160px;color:rgba(0,217,122,0.6);font-size:9px;letter-spacing:1px;white-space:nowrap"><span class="name-full">MARK PLAYER</span><span class="name-short">SWIPE LEFT TO MARK PLAYER</span></th>`
+            ? `<th class="draft-cell" style="width:160px;color:rgba(0,217,122,0.6);font-size:9px;letter-spacing:1px;white-space:nowrap"><span class="name-full">MARK PLAYER</span><span class="name-short">SWIPE LEFT TO MARK PLAYER</span></th>`
             : `<th class="sleeper-col sortable" onclick="sortBy('sleeperAdp')">ADP<span class="sort-arrow">${state.sortCol==='sleeperAdp' ? (state.sortDir==='asc'?'↑':'↓') : ''}</span></th>`
           }
         </tr>
