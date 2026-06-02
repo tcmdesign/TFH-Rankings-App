@@ -1528,12 +1528,12 @@ async function generateCheatSheet(style) {
   const section     = state.section;
   const pKey        = populatedKey();
   const formatLabel = FORMAT_CONFIG[format]?.label || '';
-  const overallPos  = mode === 'dynasty' ? 'SF' : null;
   const sheetTitle  = section === 'rookie' ? 'TFH 2026 Rookie Rankings' : mode === 'redraft' ? 'TFH 2026 Redraft Rankings' : 'TFH 2026 Dynasty Rankings';
+  const isRedraft = mode === 'redraft' && section === 'redraft';
 
   const fetchPos = async (pos) => {
     if (!POPULATED[pKey]?.[pos]) return [];
-    if (mode === 'redraft' && section === 'redraft') {
+    if (isRedraft) {
       const res = await fetch(`/api/rankings/redraft-consensus/${pos}`);
       const json = await res.json();
       return json.players || [];
@@ -1546,14 +1546,18 @@ async function generateCheatSheet(style) {
     }
   };
 
-  const [results, overallRows] = await Promise.all([
+  // Determine which multi-position lists to fetch
+  const multiPosList = [];
+  if (mode === 'dynasty' && POPULATED[pKey]?.SF) multiPosList.push({ pos: 'SF', label: 'Overall Rankings', key: 'SF' });
+  if (isRedraft && POPULATED[pKey]?.FLEX) multiPosList.push({ pos: 'FLEX', label: 'Flex Rankings', key: 'FLEX' });
+  if (isRedraft && POPULATED[pKey]?.Overall) multiPosList.push({ pos: 'Overall', label: 'Overall Rankings', key: 'Overall' });
+
+  const [results, ...multiPosRows] = await Promise.all([
     Promise.all(positions.map(async pos => {
       try { return { pos, rows: await fetchPos(pos) }; }
       catch { return { pos, rows: [] }; }
     })),
-    overallPos && POPULATED[pKey]?.[overallPos]
-      ? fetchPos(overallPos).catch(() => [])
-      : Promise.resolve([]),
+    ...multiPosList.map(mp => fetchPos(mp.pos).catch(() => [])),
   ]);
 
   if (btn) btn.innerHTML = origText;
@@ -1583,9 +1587,9 @@ async function generateCheatSheet(style) {
     return `<div class="cs-section">${hd}<table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
   };
 
-  const buildOverall = (rows) => {
+  const buildMultiPos = (rows, label, key) => {
     if (!rows.length) return '';
-    const savedOrder = tabOrders[`${format}_SF`];
+    const savedOrder = tabOrders[`${format}_${key}`];
     const ordered = savedOrder ? savedOrder.order.map(i => rows[i]).filter(Boolean) : rows;
     const cols = 4;
     const chunkSize = Math.ceil(ordered.length / cols);
@@ -1602,7 +1606,7 @@ async function generateCheatSheet(style) {
       return `<div class="ov-col"><table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
     }).join('');
     return `<div class="ov-wrap">
-      <div class="ov-hd">Overall Rankings</div>
+      <div class="ov-hd">${label}</div>
       <div class="ov-grid">${tables}</div>
     </div>`;
   };
@@ -1698,7 +1702,10 @@ tbody tr:nth-child(even){background:#f9f9f9}
     <h1>${sheetTitle}</h1>
     <h2>${formatLabel}</h2>
   </div>
-  ${buildOverall(overallRows)}
+  ${multiPosList.map((mp, i) => {
+    const html = buildMultiPos(multiPosRows[i], mp.label, mp.key);
+    return html ? `<div style="page-break-after:always">${html}</div>` : '';
+  }).join('')}
   <div class="grid">${gridContent}</div>
   <div class="footer">
     <span>TheFantasyHeadliners.com</span>
