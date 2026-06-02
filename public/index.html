@@ -1639,9 +1639,8 @@ async function generateCheatSheet(style) {
   } else if (style === 'standard') {
     const pairs = [[results[0], results[1]], [results[2], results[3]]];
     gridContent = pairs.map((pair, pi) =>
-      `<div class="std-pair" style="${pi < pairs.length - 1 ? 'page-break-after:always' : ''}">
-        <div class="std-col">${buildSection(pair[0])}</div>
-        <div class="std-col">${buildSection(pair[1])}</div>
+      `<div class="std-page" style="${pi < pairs.length - 1 ? 'page-break-after:always' : ''}">
+        ${buildSection(pair[0])}${buildSection(pair[1])}
       </div>`
     ).join('');
   } else {
@@ -1663,10 +1662,9 @@ body{font-family:Arial,Helvetica,sans-serif;font-size:${s.bodyFont};color:#000;b
 .ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 6pt}
 .ov-col{break-inside:avoid}
 .grid{${s.gridCss}}
-.std-pair{display:grid;grid-template-columns:1fr 1fr;gap:0 12pt;align-items:start}
-.std-col{min-width:0}
-.full-pos .cs-section{column-count:2;column-gap:14pt}
-.full-pos .cs-hd{column-span:all}
+.std-page{column-count:2;column-gap:12pt}
+.full-pos{column-count:2;column-gap:14pt}
+.full-pos .cs-hd,.std-page .cs-hd{column-span:all}
 .cs-section{break-inside:auto}
 .cs-hd{break-after:avoid;background:#111;color:#fff;font-size:${s.hdFont};font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2pt 4pt;margin-top:4pt}
 .cs-section:first-child .cs-hd{margin-top:0}
