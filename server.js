@@ -261,6 +261,34 @@ app.get('/api/rankings/redraft-consensus/:pos', async (req, res) => {
 
 
 
+// ── GET /api/rankings/rookie-redraft/:pos ──────────────────────────────────────
+// Pulls from "Redraft Rookie {POS}" Airtable tables (separate from full redraft consensus).
+app.get('/api/rankings/rookie-redraft/:pos', async (req, res) => {
+  const { pos } = req.params;
+  if (!['QB', 'RB', 'WR', 'TE'].includes(pos)) return res.status(400).json({ error: 'Invalid position' });
+  try {
+    const format = req.query.format || 'redraft_half';
+    const sleeperFieldMap = {
+      redraft_ppr:  'ppr',
+      redraft_half: 'halfPpr',
+      redraft_std:  'std',
+    };
+    const sf = sleeperFieldMap[format] || 'halfPpr';
+    const [data, sleeperAdpMap] = await Promise.all([
+      fetchTableByName(`Redraft Rookie ${pos}`),
+      fetchSleeperAdpMap(),
+    ]);
+    const enriched = data.map(p => {
+      const sEntry = sleeperAdpMap[(p.Player || '').toLowerCase()];
+      return { ...p, sleeperAdp: sEntry?.[sf] || null };
+    });
+    res.json(enriched);
+  } catch (err) {
+    console.error('/api/rankings/rookie-redraft error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/rankings/:mode/:pos', async (req, res) => {
   const { mode, pos } = req.params;
   const tableId = TABLES[mode]?.[pos];

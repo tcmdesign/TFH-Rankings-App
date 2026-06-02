@@ -761,8 +761,9 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
 
 <script>
 const POPULATED = {
-  redraft: { QB: true, RB: true, WR: true, TE: true, Overall: true, SF: false },
-  dynasty: { QB: true, RB: true, WR: true, TE: true, Overall: false, SF: true },
+  redraft:        { QB: true, RB: true, WR: true, TE: true, Overall: true, SF: false },
+  dynasty:        { QB: true, RB: true, WR: true, TE: true, Overall: false, SF: true },
+  rookie_redraft: { QB: true, RB: true, WR: true, TE: true, Overall: false, SF: false },
 };
 
 const POS_COLORS = { QB: '#E52222', RB: '#00cc66', WR: '#00bfff', TE: '#ff8c00' };
@@ -789,6 +790,7 @@ let state = {
   draftMode: false,
   draftMine: new Set(),
   draftGone: new Set(),
+  section: 'rookie',       // sidebar selection: 'rookie' or 'redraft'
   avoided:   new Set(),  // name-based, persistent
   creators:  [],          // creator names for redraft consensus columns
   publishInfo: null,      // last redraft publish metadata
@@ -797,6 +799,9 @@ let state = {
 const tabOrders = {};
 const tabData   = {}; // caches loaded data per tab so starred view works across positions
 function tabKey() { return `${state.format}_${state.pos}`; }
+function populatedKey() {
+  return (state.section === 'rookie' && state.mode === 'redraft') ? 'rookie_redraft' : state.mode;
+}
 function saveTabOrder() {
   if (state.custom) tabOrders[tabKey()] = { order: [...state.order], custom: true };
 }
@@ -817,6 +822,11 @@ function loadFromURL() {
   if (p.has('format') && FORMAT_CONFIG[p.get('format')]) state.format = p.get('format');
   if (p.has('pos'))     state.pos = p.get('pos');
   state.mode = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
+  if (p.has('section') && ['rookie', 'redraft'].includes(p.get('section'))) {
+    state.section = p.get('section');
+  } else {
+    state.section = state.mode === 'redraft' ? 'redraft' : 'rookie';
+  }
   if (p.has('order'))   try { state.order   = JSON.parse(atob(p.get('order'))); state.custom = true; } catch {}
   if (p.has('checked')) try { state.checked = new Set(JSON.parse(atob(p.get('checked')))); } catch {}
   if (p.has('starred')) try { state.starred = new Set(JSON.parse(atob(p.get('starred')))); } catch {}
@@ -833,6 +843,7 @@ document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
       document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
       document.querySelector('.format-pill[data-format="redraft_half"]')?.classList.add('active');
       saveTabOrder();
+      state.section = 'redraft';
       state.format  = 'redraft_half';
       state.mode    = 'redraft';
       state.custom  = false;
@@ -845,6 +856,7 @@ document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
       document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
       document.querySelector('.format-pill[data-format="dynasty_1qb"]')?.classList.add('active');
       saveTabOrder();
+      state.section = 'rookie';
       state.format  = 'dynasty_1qb';
       state.mode    = 'dynasty';
       state.custom  = false;
@@ -890,14 +902,14 @@ document.querySelectorAll('.pos-tab').forEach(el => {
 function updateFormatBar() {
   const dynastyPill = document.querySelector('.format-pill[data-format="dynasty_1qb"]');
   const formatSep   = document.querySelector('.format-sep');
-  const isRedraft   = state.mode === 'redraft';
+  const hideDynasty = state.section === 'redraft';
 
-  if (dynastyPill) dynastyPill.style.display = isRedraft ? 'none' : '';
-  if (formatSep)   formatSep.style.display   = isRedraft ? 'none' : '';
+  if (dynastyPill) dynastyPill.style.display = hideDynasty ? 'none' : '';
+  if (formatSep)   formatSep.style.display   = hideDynasty ? 'none' : '';
 
   document.querySelectorAll('.format-pill').forEach(p => {
     const fmt = p.dataset.format;
-    if (isRedraft && (fmt === 'redraft_ppr' || fmt === 'redraft_std')) {
+    if (state.mode === 'redraft' && (fmt === 'redraft_ppr' || fmt === 'redraft_std')) {
       p.classList.add('disabled');
     } else {
       p.classList.remove('disabled');
@@ -906,12 +918,13 @@ function updateFormatBar() {
 }
 
 function updatePosTabs() {
-  const populated = POPULATED[state.mode] || {};
+  const pKey      = populatedKey();
+  const populated = POPULATED[pKey] || {};
 
-  // Show Overall tab for redraft, SF tab for dynasty
+  // Show Overall tab only for full redraft, SF tab only for dynasty
   const overallTab = document.querySelector('.pos-tab[data-pos="Overall"]');
   const sfTab      = document.querySelector('.pos-tab[data-pos="SF"]');
-  if (overallTab) overallTab.style.display = state.mode === 'redraft' ? '' : 'none';
+  if (overallTab) overallTab.style.display = (state.mode === 'redraft' && state.section === 'redraft') ? '' : 'none';
   if (sfTab)      sfTab.style.display      = state.mode === 'dynasty' ? '' : 'none';
 
   document.querySelectorAll('.pos-tab').forEach(el => {
@@ -958,7 +971,8 @@ async function loadRankings() {
   }
 
   document.getElementById('clearStarsBtn').style.display = 'none';
-  const populated = POPULATED[state.mode]?.[state.pos];
+  const pKey = populatedKey();
+  const populated = POPULATED[pKey]?.[state.pos];
   if (!populated) {
     container.innerHTML = '<div class="coming-soon-msg">Rankings Coming Soon</div>';
     document.getElementById('playerCount').textContent = '';
@@ -966,12 +980,19 @@ async function loadRankings() {
   }
   container.innerHTML = '<div class="coming-soon-msg">Loading...</div>';
   try {
-    if (state.mode === 'redraft') {
+    if (state.mode === 'redraft' && state.section === 'redraft') {
+      // Full redraft consensus (all players)
       const res  = await fetch(`/api/rankings/redraft-consensus/${state.pos}`);
       const json = await res.json();
       state.data        = json.players || [];
       state.creators    = json.creators || [];
       state.publishInfo = json.publishInfo || null;
+    } else if (state.mode === 'redraft' && state.section === 'rookie') {
+      // Rookie-only redraft
+      const res  = await fetch(`/api/rankings/rookie-redraft/${state.pos}?format=${state.format}`);
+      state.data = await res.json();
+      state.creators    = [];
+      state.publishInfo = null;
     } else {
       const res  = await fetch(`/api/rankings/${state.mode}/${state.pos}?format=${state.format}`);
       state.data = await res.json();
@@ -1434,19 +1455,33 @@ async function printCheatSheet() {
   const positions = ['QB', 'RB', 'WR', 'TE'];
   const format      = state.format;
   const mode        = state.mode;
+  const section     = state.section;
+  const pKey        = populatedKey();
   const formatLabel = FORMAT_CONFIG[format]?.label || '';
   const overallPos  = mode === 'dynasty' ? 'SF' : null;
 
+  const fetchPos = async (pos) => {
+    if (!POPULATED[pKey]?.[pos]) return [];
+    if (mode === 'redraft' && section === 'redraft') {
+      const res = await fetch(`/api/rankings/redraft-consensus/${pos}`);
+      const json = await res.json();
+      return json.players || [];
+    } else if (mode === 'redraft' && section === 'rookie') {
+      const res = await fetch(`/api/rankings/rookie-redraft/${pos}?format=${format}`);
+      return await res.json();
+    } else {
+      const res = await fetch(`/api/rankings/${mode}/${pos}?format=${format}`);
+      return await res.json();
+    }
+  };
+
   const [results, overallRows] = await Promise.all([
     Promise.all(positions.map(async pos => {
-      if (!POPULATED[mode]?.[pos]) return { pos, rows: [] };
-      try {
-        const res = await fetch(`/api/rankings/${mode}/${pos}?format=${format}`);
-        return { pos, rows: await res.json() };
-      } catch { return { pos, rows: [] }; }
+      try { return { pos, rows: await fetchPos(pos) }; }
+      catch { return { pos, rows: [] }; }
     })),
-    overallPos && POPULATED[mode]?.[overallPos]
-      ? fetch(`/api/rankings/${mode}/${overallPos}?format=${format}`).then(r => r.json()).catch(() => [])
+    overallPos && POPULATED[pKey]?.[overallPos]
+      ? fetchPos(overallPos).catch(() => [])
       : Promise.resolve([]),
   ]);
 
@@ -2149,6 +2184,11 @@ function renderAdpChart(history) {
 loadFromURL();
 updateFormatBar();
 updatePosTabs();
+
+// Activate sidebar item based on section
+document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+const activeSidebar = document.querySelector(`.sidebar-item[data-tool="${state.section === 'redraft' ? 'redraft' : 'rookie'}"]`);
+if (activeSidebar) activeSidebar.classList.add('active');
 
 // Activate format pill
 document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
