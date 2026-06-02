@@ -99,6 +99,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .pos-tab[data-pos="RB"]     {--pc:0,217,122;  --ph:var(--green)}
 .pos-tab[data-pos="WR"]     {--pc:74,158,255; --ph:var(--blue)}
 .pos-tab[data-pos="TE"]     {--pc:255,140,0;  --ph:#ff8c00}
+.pos-tab[data-pos="FLEX"]    {--pc:168,85,247; --ph:#a855f7}
 .pos-tab[data-pos="Overall"] {--pc:0,191,165;  --ph:#00e5c8}
 .pos-tab[data-pos="SF"]      {--pc:0,191,165;  --ph:#00e5c8}
 .pos-tab[data-pos="Targets"] {--pc:255,165,0;  --ph:#ffa500}
@@ -709,6 +710,7 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
     <div class="pos-tab" data-pos="RB">RB</div>
     <div class="pos-tab" data-pos="WR">WR</div>
     <div class="pos-tab" data-pos="TE">TE</div>
+    <div class="pos-tab" data-pos="FLEX" style="display:none">Flex</div>
     <div class="pos-tab" data-pos="Overall" style="display:none">Overall</div>
     <div class="pos-tab" data-pos="SF">Overall</div>
     <div class="pos-tab" data-pos="Targets" style="display:none">★ Targets<span class="tab-star-count" id="tabStarCount"></span></div>
@@ -780,7 +782,7 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
 
 <script>
 const POPULATED = {
-  redraft:        { QB: true, RB: true, WR: true, TE: true, Overall: true, SF: false },
+  redraft:        { QB: true, RB: true, WR: true, TE: true, FLEX: true, Overall: true, SF: false },
   dynasty:        { QB: true, RB: true, WR: true, TE: true, Overall: false, SF: true },
   rookie_redraft: { QB: true, RB: true, WR: true, TE: true, Overall: false, SF: false },
 };
@@ -961,10 +963,13 @@ function updatePosTabs() {
   const pKey      = populatedKey();
   const populated = POPULATED[pKey] || {};
 
-  // Show Overall tab only for full redraft, SF tab only for dynasty
+  // Show Overall/FLEX tabs only for full redraft, SF tab only for dynasty
   const overallTab = document.querySelector('.pos-tab[data-pos="Overall"]');
+  const flexTab    = document.querySelector('.pos-tab[data-pos="FLEX"]');
   const sfTab      = document.querySelector('.pos-tab[data-pos="SF"]');
-  if (overallTab) overallTab.style.display = (state.mode === 'redraft' && state.section === 'redraft') ? '' : 'none';
+  const isRedraft  = state.mode === 'redraft' && state.section === 'redraft';
+  if (overallTab) overallTab.style.display = isRedraft ? '' : 'none';
+  if (flexTab)    flexTab.style.display    = isRedraft ? '' : 'none';
   if (sfTab)      sfTab.style.display      = state.mode === 'dynasty' ? '' : 'none';
 
   document.querySelectorAll('.pos-tab').forEach(el => {
@@ -1078,7 +1083,7 @@ async function updateLastUpdated() {
 function rankClass(rank) { return rank===1?"rank-1":rank===2?"rank-2":rank===3?"rank-3":""; }
 
 function renderTable() {
-  const isOverall = state.pos === 'Overall' || state.pos === 'SF' || state.pos === 'Targets';
+  const isOverall = state.pos === 'Overall' || state.pos === 'SF' || state.pos === 'FLEX' || state.pos === 'Targets';
   let displayRows = state.order.map(i => ({ ...state.data[i], _orig: i }));
   if (state.sortCol) {
     const dir = state.sortDir === 'asc' ? 1 : -1;
