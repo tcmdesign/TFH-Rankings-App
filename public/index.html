@@ -1613,17 +1613,17 @@ async function generateCheatSheet(style) {
       pageSize: 'letter portrait',
     },
     standard: {
-      bodyFont: '8pt', pagepad: '0.25in 0.3in', h1: '14pt', h2: '9pt',
-      thFont: '6.5pt', tdFont: '8pt', tdPad: '1.5pt 4pt', thPad: '2pt 4pt',
-      tierFont: '7pt', hdFont: '8pt',
-      gridCss: 'column-count:2;column-gap:12pt',
+      bodyFont: '7.5pt', pagepad: '0.2in 0.25in', h1: '14pt', h2: '9pt',
+      thFont: '6pt', tdFont: '7.5pt', tdPad: '1pt 3pt', thPad: '1.5pt 3pt',
+      tierFont: '6.5pt', hdFont: '7.5pt',
+      gridCss: '',
       sectionBreak: '',
       pageSize: 'letter portrait',
     },
     full: {
-      bodyFont: '10pt', pagepad: '0.3in 0.4in', h1: '16pt', h2: '10pt',
-      thFont: '8pt', tdFont: '10pt', tdPad: '2.5pt 6pt', thPad: '3pt 6pt',
-      tierFont: '8.5pt', hdFont: '10pt',
+      bodyFont: '8.5pt', pagepad: '0.25in 0.3in', h1: '16pt', h2: '10pt',
+      thFont: '7pt', tdFont: '8.5pt', tdPad: '2pt 5pt', thPad: '2pt 5pt',
+      tierFont: '7.5pt', hdFont: '9pt',
       gridCss: '',
       sectionBreak: 'page-break-after:always',
       pageSize: 'letter portrait',
@@ -1638,11 +1638,14 @@ async function generateCheatSheet(style) {
     ).join('');
   } else if (style === 'standard') {
     const pairs = [[results[0], results[1]], [results[2], results[3]]];
-    gridContent = pairs.map((pair, pi) =>
-      `<div class="std-page" style="${pi < pairs.length - 1 ? 'page-break-after:always' : ''}">
-        ${buildSection(pair[0])}${buildSection(pair[1])}
-      </div>`
-    ).join('');
+    gridContent = pairs.map((pair, pi) => {
+      const small = pair[0]; // QB or WR (first of pair)
+      const big   = pair[1]; // RB or TE (second of pair)
+      return `<div class="std-page" style="${pi < pairs.length - 1 ? 'page-break-after:always' : ''}">
+        <div class="std-small">${buildSection(small)}</div>
+        <div class="std-big">${buildSection(big)}</div>
+      </div>`;
+    }).join('');
   } else {
     gridContent = results.map(buildSection).join('');
   }
@@ -1662,9 +1665,9 @@ body{font-family:Arial,Helvetica,sans-serif;font-size:${s.bodyFont};color:#000;b
 .ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 6pt}
 .ov-col{break-inside:avoid}
 .grid{${s.gridCss}}
-.std-page{column-count:2;column-gap:12pt}
-.full-pos{column-count:2;column-gap:14pt}
-.full-pos .cs-hd,.std-page .cs-hd{column-span:all}
+.std-page{display:grid;grid-template-columns:1fr 2fr;gap:0 10pt;align-items:start}
+.std-big{column-count:2;column-gap:8pt}
+.full-pos{column-count:2;column-gap:12pt}
 .cs-section{break-inside:auto}
 .cs-hd{break-after:avoid;background:#111;color:#fff;font-size:${s.hdFont};font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2pt 4pt;margin-top:4pt}
 .cs-section:first-child .cs-hd{margin-top:0}
