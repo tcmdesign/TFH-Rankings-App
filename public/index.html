@@ -1633,8 +1633,9 @@ async function generateCheatSheet(style) {
 
   let gridContent;
   if (style === 'full') {
+    const fullCols = { QB:2, RB:3, WR:3, TE:2 };
     gridContent = results.map((r, idx) =>
-      `<div class="full-pos" style="${idx < results.length - 1 ? 'page-break-after:always' : ''}">${buildSection(r)}</div>`
+      `<div class="full-pos full-cols-${fullCols[r.pos]}" style="${idx < results.length - 1 ? 'page-break-after:always' : ''}">${buildSection(r)}</div>`
     ).join('');
   } else if (style === 'standard') {
     const pairs = [[results[0], results[1]], [results[2], results[3]]];
@@ -1667,7 +1668,9 @@ body{font-family:Arial,Helvetica,sans-serif;font-size:${s.bodyFont};color:#000;b
 .grid{${s.gridCss}}
 .std-page{display:grid;grid-template-columns:1fr 2fr;gap:0 10pt;align-items:start}
 .std-big{column-count:2;column-gap:8pt}
-.full-pos{column-count:2;column-gap:12pt}
+.full-pos{column-gap:12pt}
+.full-cols-2{column-count:2}
+.full-cols-3{column-count:3}
 .cs-section{break-inside:auto}
 .cs-hd{break-after:avoid;background:#111;color:#fff;font-size:${s.hdFont};font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2pt 4pt;margin-top:4pt}
 .cs-section:first-child .cs-hd{margin-top:0}
