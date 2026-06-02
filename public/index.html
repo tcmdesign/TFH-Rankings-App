@@ -1566,8 +1566,9 @@ body{font-family:Arial,Helvetica,sans-serif;font-size:7pt;color:#000;background:
 .ov-hd{background:#111;color:#fff;font-size:6.5pt;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2pt 4pt;margin-bottom:2pt}
 .ov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0 8pt}
 .ov-col{break-inside:avoid}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 8pt}
-.cs-section{break-inside:avoid}
+.grid{column-count:4;column-gap:8pt}
+.cs-section{break-inside:auto}
+.cs-hd{break-before:auto;break-after:avoid}
 .cs-hd{color:#fff;font-size:6.5pt;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2pt 4pt}
 .cs-empty{font-size:6.5pt;color:#888;padding:3pt 4pt;font-style:italic}
 table{width:100%;border-collapse:collapse}
