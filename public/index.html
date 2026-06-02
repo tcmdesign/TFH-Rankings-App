@@ -1587,11 +1587,10 @@ async function generateCheatSheet(style) {
     return `<div class="cs-section">${hd}<table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
   };
 
-  const buildMultiPos = (rows, label, key) => {
+  const buildMultiPos = (rows, label, key, cols) => {
     if (!rows.length) return '';
     const savedOrder = tabOrders[`${format}_${key}`];
     const ordered = savedOrder ? savedOrder.order.map(i => rows[i]).filter(Boolean) : rows;
-    const cols = 4;
     const chunkSize = Math.ceil(ordered.length / cols);
     const ovByeCol = showBye ? '<th class="tc">Bye</th>' : '';
     const thead = `<tr><th class="tc">#</th><th>Player</th><th class="tc">Pos</th><th class="tc">Tm</th>${ovByeCol}</tr>`;
@@ -1620,6 +1619,7 @@ async function generateCheatSheet(style) {
       gridCss: 'column-count:4;column-gap:6pt',
       sectionBreak: '',
       pageSize: 'letter portrait',
+      ovCols: 4,
     },
     standard: {
       bodyFont: '7.5pt', pagepad: '0.2in 0.25in', h1: '14pt', h2: '9pt',
@@ -1628,6 +1628,7 @@ async function generateCheatSheet(style) {
       gridCss: '',
       sectionBreak: '',
       pageSize: 'letter portrait',
+      ovCols: 3,
     },
     full: {
       bodyFont: '8.5pt', pagepad: '0.25in 0.3in', h1: '16pt', h2: '10pt',
@@ -1636,6 +1637,7 @@ async function generateCheatSheet(style) {
       gridCss: '',
       sectionBreak: 'page-break-after:always',
       pageSize: 'letter portrait',
+      ovCols: 3,
     },
   };
   const s = styles[style];
@@ -1672,7 +1674,7 @@ body{font-family:Arial,Helvetica,sans-serif;font-size:${s.bodyFont};color:#000;b
 .header h2{font-size:${s.h2};font-weight:700;text-transform:uppercase;color:#444;margin-top:1pt}
 .ov-wrap{margin-bottom:4pt}
 .ov-hd{background:#111;color:#fff;font-size:${s.hdFont};font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2pt 4pt;margin-bottom:2pt}
-.ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 6pt}
+.ov-grid{display:grid;grid-template-columns:repeat(${s.ovCols},1fr);gap:0 6pt}
 .ov-col{break-inside:avoid}
 .grid{${s.gridCss}}
 .std-page{display:grid;grid-template-columns:1fr 2fr;gap:0 10pt;align-items:start}
@@ -1703,7 +1705,7 @@ tbody tr:nth-child(even){background:#f9f9f9}
     <h2>${formatLabel}</h2>
   </div>
   ${multiPosList.map((mp, i) => {
-    const html = buildMultiPos(multiPosRows[i], mp.label, mp.key);
+    const html = buildMultiPos(multiPosRows[i], mp.label, mp.key, s.ovCols);
     return html ? `<div style="page-break-after:always">${html}</div>` : '';
   }).join('')}
   <div class="grid">${gridContent}</div>
