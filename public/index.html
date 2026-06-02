@@ -1631,9 +1631,22 @@ async function generateCheatSheet(style) {
   };
   const s = styles[style];
 
-  const fullPageSections = style === 'full'
-    ? results.map((r, idx) => `<div style="${idx < results.length - 1 ? 'page-break-after:always' : ''}">${buildSection(r)}</div>`).join('')
-    : results.map(buildSection).join('');
+  let gridContent;
+  if (style === 'full') {
+    gridContent = results.map((r, idx) =>
+      `<div class="full-pos" style="${idx < results.length - 1 ? 'page-break-after:always' : ''}">${buildSection(r)}</div>`
+    ).join('');
+  } else if (style === 'standard') {
+    const pairs = [[results[0], results[1]], [results[2], results[3]]];
+    gridContent = pairs.map((pair, pi) =>
+      `<div class="std-pair" style="${pi < pairs.length - 1 ? 'page-break-after:always' : ''}">
+        <div class="std-col">${buildSection(pair[0])}</div>
+        <div class="std-col">${buildSection(pair[1])}</div>
+      </div>`
+    ).join('');
+  } else {
+    gridContent = results.map(buildSection).join('');
+  }
 
   const html = `<!DOCTYPE html><html><head>
 <meta charset="UTF-8">
@@ -1650,6 +1663,10 @@ body{font-family:Arial,Helvetica,sans-serif;font-size:${s.bodyFont};color:#000;b
 .ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 6pt}
 .ov-col{break-inside:avoid}
 .grid{${s.gridCss}}
+.std-pair{display:grid;grid-template-columns:1fr 1fr;gap:0 12pt;align-items:start}
+.std-col{min-width:0}
+.full-pos .cs-section{column-count:2;column-gap:14pt}
+.full-pos .cs-hd{column-span:all}
 .cs-section{break-inside:auto}
 .cs-hd{break-after:avoid;background:#111;color:#fff;font-size:${s.hdFont};font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2pt 4pt;margin-top:4pt}
 .cs-section:first-child .cs-hd{margin-top:0}
@@ -1672,7 +1689,7 @@ tbody tr:nth-child(even){background:#f9f9f9}
     <h2>${formatLabel}</h2>
   </div>
   ${buildOverall(overallRows)}
-  <div class="grid">${fullPageSections}</div>
+  <div class="grid">${gridContent}</div>
   <div class="footer">
     <span>TheFantasyHeadliners.com</span>
     <span>Generated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</span>
