@@ -317,6 +317,13 @@ td{padding:7px 8px;vertical-align:middle}
 .pos-te{background:rgba(255,140,0,0.15);color:#ff8c00}
 .pos-k {background:rgba(255,140,0,0.15);color:var(--orange)}
 .adp-cell{width:80px;text-align:center}
+.tier-divider td{padding:0!important;border:none!important;background:transparent!important}
+.tier-divider-inner{display:flex;align-items:center;gap:10px;padding:10px 10px 4px}
+.tier-divider-line{flex:1;height:1px}
+.tier-divider-label{
+  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1.5px;
+  text-transform:uppercase;padding:2px 8px;border-radius:3px;white-space:nowrap;
+}
 .adp-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--text2)}
 .adp-none{font-size:14px;color:var(--text3)}
 /* ── Source columns (comparison) ── */
@@ -768,6 +775,15 @@ const POPULATED = {
 
 const POS_COLORS = { QB: '#E52222', RB: '#00cc66', WR: '#00bfff', TE: '#ff8c00' };
 
+const TIER_STYLE = {
+  1: { color: '#4ADE80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)', label: 'Elite' },
+  2: { color: '#29C9F0', bg: 'rgba(41,201,240,0.08)',  border: 'rgba(41,201,240,0.25)', label: 'Solid' },
+  3: { color: '#E0613A', bg: 'rgba(224,97,58,0.08)',   border: 'rgba(224,97,58,0.25)',  label: 'Flex' },
+  4: { color: '#A78BFA', bg: 'rgba(167,139,250,0.08)', border: 'rgba(167,139,250,0.25)',label: 'Depth' },
+  5: { color: '#F59E0B', bg: 'rgba(245,158,11,0.08)',  border: 'rgba(245,158,11,0.25)', label: 'Streamer' },
+  6: { color: '#8A9099', bg: 'rgba(138,144,153,0.06)', border: 'rgba(138,144,153,0.18)', label: 'Handcuff' },
+};
+
 const FORMAT_CONFIG = {
   dynasty_1qb:  { mode: 'dynasty',  label: '2026 Dynasty'             },
   // dynasty_2qb:  { mode: 'dynasty',  label: '2026 Dynasty · SF / 2QB'  },  // re-enable when ready
@@ -1051,7 +1067,21 @@ function renderTable() {
   document.getElementById('playerCount').textContent = `${displayRows.length} players`;
 
   const noDrag = state.draftMode;
+  // Show tiers only for redraft consensus (data has Tier field from Airtable)
+  const showTiers = state.mode === 'redraft' && state.section === 'redraft' && !state.sortCol && displayRows.some(p => p.Tier);
+  let lastTier = null;
   const tbody = displayRows.map((p, displayIdx) => {
+    let tierHtml = '';
+    if (showTiers && p.Tier && p.Tier !== lastTier) {
+      const ts = TIER_STYLE[p.Tier] || TIER_STYLE[6];
+      const colCount = 8 + (state.custom ? 1 : 0) + (state.creators?.length || 0);
+      tierHtml = `<tr class="tier-divider"><td colspan="${colCount}"><div class="tier-divider-inner">
+        <div class="tier-divider-line" style="background:${ts.color}40"></div>
+        <span class="tier-divider-label" style="color:${ts.color};border:1px solid ${ts.border};background:${ts.bg}">Tier ${p.Tier} · ${ts.label}</span>
+        <div class="tier-divider-line" style="background:${ts.color}40"></div>
+      </div></td></tr>`;
+      lastTier = p.Tier;
+    }
     const orig      = p._orig;
     const rank      = displayIdx + 1;
     const isChecked = state.checked.has(orig);
@@ -1077,7 +1107,7 @@ function renderTable() {
     const avoidClass  = isAvoided ? 'draft-avoid' : '';
     const targetClass = isStarred ? 'draft-target' : '';
 
-    return `<tr data-idx="${orig}" draggable="${noDrag ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${avoidClass} ${targetClass} ${noDrag ? '' : 'drag-enabled'}">
+    return `${tierHtml}<tr data-idx="${orig}" draggable="${noDrag ? 'false' : 'true'}" data-player="${(p.Player||'').replace(/"/g,'&quot;')}" class="${isChecked ? 'checked' : ''} ${draftClass} ${avoidClass} ${targetClass} ${noDrag ? '' : 'drag-enabled'}">
       <td class="drag-cell" style="${noDrag ? 'display:none' : ''}">
         <div class="drag-handle"><span></span><span></span><span></span></div>
       </td>
