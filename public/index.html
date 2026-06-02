@@ -1638,15 +1638,15 @@ async function generateCheatSheet(style) {
       `<div class="full-pos full-cols-${fullCols[r.pos]}" style="${idx < results.length - 1 ? 'page-break-after:always' : ''}">${buildSection(r)}</div>`
     ).join('');
   } else if (style === 'standard') {
-    const pairs = [[results[0], results[1]], [results[2], results[3]]];
-    gridContent = pairs.map((pair, pi) => {
-      const small = pair[0]; // QB or WR (first of pair)
-      const big   = pair[1]; // RB or TE (second of pair)
-      return `<div class="std-page" style="${pi < pairs.length - 1 ? 'page-break-after:always' : ''}">
-        <div class="std-small">${buildSection(small)}</div>
-        <div class="std-big">${buildSection(big)}</div>
+    // Page 1: QB (1 col) + RB (2 cols)  |  Page 2: WR (2 cols) + TE (1 col)
+    gridContent = `<div class="std-page" style="page-break-after:always">
+        <div class="std-small">${buildSection(results[0])}</div>
+        <div class="std-big">${buildSection(results[1])}</div>
+      </div>
+      <div class="std-page std-page-flip">
+        <div class="std-big">${buildSection(results[2])}</div>
+        <div class="std-small">${buildSection(results[3])}</div>
       </div>`;
-    }).join('');
   } else {
     gridContent = results.map(buildSection).join('');
   }
@@ -1667,6 +1667,7 @@ body{font-family:Arial,Helvetica,sans-serif;font-size:${s.bodyFont};color:#000;b
 .ov-col{break-inside:avoid}
 .grid{${s.gridCss}}
 .std-page{display:grid;grid-template-columns:1fr 2fr;gap:0 10pt;align-items:start}
+.std-page-flip{grid-template-columns:2fr 1fr}
 .std-big{column-count:2;column-gap:8pt}
 .full-pos{column-gap:12pt}
 .full-cols-2{column-count:2}
