@@ -1571,6 +1571,7 @@ async function generateCheatSheet(style) {
     if (!rows.length) return `<div class="cs-section">${hd}<p class="cs-empty">Rankings coming soon</p></div>`;
     const savedOrder = tabOrders[`${format}_${pos}`];
     const ordered = savedOrder ? savedOrder.order.map(i => rows[i]).filter(Boolean) : rows;
+    const colgroup = `<colgroup><col style="width:2em"><col><col style="width:2.5em">${showBye ? '<col style="width:2.5em">' : ''}</colgroup>`;
     const thead = `<tr><th class="tc">#</th><th>Player</th><th class="tc">Tm</th>${byeCol}</tr>`;
     const cs = colSpan || (showBye ? 4 : 3);
     let lastTier = null;
@@ -1584,7 +1585,7 @@ async function generateCheatSheet(style) {
       const bye = showBye ? `<td class="tc bye">${BYE_WEEK[tm] || ''}</td>` : '';
       return `${tierRow}<tr><td class="tc">${i + 1}</td><td>${r.Player || '—'}</td><td class="tc">${tm}</td>${bye}</tr>`;
     }).join('');
-    return `<div class="cs-section">${hd}<table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
+    return `<div class="cs-section">${hd}<table>${colgroup}<thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
   };
 
   const buildMultiPos = (rows, label, key, cols, perPage) => {
