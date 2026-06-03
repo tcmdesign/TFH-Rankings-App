@@ -1600,7 +1600,7 @@ async function generateCheatSheet(style) {
       return `${p}${posCounts[p]}`;
     });
     const ovByeCol = showBye ? '<th class="tc">Bye</th>' : '';
-    const ovColgroup = `<colgroup><col style="width:2em"><col><col style="width:3em"><col style="width:2.5em">${showBye ? '<col style="width:2.5em">' : ''}</colgroup>`;
+    const ovColgroup = `<colgroup><col style="width:2em"><col><col style="width:4em"><col style="width:2.5em">${showBye ? '<col style="width:2.5em">' : ''}</colgroup>`;
     const thead = `<tr><th class="tc">#</th><th>Player</th><th class="tc">Pos</th><th class="tc">Tm</th>${ovByeCol}</tr>`;
 
     const buildPage = (pageRows, startIdx, pageLabel) => {
