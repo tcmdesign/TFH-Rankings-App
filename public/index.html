@@ -1587,7 +1587,7 @@ async function generateCheatSheet(style) {
     return `<div class="cs-section">${hd}<table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
   };
 
-  const buildMultiPos = (rows, label, key, cols) => {
+  const buildMultiPos = (rows, label, key, cols, perPage) => {
     if (!rows.length) return '';
     const savedOrder = tabOrders[`${format}_${key}`];
     const ordered = savedOrder ? savedOrder.order.map(i => rows[i]).filter(Boolean) : rows;
@@ -1598,24 +1598,39 @@ async function generateCheatSheet(style) {
       posCounts[p] = (posCounts[p] || 0) + 1;
       return `${p}${posCounts[p]}`;
     });
-    const chunkSize = Math.ceil(ordered.length / cols);
     const ovByeCol = showBye ? '<th class="tc">Bye</th>' : '';
     const thead = `<tr><th class="tc">#</th><th>Player</th><th class="tc">Pos</th><th class="tc">Tm</th>${ovByeCol}</tr>`;
-    const tables = Array.from({ length: cols }, (_, ci) => {
-      const chunk = ordered.slice(ci * chunkSize, (ci + 1) * chunkSize);
-      const tbody = chunk.map((r, i) => {
-        const gi = ci * chunkSize + i;
-        const pc = posColors[r.Pos] || '#555';
-        const tm = (r.Team || '').toUpperCase();
-        const bye = showBye ? `<td class="tc bye">${BYE_WEEK[tm] || ''}</td>` : '';
-        return `<tr><td class="tc">${gi + 1}</td><td>${r.Player || '—'}</td><td class="tc" style="color:${pc};font-weight:700">${posRanks[gi]}</td><td class="tc">${tm}</td>${bye}</tr>`;
+
+    const buildPage = (pageRows, startIdx, pageLabel) => {
+      const chunkSize = Math.ceil(pageRows.length / cols);
+      const tables = Array.from({ length: cols }, (_, ci) => {
+        const chunk = pageRows.slice(ci * chunkSize, (ci + 1) * chunkSize);
+        const tbody = chunk.map((r, i) => {
+          const gi = startIdx + ci * chunkSize + i;
+          const pc = posColors[r.Pos] || '#555';
+          const tm = (r.Team || '').toUpperCase();
+          const bye = showBye ? `<td class="tc bye">${BYE_WEEK[tm] || ''}</td>` : '';
+          return `<tr><td class="tc">${gi + 1}</td><td>${r.Player || '—'}</td><td class="tc" style="color:${pc};font-weight:700">${posRanks[gi]}</td><td class="tc">${tm}</td>${bye}</tr>`;
+        }).join('');
+        return `<div class="ov-col"><table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
       }).join('');
-      return `<div class="ov-col"><table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
-    }).join('');
-    return `<div class="ov-wrap">
-      <div class="ov-hd">${label}</div>
-      <div class="ov-grid">${tables}</div>
-    </div>`;
+      return `<div class="ov-wrap">
+        <div class="ov-hd">${pageLabel}</div>
+        <div class="ov-grid">${tables}</div>
+      </div>`;
+    };
+
+    if (perPage && ordered.length > perPage) {
+      const pages = [];
+      for (let start = 0; start < ordered.length; start += perPage) {
+        const slice = ordered.slice(start, start + perPage);
+        const end = Math.min(start + perPage, ordered.length);
+        const pageLabel = `${label} (${start + 1}–${end})`;
+        pages.push(buildPage(slice, start, pageLabel));
+      }
+      return pages.join('<div style="page-break-after:always"></div>');
+    }
+    return buildPage(ordered, 0, label);
   };
 
   /* ── Style configs ── */
@@ -1627,7 +1642,7 @@ async function generateCheatSheet(style) {
       gridCss: 'column-count:4;column-gap:6pt',
       sectionBreak: '',
       pageSize: 'letter portrait',
-      ovCols: 4,
+      ovCols: 4, ovPerPage: 0,
     },
     standard: {
       bodyFont: '7.5pt', pagepad: '0.2in 0.25in', h1: '14pt', h2: '9pt',
@@ -1636,7 +1651,7 @@ async function generateCheatSheet(style) {
       gridCss: '',
       sectionBreak: '',
       pageSize: 'letter portrait',
-      ovCols: 3,
+      ovCols: 3, ovPerPage: 125,
     },
     full: {
       bodyFont: '8.5pt', pagepad: '0.25in 0.3in', h1: '16pt', h2: '10pt',
@@ -1645,7 +1660,7 @@ async function generateCheatSheet(style) {
       gridCss: '',
       sectionBreak: 'page-break-after:always',
       pageSize: 'letter portrait',
-      ovCols: 3,
+      ovCols: 3, ovPerPage: 0,
     },
   };
   const s = styles[style];
@@ -1713,7 +1728,7 @@ tbody tr:nth-child(even){background:#f9f9f9}
     <h2>${formatLabel}</h2>
   </div>
   ${multiPosList.map((mp, i) => {
-    const html = buildMultiPos(multiPosRows[i], mp.label, mp.key, s.ovCols);
+    const html = buildMultiPos(multiPosRows[i], mp.label, mp.key, s.ovCols, s.ovPerPage);
     return html ? `<div style="page-break-after:always">${html}</div>` : '';
   }).join('')}
   <div class="grid">${gridContent}</div>
