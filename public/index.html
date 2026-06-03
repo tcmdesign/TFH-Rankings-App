@@ -1591,16 +1591,24 @@ async function generateCheatSheet(style) {
     if (!rows.length) return '';
     const savedOrder = tabOrders[`${format}_${key}`];
     const ordered = savedOrder ? savedOrder.order.map(i => rows[i]).filter(Boolean) : rows;
+    // Pre-compute positional ranks (RB1, WR2, etc.)
+    const posCounts = {};
+    const posRanks = ordered.map(r => {
+      const p = r.Pos || '';
+      posCounts[p] = (posCounts[p] || 0) + 1;
+      return `${p}${posCounts[p]}`;
+    });
     const chunkSize = Math.ceil(ordered.length / cols);
     const ovByeCol = showBye ? '<th class="tc">Bye</th>' : '';
     const thead = `<tr><th class="tc">#</th><th>Player</th><th class="tc">Pos</th><th class="tc">Tm</th>${ovByeCol}</tr>`;
     const tables = Array.from({ length: cols }, (_, ci) => {
       const chunk = ordered.slice(ci * chunkSize, (ci + 1) * chunkSize);
       const tbody = chunk.map((r, i) => {
+        const gi = ci * chunkSize + i;
         const pc = posColors[r.Pos] || '#555';
         const tm = (r.Team || '').toUpperCase();
         const bye = showBye ? `<td class="tc bye">${BYE_WEEK[tm] || ''}</td>` : '';
-        return `<tr><td class="tc">${ci * chunkSize + i + 1}</td><td>${r.Player || '—'}</td><td class="tc" style="color:${pc};font-weight:700">${r.Pos || ''}</td><td class="tc">${tm}</td>${bye}</tr>`;
+        return `<tr><td class="tc">${gi + 1}</td><td>${r.Player || '—'}</td><td class="tc" style="color:${pc};font-weight:700">${posRanks[gi]}</td><td class="tc">${tm}</td>${bye}</tr>`;
       }).join('');
       return `<div class="ov-col"><table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
     }).join('');
