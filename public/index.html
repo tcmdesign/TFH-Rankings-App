@@ -1600,6 +1600,7 @@ async function generateCheatSheet(style) {
       return `${p}${posCounts[p]}`;
     });
     const ovByeCol = showBye ? '<th class="tc">Bye</th>' : '';
+    const ovColgroup = `<colgroup><col style="width:2em"><col><col style="width:3em"><col style="width:2.5em">${showBye ? '<col style="width:2.5em">' : ''}</colgroup>`;
     const thead = `<tr><th class="tc">#</th><th>Player</th><th class="tc">Pos</th><th class="tc">Tm</th>${ovByeCol}</tr>`;
 
     const buildPage = (pageRows, startIdx, pageLabel) => {
@@ -1613,7 +1614,7 @@ async function generateCheatSheet(style) {
           const bye = showBye ? `<td class="tc bye">${BYE_WEEK[tm] || ''}</td>` : '';
           return `<tr><td class="tc">${gi + 1}</td><td>${r.Player || '—'}</td><td class="tc" style="color:${pc};font-weight:700">${posRanks[gi]}</td><td class="tc">${tm}</td>${bye}</tr>`;
         }).join('');
-        return `<div class="ov-col"><table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
+        return `<div class="ov-col"><table>${ovColgroup}<thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
       }).join('');
       return `<div class="ov-wrap">
         <div class="ov-hd">${pageLabel}</div>
