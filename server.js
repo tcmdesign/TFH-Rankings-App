@@ -212,11 +212,20 @@ app.get('/api/rankings/redraft-consensus/:pos', async (req, res) => {
       } catch (e) { console.error('creator lookup failed:', e.message); }
     }
 
+    const format = req.query.format || 'redraft_half';
+    const sleeperFieldMap = {
+      redraft_ppr:  'ppr',
+      redraft_half: 'halfPpr',
+      redraft_std:  'std',
+    };
+    const sf = sleeperFieldMap[format] || 'halfPpr';
+
     const conName      = `CON-${scoring}-${suffix}`;
     const creatorNames = creators.map(c => `${c.label}-${scoring}-${suffix}`);
 
-    const [conData, ...creatorRows] = await Promise.all([
+    const [conData, sleeperAdpMap, ...creatorRows] = await Promise.all([
       fetchTableByName(conName),
+      fetchSleeperAdpMap(),
       ...creatorNames.map(n => fetchTableByName(n).catch(() => [])),
     ]);
 
@@ -227,13 +236,14 @@ app.get('/api/rankings/redraft-consensus/:pos', async (req, res) => {
       return { label: c.label, map: m };
     });
 
-    // Enrich consensus rows with creator ranks
+    // Enrich consensus rows with creator ranks + Sleeper ADP
     const enriched = conData.map(p => {
       const key = (p.Player || '').toLowerCase();
       const extra = {};
       creatorMaps.forEach(c => { extra[c.label] = c.map[key] ?? null; });
+      const sEntry = sleeperAdpMap[key];
       // Normalise position field (FantasyPro writes "Position", dynasty tables use "Pos")
-      return { ...p, Pos: p.Pos || p.Position || pos, creatorRanks: extra };
+      return { ...p, Pos: p.Pos || p.Position || pos, creatorRanks: extra, sleeperAdp: sEntry?.[sf] || null };
     });
 
     // Get publish info from DB
@@ -557,29 +567,46 @@ async function saveSleeperAdpSnapshots() {
     const sleeperMap = await fetchSleeperAdpMap(); // also populates cache.__sleeperIds
     const idMap = cache.__sleeperIds || {};
     const now = new Date();
-    let saved = 0;
+    let saved = 0, skipped = 0;
     for (const [name, vals] of Object.entries(sleeperMap)) {
       const sleeperId = idMap[name];
       if (!sleeperId) continue;
       // Require at least one ADP value to be present
       if (!vals.dynastyPpr && !vals.ppr && !vals.halfPpr && !vals.std && !vals.dynasty2qb) continue;
+
+      const newAdp        = vals.dynastyPpr ? parseFloat(vals.dynastyPpr) : null;
+      const newAdpPpr     = vals.ppr        ? parseFloat(vals.ppr)        : null;
+      const newAdpHalf    = vals.halfPpr    ? parseFloat(vals.halfPpr)    : null;
+      const newAdpStd     = vals.std        ? parseFloat(vals.std)        : null;
+      const newAdpDyn2qb  = vals.dynasty2qb ? parseFloat(vals.dynasty2qb) : null;
+
+      // Check if any ADP value changed from the most recent snapshot
+      const prev = await db.query(
+        `SELECT adp, adp_ppr, adp_half_ppr, adp_std, adp_dynasty_2qb
+         FROM sleeper_adp_history
+         WHERE sleeper_player_id = $1 AND season = 2026
+         ORDER BY pulled_at DESC LIMIT 1`,
+        [sleeperId]
+      );
+      if (prev.rows.length) {
+        const p = prev.rows[0];
+        const same = parseFloat(p.adp) === newAdp
+          && parseFloat(p.adp_ppr) === newAdpPpr
+          && parseFloat(p.adp_half_ppr) === newAdpHalf
+          && parseFloat(p.adp_std) === newAdpStd
+          && parseFloat(p.adp_dynasty_2qb) === newAdpDyn2qb;
+        if (same) { skipped++; continue; }
+      }
+
       await db.query(
         `INSERT INTO sleeper_adp_history
            (sleeper_player_id, adp, adp_ppr, adp_half_ppr, adp_std, adp_dynasty_2qb, pulled_at, season)
          VALUES ($1, $2, $3, $4, $5, $6, $7, 2026)`,
-        [
-          sleeperId,
-          vals.dynastyPpr ? parseFloat(vals.dynastyPpr) : null,
-          vals.ppr        ? parseFloat(vals.ppr)        : null,
-          vals.halfPpr    ? parseFloat(vals.halfPpr)    : null,
-          vals.std        ? parseFloat(vals.std)        : null,
-          vals.dynasty2qb ? parseFloat(vals.dynasty2qb) : null,
-          now,
-        ]
+        [sleeperId, newAdp, newAdpPpr, newAdpHalf, newAdpStd, newAdpDyn2qb, now]
       );
       saved++;
     }
-    console.log(`Saved ${saved} Sleeper ADP snapshots`);
+    console.log(`Sleeper ADP snapshots: ${saved} saved, ${skipped} unchanged`);
   } catch (e) { console.error('saveSleeperAdpSnapshots failed:', e.message); }
 }
 

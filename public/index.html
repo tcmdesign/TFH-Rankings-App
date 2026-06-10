@@ -1027,7 +1027,7 @@ async function loadRankings() {
   try {
     if (state.mode === 'redraft' && state.section === 'redraft') {
       // Full redraft consensus (all players)
-      const res  = await fetch(`/api/rankings/redraft-consensus/${state.pos}`);
+      const res  = await fetch(`/api/rankings/redraft-consensus/${state.pos}?format=${state.format}`);
       const json = await res.json();
       state.data        = json.players || [];
       state.creators    = json.creators || [];
@@ -1534,7 +1534,7 @@ async function generateCheatSheet(style) {
   const fetchPos = async (pos) => {
     if (!POPULATED[pKey]?.[pos]) return [];
     if (isRedraft) {
-      const res = await fetch(`/api/rankings/redraft-consensus/${pos}`);
+      const res = await fetch(`/api/rankings/redraft-consensus/${pos}?format=${format}`);
       const json = await res.json();
       return json.players || [];
     } else if (mode === 'redraft' && section === 'rookie') {
