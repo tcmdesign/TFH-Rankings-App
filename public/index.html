@@ -2024,9 +2024,9 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
     <!-- ADP Trend -->
     <div class="panel-section">
       <div class="panel-section-title">ADP Tracker · 2026 Season</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Overall rank trajectory · Source: MFL mock drafts</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">ADP trajectory · Source: Sleeper</div>
       <div class="panel-chart-wrap" id="adpChartWrap">
-        ${history.mfl?.length >= 1
+        ${history?.length >= 1
           ? `<div id="adpSvgChart"></div>`
           : `<div class="panel-chart-empty">No ADP history yet<br><span style="font-size:10px">Check back after the next sync</span></div>`
         }
@@ -2084,7 +2084,7 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
   if (mode === 'redraft' && Object.keys(statRanks).length > 0) renderStatRanks(statRanks, posAbbr);
 
   // ADP chart
-  if (history.mfl?.length >= 1) renderAdpChart(history);
+  if (history?.length >= 1) renderAdpChart(history);
 }
 
 function loadPanelPhoto(name, slug, sleeperId) {
@@ -2252,7 +2252,7 @@ function renderAdpChart(history) {
   const wrap = document.getElementById('adpSvgChart');
   if (!wrap) return;
 
-  const sorted = [...(history.mfl || [])].sort((a, b) => a.ts - b.ts);
+  const sorted = [...history].sort((a, b) => a.ts - b.ts);
   if (!sorted.length) return;
 
   const WEEK1 = new Date('2026-09-06').getTime();
@@ -2266,25 +2266,25 @@ function renderAdpChart(history) {
   const xMin = sorted[0].ts;
   const xMax = Math.max(WEEK1, sorted[sorted.length - 1].ts);
 
-  const ranks   = sorted.map(d => d.overall_rank).filter(r => r != null);
-  if (!ranks.length) { wrap.innerHTML = '<div class="panel-chart-empty">No rank data</div>'; return; }
-  const rMin    = Math.max(1, Math.min(...ranks) - 4);
-  const rMax    = Math.min(250, Math.max(...ranks) + 8);
+  const adps   = sorted.map(d => d.adp).filter(a => a != null);
+  if (!adps.length) { wrap.innerHTML = '<div class="panel-chart-empty">No ADP data</div>'; return; }
+  const rMin    = Math.max(1, Math.min(...adps) - 4);
+  const rMax    = Math.min(500, Math.max(...adps) + 8);
   const rRange  = rMax - rMin || 1;
 
   const xp = ts  => PAD.left + ((ts  - xMin) / (xMax - xMin)) * cW;
   const yp = r   => PAD.top  + ((r   - rMin) / rRange)         * cH;
 
   // Line path
-  const pts  = sorted.filter(d => d.overall_rank != null).map(d => `${xp(d.ts).toFixed(1)},${yp(d.overall_rank).toFixed(1)}`);
-  const last = sorted.filter(d => d.overall_rank != null);
+  const pts  = sorted.filter(d => d.adp != null).map(d => `${xp(d.ts).toFixed(1)},${yp(d.adp).toFixed(1)}`);
+  const last = sorted.filter(d => d.adp != null);
   const lineD = `M ${pts.join(' L ')}`;
   const areaD = `M ${pts[0]} L ${pts.join(' L ')} L ${xp(last[last.length-1].ts).toFixed(1)},${(PAD.top+cH).toFixed(1)} L ${xp(last[0].ts).toFixed(1)},${(PAD.top+cH).toFixed(1)} Z`;
 
   // Week 1 line
   const w1x = xp(WEEK1);
   const showW1 = WEEK1 > xMin && WEEK1 <= xMax;
-  const latestRank = last[last.length - 1].overall_rank;
+  const latestAdp = last[last.length - 1].adp;
 
   // Y ticks
   const tickStep  = rRange <= 20 ? 5 : rRange <= 50 ? 10 : 25;
@@ -2330,20 +2330,20 @@ function renderAdpChart(history) {
               font-family="'Barlow Condensed',sans-serif">WK1</text>
         <text x="${(w1x+4).toFixed(1)}" y="${PAD.top+22}"
               fill="#E0613A" font-size="11" font-weight="700"
-              font-family="'Barlow Condensed',sans-serif">#${latestRank}</text>
+              font-family="'Barlow Condensed',sans-serif">${latestAdp.toFixed(1)}</text>
       ` : ''}
       <path d="${areaD}" fill="url(#rAdpFill)" clip-path="url(#rAdpClip)"/>
       <path d="${lineD}" fill="none" stroke="#E0613A" stroke-width="2.5"
             stroke-linecap="round" stroke-linejoin="round" clip-path="url(#rAdpClip)"/>
-      ${sorted.filter(d => d.overall_rank != null).map(d => `
-        <circle cx="${xp(d.ts).toFixed(1)}" cy="${yp(d.overall_rank).toFixed(1)}" r="3.5"
+      ${sorted.filter(d => d.adp != null).map(d => `
+        <circle cx="${xp(d.ts).toFixed(1)}" cy="${yp(d.adp).toFixed(1)}" r="3.5"
                 fill="var(--bg,#0d0d12)" stroke="#E0613A" stroke-width="2"
                 clip-path="url(#rAdpClip)"/>
       `).join('')}
       <text x="${PAD.left - 8}" y="${PAD.top + cH/2}"
             fill="rgba(255,255,255,0.3)" font-size="9" text-anchor="middle" letter-spacing="0.5"
             font-family="'Barlow Condensed',sans-serif"
-            transform="rotate(-90,${PAD.left-28},${PAD.top+cH/2})">OVERALL RANK</text>
+            transform="rotate(-90,${PAD.left-28},${PAD.top+cH/2})">ADP</text>
       ${xTicks.map(t => {
         const x = xp(t).toFixed(1);
         const mo = new Date(t).getMonth();

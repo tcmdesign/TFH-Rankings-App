@@ -410,7 +410,7 @@ app.get('/api/sleeper-ids', (req, res) => {
 
 app.get('/api/adp/history/:name', async (req, res) => {
   const name = decodeURIComponent(req.params.name).toLowerCase();
-  if (!db) return res.json({ mfl: [], sleeper: [] });
+  if (!db) return res.json([]);
 
   // Map app format key → which column to use
   const format = req.query.format || 'dynasty_1qb';
@@ -425,31 +425,18 @@ app.get('/api/adp/history/:name', async (req, res) => {
 
   try {
     const sleeperId = cache.__sleeperIds?.[name];
-    const [mflRes, sleeperRes] = await Promise.all([
-      db.query(`
-        SELECT s.pulled_at AS ts, s.adp, s.overall_rank
-        FROM adp_snapshots s
-        JOIN players p ON p.id = s.player_id
-        WHERE LOWER(p.name) = $1 AND s.season = 2026 AND s.scoring = 'ppr'
-        ORDER BY s.pulled_at ASC
-      `, [name]),
-      sleeperId
-        ? db.query(`
-            SELECT pulled_at AS ts, ${adpCol} AS adp
-            FROM sleeper_adp_history
-            WHERE sleeper_player_id = $1 AND season = 2026
-              AND ${adpCol} IS NOT NULL
-            ORDER BY pulled_at ASC
-          `, [sleeperId])
-        : Promise.resolve({ rows: [] }),
-    ]);
-    res.json({
-      mfl:     mflRes.rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp), overall_rank: r.overall_rank ? parseInt(r.overall_rank) : null })),
-      sleeper: sleeperRes.rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })),
-    });
+    if (!sleeperId) return res.json([]);
+    const result = await db.query(`
+      SELECT pulled_at AS ts, ${adpCol} AS adp
+      FROM sleeper_adp_history
+      WHERE sleeper_player_id = $1 AND season = 2026
+        AND ${adpCol} IS NOT NULL
+      ORDER BY pulled_at ASC
+    `, [sleeperId]);
+    res.json(result.rows.map(r => ({ ts: new Date(r.ts).getTime(), adp: parseFloat(r.adp) })));
   } catch (err) {
     console.error('adp/history failed:', err.message);
-    res.json({ mfl: [], sleeper: [] });
+    res.json([]);
   }
 });
 
