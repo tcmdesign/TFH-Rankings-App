@@ -557,6 +557,8 @@ async function ensureSleeperHistoryTable() {
         ADD COLUMN IF NOT EXISTS adp_std          DECIMAL(6,1),
         ADD COLUMN IF NOT EXISTS adp_dynasty_2qb  DECIMAL(6,1)
     `);
+    // Relax NOT NULL on adp column — players may have redraft ADP but no dynasty ADP
+    await db.query(`ALTER TABLE sleeper_adp_history ALTER COLUMN adp DROP NOT NULL`);
   } catch (e) { console.error('ensureSleeperHistoryTable:', e.message); }
 }
 
@@ -590,21 +592,26 @@ async function saveSleeperAdpSnapshots() {
       );
       if (prev.rows.length) {
         const p = prev.rows[0];
-        const same = parseFloat(p.adp) === newAdp
-          && parseFloat(p.adp_ppr) === newAdpPpr
-          && parseFloat(p.adp_half_ppr) === newAdpHalf
-          && parseFloat(p.adp_std) === newAdpStd
-          && parseFloat(p.adp_dynasty_2qb) === newAdpDyn2qb;
+        const eq = (a, b) => (a == null && b == null) || (a != null && b != null && parseFloat(a) === parseFloat(b));
+        const same = eq(p.adp, newAdp)
+          && eq(p.adp_ppr, newAdpPpr)
+          && eq(p.adp_half_ppr, newAdpHalf)
+          && eq(p.adp_std, newAdpStd)
+          && eq(p.adp_dynasty_2qb, newAdpDyn2qb);
         if (same) { skipped++; continue; }
       }
 
-      await db.query(
-        `INSERT INTO sleeper_adp_history
-           (sleeper_player_id, adp, adp_ppr, adp_half_ppr, adp_std, adp_dynasty_2qb, pulled_at, season)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, 2026)`,
-        [sleeperId, newAdp, newAdpPpr, newAdpHalf, newAdpStd, newAdpDyn2qb, now]
-      );
-      saved++;
+      try {
+        await db.query(
+          `INSERT INTO sleeper_adp_history
+             (sleeper_player_id, adp, adp_ppr, adp_half_ppr, adp_std, adp_dynasty_2qb, pulled_at, season)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, 2026)`,
+          [sleeperId, newAdp, newAdpPpr, newAdpHalf, newAdpStd, newAdpDyn2qb, now]
+        );
+        saved++;
+      } catch (rowErr) {
+        console.error(`ADP snapshot failed for ${name} (${sleeperId}):`, rowErr.message);
+      }
     }
     console.log(`Sleeper ADP snapshots: ${saved} saved, ${skipped} unchanged`);
   } catch (e) { console.error('saveSleeperAdpSnapshots failed:', e.message); }
