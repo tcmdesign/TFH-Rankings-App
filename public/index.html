@@ -129,11 +129,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .search-item .si-team{font-size:10px;color:var(--text3);margin-left:auto}
 /* Glow highlight on found player row */
 @keyframes searchGlow{
-  0%,100%{box-shadow:0 0 12px 3px rgba(0,191,165,0.45)}
-  50%{box-shadow:0 0 6px 1px rgba(0,191,165,0.25)}
+  0%,100%{background:rgba(0,191,165,0.15)}
+  50%{background:rgba(0,191,165,0.06)}
 }
-tr.search-highlight td{background:rgba(0,191,165,0.12)!important}
-tr.search-highlight{animation:searchGlow 1.5s ease-in-out 2;outline:1px solid rgba(0,191,165,0.35);outline-offset:-1px}
+tr.search-highlight{animation:searchGlow 1.5s ease-in-out infinite!important;outline:2px solid rgba(0,191,165,0.5)!important;outline-offset:-2px;z-index:5;position:relative}
+tr.search-highlight td{background:transparent!important}
 
 .pos-tab:hover:not(.disabled):not(.active){
   background:rgba(var(--pc),0.07);border-color:rgba(var(--pc),0.25);color:rgba(var(--pc),0.8);
