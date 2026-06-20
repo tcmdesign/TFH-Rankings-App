@@ -104,6 +104,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .pos-tab[data-pos="SF"]      {--pc:0,191,165;  --ph:#00e5c8}
 .pos-tab[data-pos="Targets"] {--pc:255,165,0;  --ph:#ffa500}
 .tab-star-count{background:#ffa500;color:#000;border-radius:10px;font-size:10px;padding:0px 5px;font-weight:800;margin-left:3px;vertical-align:middle}
+/* ── Player search ── */
+.search-wrap{position:relative;margin-left:auto;flex-shrink:0}
+.search-icon{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.player-search{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:20px;color:var(--text1);font-size:12px;font-weight:500;
+  padding:5px 12px 5px 28px;width:160px;outline:none;transition:border-color 0.15s,width 0.2s;
+}
+.player-search:focus{border-color:rgba(255,255,255,0.25);width:200px}
+.player-search::placeholder{color:var(--text3);opacity:0.6}
+.search-dropdown{
+  display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  max-height:220px;overflow-y:auto;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+.search-dropdown.open{display:block}
+.search-item{
+  padding:7px 12px;font-size:12px;color:var(--text1);cursor:pointer;
+  display:flex;align-items:center;gap:8px;
+}
+.search-item:hover,.search-item.active{background:rgba(255,255,255,0.08)}
+.search-item .si-pos{font-size:10px;font-weight:700;opacity:0.5;width:24px}
+.search-item .si-team{font-size:10px;color:var(--text3);margin-left:auto}
+/* Glow highlight on found player row */
+@keyframes searchGlow{
+  0%{box-shadow:0 0 8px 2px rgba(0,191,165,0.5)}
+  100%{box-shadow:none}
+}
+tr.search-highlight td{background:rgba(0,191,165,0.08)!important}
+tr.search-highlight{animation:searchGlow 2s ease-out forwards;outline:1px solid rgba(0,191,165,0.3);outline-offset:-1px}
+
 .pos-tab:hover:not(.disabled):not(.active){
   background:rgba(var(--pc),0.07);border-color:rgba(var(--pc),0.25);color:rgba(var(--pc),0.8);
 }
@@ -429,8 +460,10 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
   #draftLegend > span{display:none!important}
   #draftLegend .btn{font-size:11px;padding:5px 12px}
   /* Pos-bar: flat nav style on mobile */
-  .pos-bar{border-top:1px solid var(--border);padding:6px 12px}
+  .pos-bar{border-top:1px solid var(--border);padding:6px 12px;flex-wrap:wrap}
   .pos-tab{font-size:11px;padding:5px 12px}
+  .search-wrap{width:100%;margin-left:0;margin-top:4px}
+  .player-search{width:100%!important;box-sizing:border-box}
   /* Table: display:flex on rows for swipe support */
   thead tr{display:flex;align-items:center;border-bottom:1px solid var(--border2);margin-bottom:2px}
   thead th{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;padding:4px 6px;background:transparent;border:none}
@@ -714,6 +747,11 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
     <div class="pos-tab" data-pos="Overall" style="display:none">Overall</div>
     <div class="pos-tab" data-pos="SF">Overall</div>
     <div class="pos-tab" data-pos="Targets" style="display:none">★ Targets<span class="tab-star-count" id="tabStarCount"></span></div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="playerSearch" class="player-search" placeholder="Search player…" autocomplete="off" spellcheck="false">
+      <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
   </div>
 
   <!-- Action bar -->
@@ -1465,6 +1503,138 @@ function toggleAvoid(name) {
   else { state.avoided.add(name); state.starred.delete(name); }
   renderTable();
 }
+
+// ── Player search ─────────────────────────────────────────────────────────────
+(function initSearch() {
+  const input = document.getElementById('playerSearch');
+  const dropdown = document.getElementById('searchDropdown');
+  let activeIdx = -1;
+
+  function getAllPlayers() {
+    const seen = new Set();
+    const results = [];
+    // Current tab first, then cached tabs
+    const sources = [state.data, ...Object.values(tabData)];
+    for (const data of sources) {
+      if (!data) continue;
+      for (const p of data) {
+        if (!p.Player || seen.has(p.Player)) continue;
+        seen.add(p.Player);
+        results.push({ name: p.Player, pos: p.Pos || '', team: p.Team || '' });
+      }
+    }
+    return results;
+  }
+
+  function showDropdown(items) {
+    if (!items.length) { dropdown.classList.remove('open'); return; }
+    activeIdx = -1;
+    dropdown.innerHTML = items.slice(0, 12).map((p, i) =>
+      `<div class="search-item" data-name="${p.name.replace(/"/g,'&quot;')}" data-idx="${i}">
+        <span class="si-pos">${p.pos}</span>
+        <span>${p.name}</span>
+        <span class="si-team">${p.team}</span>
+      </div>`
+    ).join('');
+    dropdown.classList.add('open');
+  }
+
+  function selectPlayer(name) {
+    input.value = '';
+    dropdown.classList.remove('open');
+    // Find the row in current table
+    const row = document.querySelector(`tr[data-player="${CSS.escape(name)}"]`);
+    if (row) {
+      scrollAndHighlight(row);
+      return;
+    }
+    // Player not on current tab — find which tab has them
+    for (const [key, data] of Object.entries(tabData)) {
+      if (data.some(p => p.Player === name)) {
+        const pos = key.substring(key.lastIndexOf('_') + 1);
+        const posTab = document.querySelector(`.pos-tab[data-pos="${pos}"]`);
+        if (posTab && !posTab.classList.contains('disabled') && posTab.style.display !== 'none') {
+          posTab.click();
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              const r = document.querySelector(`tr[data-player="${CSS.escape(name)}"]`);
+              if (r) scrollAndHighlight(r);
+            });
+          });
+          return;
+        }
+      }
+    }
+  }
+
+  function scrollAndHighlight(row) {
+    const wrap = document.querySelector('.table-wrap');
+    row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    row.classList.add('search-highlight');
+
+    function clearHighlight() {
+      row.classList.remove('search-highlight');
+      wrap.removeEventListener('scroll', clearHighlight);
+      document.removeEventListener('click', clearHighlight);
+    }
+    // Remove glow on scroll or click
+    setTimeout(() => {
+      wrap.addEventListener('scroll', clearHighlight, { once: true });
+      document.addEventListener('click', clearHighlight, { once: true });
+    }, 100);
+  }
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { dropdown.classList.remove('open'); return; }
+    const all = getAllPlayers();
+    const matches = all.filter(p => p.name.toLowerCase().includes(q));
+    // Sort: starts-with first, then includes
+    matches.sort((a, b) => {
+      const aStarts = a.name.toLowerCase().startsWith(q) ? 0 : 1;
+      const bStarts = b.name.toLowerCase().startsWith(q) ? 0 : 1;
+      return aStarts - bStarts;
+    });
+    showDropdown(matches);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const items = dropdown.querySelectorAll('.search-item');
+    if (!items.length || !dropdown.classList.contains('open')) {
+      if (e.key === 'Escape') { input.blur(); input.value = ''; }
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIdx = Math.min(activeIdx + 1, items.length - 1);
+      items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIdx = Math.max(activeIdx - 1, 0);
+      items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const sel = activeIdx >= 0 ? items[activeIdx] : items[0];
+      if (sel) selectPlayer(sel.dataset.name);
+    } else if (e.key === 'Escape') {
+      dropdown.classList.remove('open');
+      input.blur();
+      input.value = '';
+    }
+  });
+
+  dropdown.addEventListener('click', (e) => {
+    const item = e.target.closest('.search-item');
+    if (item) selectPlayer(item.dataset.name);
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-wrap')) {
+      dropdown.classList.remove('open');
+    }
+  });
+})();
 
 // ── Actions ───────────────────────────────────────────────────────────────────
 function resetOrder() {
