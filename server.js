@@ -569,7 +569,7 @@ async function saveSleeperAdpSnapshots() {
     const sleeperMap = await fetchSleeperAdpMap(); // also populates cache.__sleeperIds
     const idMap = cache.__sleeperIds || {};
     const now = new Date();
-    let saved = 0, skipped = 0;
+    let saved = 0;
     for (const [name, vals] of Object.entries(sleeperMap)) {
       const sleeperId = idMap[name];
       if (!sleeperId) continue;
@@ -581,25 +581,6 @@ async function saveSleeperAdpSnapshots() {
       const newAdpHalf    = vals.halfPpr    ? parseFloat(vals.halfPpr)    : null;
       const newAdpStd     = vals.std        ? parseFloat(vals.std)        : null;
       const newAdpDyn2qb  = vals.dynasty2qb ? parseFloat(vals.dynasty2qb) : null;
-
-      // Check if any ADP value changed from the most recent snapshot
-      const prev = await db.query(
-        `SELECT adp, adp_ppr, adp_half_ppr, adp_std, adp_dynasty_2qb
-         FROM sleeper_adp_history
-         WHERE sleeper_player_id = $1 AND season = 2026
-         ORDER BY pulled_at DESC LIMIT 1`,
-        [sleeperId]
-      );
-      if (prev.rows.length) {
-        const p = prev.rows[0];
-        const eq = (a, b) => (a == null && b == null) || (a != null && b != null && parseFloat(a) === parseFloat(b));
-        const same = eq(p.adp, newAdp)
-          && eq(p.adp_ppr, newAdpPpr)
-          && eq(p.adp_half_ppr, newAdpHalf)
-          && eq(p.adp_std, newAdpStd)
-          && eq(p.adp_dynasty_2qb, newAdpDyn2qb);
-        if (same) { skipped++; continue; }
-      }
 
       try {
         await db.query(
@@ -613,7 +594,7 @@ async function saveSleeperAdpSnapshots() {
         console.error(`ADP snapshot failed for ${name} (${sleeperId}):`, rowErr.message);
       }
     }
-    console.log(`Sleeper ADP snapshots: ${saved} saved, ${skipped} unchanged`);
+    console.log(`Sleeper ADP snapshots: ${saved} saved`);
   } catch (e) { console.error('saveSleeperAdpSnapshots failed:', e.message); }
 }
 
@@ -623,7 +604,7 @@ Promise.all([ensureSourceColumn(), ensureSleeperHistoryTable(), ensurePublishedA
     console.log(`Rankings app running on port ${PORT}`);
     initSleeperIdMap();
     saveSleeperAdpSnapshots();
-    setInterval(saveSleeperAdpSnapshots, 2 * 60 * 60 * 1000);
+    setInterval(saveSleeperAdpSnapshots, 12 * 60 * 60 * 1000);
   });
 }).catch(e => {
   console.error('DB migration failed, starting anyway:', e.message);
