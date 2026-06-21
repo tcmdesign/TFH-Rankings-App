@@ -1598,9 +1598,12 @@ function toggleAvoid(name) {
 
   input.addEventListener('input', () => {
     const q = input.value.trim().toLowerCase();
+    console.log('SEARCH INPUT:', q);
     if (!q) { dropdown.classList.remove('open'); return; }
     const all = getAllPlayers();
+    console.log('ALL PLAYERS:', all.length);
     const matches = all.filter(p => p.name.toLowerCase().includes(q));
+    console.log('MATCHES:', matches.length, matches.slice(0,3));
     // Sort: starts-with first, then includes
     matches.sort((a, b) => {
       const aStarts = a.name.toLowerCase().startsWith(q) ? 0 : 1;
@@ -1635,8 +1638,10 @@ function toggleAvoid(name) {
     }
   });
 
-  dropdown.addEventListener('click', (e) => {
+  dropdown.addEventListener('mousedown', (e) => {
+    e.preventDefault(); // prevent blur from hiding dropdown before click registers
     const item = e.target.closest('.search-item');
+    console.log('DROPDOWN CLICK:', item?.dataset?.name);
     if (item) selectPlayer(item.dataset.name);
   });
 
