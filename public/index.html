@@ -866,9 +866,9 @@ const FORMAT_CONFIG = {
 };
 
 let state = {
-  format:  'dynasty_1qb',
-  mode:    'dynasty',
-  pos:     'QB',
+  format:  'redraft_half',
+  mode:    'redraft',
+  pos:     'Overall',
   data:    [],
   order:   [],
   starred: new Set(),
@@ -879,7 +879,7 @@ let state = {
   draftMode: false,
   draftMine: new Set(),
   draftGone: new Set(),
-  section: 'rookie',       // sidebar selection: 'rookie' or 'redraft'
+  section: 'redraft',       // sidebar selection: 'rookie' or 'redraft'
   avoided:   new Set(),  // name-based, persistent
   creators:  [],          // creator names for redraft consensus columns
   publishInfo: null,      // last redraft publish metadata
@@ -924,6 +924,39 @@ function loadFromURL() {
   if (p.has('draftGone')) try { state.draftGone = new Set(JSON.parse(atob(p.get('draftGone')))); } catch {}
 }
 
+// ── History (back/forward button support) ─────────────────────────────────────
+function pushViewState() {
+  const s = { format: state.format, pos: state.pos, section: state.section };
+  history.pushState(s, '', location.pathname + location.search);
+}
+
+function applyViewState(s) {
+  state.format  = s.format;
+  state.pos     = s.pos;
+  state.section = s.section;
+  state.mode    = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
+  state.custom  = false;
+  state.checked = new Set();
+  // Update UI to match
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  const sb = document.querySelector(`.sidebar-item[data-tool="${state.section === 'redraft' ? 'redraft' : 'rookie'}"]`);
+  if (sb) sb.classList.add('active');
+  document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
+  const fp = document.querySelector(`.format-pill[data-format="${state.format}"]`);
+  if (fp) fp.classList.add('active');
+  document.getElementById('topbarSub').textContent = FORMAT_CONFIG[state.format]?.label || '';
+  updateFormatBar();
+  updatePosTabs();
+  document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
+  const pt = document.querySelector(`.pos-tab[data-pos="${state.pos}"]`);
+  if (pt) pt.classList.add('active');
+  loadRankings();
+}
+
+window.addEventListener('popstate', (e) => {
+  if (e.state) applyViewState(e.state);
+});
+
 // ── Nav ──────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
   el.addEventListener('click', () => {
@@ -942,6 +975,7 @@ document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
       document.getElementById('topbarSub').textContent = FORMAT_CONFIG['redraft_half']?.label || '';
       updateFormatBar();
       updatePosTabs();
+      pushViewState();
       loadRankings();
     } else if (tool === 'rookie') {
       document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
@@ -955,6 +989,7 @@ document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
       document.getElementById('topbarSub').textContent = FORMAT_CONFIG['dynasty_1qb']?.label || '';
       updateFormatBar();
       updatePosTabs();
+      pushViewState();
       loadRankings();
     }
   });
@@ -973,6 +1008,7 @@ document.querySelectorAll('.format-pill').forEach(el => {
     document.getElementById('topbarSub').textContent = FORMAT_CONFIG[state.format]?.label || '';
     updateFormatBar();
     updatePosTabs();
+    pushViewState();
     loadRankings();
   });
 });
@@ -986,6 +1022,7 @@ document.querySelectorAll('.pos-tab').forEach(el => {
     state.pos     = el.dataset.pos;
     state.custom  = false;
     state.checked = new Set();
+    pushViewState();
     loadRankings();
   });
 });
@@ -2571,6 +2608,9 @@ if (state.draftMine.size > 0 || state.draftGone.size > 0) {
   document.getElementById('draftLegend').classList.add('visible');
   document.querySelector('.table-wrap').classList.add('draft-active');
 }
+
+// Set initial history state so back button works from the first view
+history.replaceState({ format: state.format, pos: state.pos, section: state.section }, '');
 
 loadRankings();
 </script>
