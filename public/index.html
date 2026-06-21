@@ -918,8 +918,10 @@ function loadFromURL() {
   }
   if (p.has('order'))   try { state.order   = JSON.parse(atob(p.get('order'))); state.custom = true; } catch {}
   if (p.has('checked')) try { state.checked = new Set(JSON.parse(atob(p.get('checked')))); } catch {}
-  if (p.has('starred')) try { state.starred = new Set(JSON.parse(atob(p.get('starred')))); } catch {}
-  if (p.has('avoided')) try { state.avoided = new Set(JSON.parse(atob(p.get('avoided')))); } catch {}
+  if (p.has('starred'))   try { state.starred   = new Set(JSON.parse(atob(p.get('starred'))));   } catch {}
+  if (p.has('avoided'))   try { state.avoided   = new Set(JSON.parse(atob(p.get('avoided'))));   } catch {}
+  if (p.has('draftMine')) try { state.draftMine = new Set(JSON.parse(atob(p.get('draftMine')))); } catch {}
+  if (p.has('draftGone')) try { state.draftGone = new Set(JSON.parse(atob(p.get('draftGone')))); } catch {}
 }
 
 // ── Nav ──────────────────────────────────────────────────────────────────────
@@ -1661,8 +1663,10 @@ function buildShareUrl() {
   p.set('pos',    state.pos);
   if (state.custom)           p.set('order',   btoa(JSON.stringify(state.order)));
   if (state.checked.size > 0) p.set('checked', btoa(JSON.stringify([...state.checked])));
-  if (state.starred.size > 0) p.set('starred', btoa(JSON.stringify([...state.starred])));
-  if (state.avoided.size > 0) p.set('avoided', btoa(JSON.stringify([...state.avoided])));
+  if (state.starred.size > 0)   p.set('starred',   btoa(JSON.stringify([...state.starred])));
+  if (state.avoided.size > 0)   p.set('avoided',   btoa(JSON.stringify([...state.avoided])));
+  if (state.draftMine.size > 0) p.set('draftMine', btoa(JSON.stringify([...state.draftMine])));
+  if (state.draftGone.size > 0) p.set('draftGone', btoa(JSON.stringify([...state.draftGone])));
   return `${location.origin}${location.pathname}?${p.toString()}`;
 }
 
@@ -2558,6 +2562,14 @@ const activePosEl = document.querySelector(`.pos-tab[data-pos="${state.pos}"]`);
 if (activePosEl) {
   document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
   activePosEl.classList.add('active');
+}
+
+// Auto-enable draft mode if shared link has draft marks
+if (state.draftMine.size > 0 || state.draftGone.size > 0) {
+  state.draftMode = true;
+  document.getElementById('draftToggle').classList.add('active');
+  document.getElementById('draftLegend').classList.add('visible');
+  document.querySelector('.table-wrap').classList.add('draft-active');
 }
 
 loadRankings();
