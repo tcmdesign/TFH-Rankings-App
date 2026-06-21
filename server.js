@@ -149,8 +149,14 @@ async function fetchSleeperAdpMap() {
       };
       const name = `${entry.player?.first_name || ''} ${entry.player?.last_name || ''}`.trim().toLowerCase();
       if (!name) return;
-      if (Object.values(vals).some(x => x)) adpMap[name] = vals;
-      if (entry.player_id) idMap[name] = entry.player_id;
+      const hasAdp = Object.values(vals).some(x => x);
+      if (hasAdp) {
+        adpMap[name] = vals;
+        // Prefer the entry with real ADP data for the ID map (handles name collisions)
+        idMap[name] = entry.player_id;
+      } else if (entry.player_id && !idMap[name]) {
+        idMap[name] = entry.player_id;
+      }
     });
     cache.__sleeperAdp = { ts: now, data: adpMap };
     cache.__sleeperIds = idMap;
@@ -508,8 +514,14 @@ async function initSleeperIdMap() {
     const res  = await fetch('https://api.sleeper.app/v1/players/nfl');
     const json = await res.json();
     const idMap = {};
+    const OFFENSE = new Set(['QB','RB','WR','TE','K']);
     Object.entries(json).forEach(([id, p]) => {
-      if (p.full_name) idMap[p.full_name.toLowerCase()] = id;
+      if (!p.full_name) return;
+      const key = p.full_name.toLowerCase();
+      // Prefer offensive players with active teams over duplicates (e.g. Lamar Jackson QB vs CB)
+      if (!idMap[key] || (OFFENSE.has(p.position) && p.team)) {
+        idMap[key] = id;
+      }
     });
     cache.__sleeperIds = idMap;
     console.log(`Sleeper ID map loaded: ${Object.keys(idMap).length} players`);
@@ -602,9 +614,10 @@ async function saveSleeperAdpSnapshots() {
 Promise.all([ensureSourceColumn(), ensureSleeperHistoryTable(), ensurePublishedAt()]).then(() => {
   app.listen(PORT, () => {
     console.log(`Rankings app running on port ${PORT}`);
-    initSleeperIdMap();
-    saveSleeperAdpSnapshots();
-    setInterval(saveSleeperAdpSnapshots, 12 * 60 * 60 * 1000);
+    initSleeperIdMap().then(() => {
+      saveSleeperAdpSnapshots();
+      setInterval(saveSleeperAdpSnapshots, 12 * 60 * 60 * 1000);
+    });
   });
 }).catch(e => {
   console.error('DB migration failed, starting anyway:', e.message);
