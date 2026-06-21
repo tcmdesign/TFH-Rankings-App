@@ -1553,7 +1553,6 @@ function toggleAvoid(name) {
     dropdown.classList.remove('open');
     // Find the row in current table
     const row = document.querySelector(`tr[data-player="${name.replace(/"/g,'\\"')}"]`);
-    console.log('SEARCH DEBUG:', { name, row, allTrs: document.querySelectorAll('tr[data-player]').length });
     if (row) {
       scrollAndHighlight(row);
       return;
@@ -1579,31 +1578,54 @@ function toggleAvoid(name) {
 
   function scrollAndHighlight(row) {
     const wrap = document.querySelector('.table-wrap');
-    console.log('HIGHLIGHT DEBUG:', { row, classList: row.className, wrap });
     row.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    row.classList.add('search-highlight');
-    console.log('AFTER ADD:', row.className, getComputedStyle(row.cells?.[0] || row).background);
 
-    function clearHighlight() {
-      row.classList.remove('search-highlight');
-      wrap.removeEventListener('scroll', clearHighlight);
-      document.removeEventListener('click', clearHighlight);
+    // Wait for smooth scroll to finish before adding highlight + dismiss listeners
+    let scrollTimer;
+    function onScrollEnd() {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        wrap.removeEventListener('scroll', onScrollEnd);
+        row.classList.add('search-highlight');
+
+        function clearHighlight() {
+          row.classList.remove('search-highlight');
+          wrap.removeEventListener('scroll', clearHighlight);
+          document.removeEventListener('click', clearHighlight);
+        }
+        // Small delay so the click/scroll that triggered this doesn't immediately dismiss
+        setTimeout(() => {
+          wrap.addEventListener('scroll', clearHighlight, { once: true });
+          document.addEventListener('click', clearHighlight, { once: true });
+        }, 50);
+      }, 100);
     }
-    // Remove glow on scroll or click
+
+    // If already in view (no scroll needed), fire immediately
+    wrap.addEventListener('scroll', onScrollEnd);
+    // Fallback: if no scroll event fires (already in view), apply highlight directly
     setTimeout(() => {
-      wrap.addEventListener('scroll', clearHighlight, { once: true });
-      document.addEventListener('click', clearHighlight, { once: true });
-    }, 100);
+      wrap.removeEventListener('scroll', onScrollEnd);
+      if (!row.classList.contains('search-highlight')) {
+        row.classList.add('search-highlight');
+        function clearHighlight() {
+          row.classList.remove('search-highlight');
+          wrap.removeEventListener('scroll', clearHighlight);
+          document.removeEventListener('click', clearHighlight);
+        }
+        setTimeout(() => {
+          wrap.addEventListener('scroll', clearHighlight, { once: true });
+          document.addEventListener('click', clearHighlight, { once: true });
+        }, 50);
+      }
+    }, 800);
   }
 
   input.addEventListener('input', () => {
     const q = input.value.trim().toLowerCase();
-    console.log('SEARCH INPUT:', q);
     if (!q) { dropdown.classList.remove('open'); return; }
     const all = getAllPlayers();
-    console.log('ALL PLAYERS:', all.length);
     const matches = all.filter(p => p.name.toLowerCase().includes(q));
-    console.log('MATCHES:', matches.length, matches.slice(0,3));
     // Sort: starts-with first, then includes
     matches.sort((a, b) => {
       const aStarts = a.name.toLowerCase().startsWith(q) ? 0 : 1;
@@ -1641,7 +1663,6 @@ function toggleAvoid(name) {
   dropdown.addEventListener('mousedown', (e) => {
     e.preventDefault(); // prevent blur from hiding dropdown before click registers
     const item = e.target.closest('.search-item');
-    console.log('DROPDOWN CLICK:', item?.dataset?.name);
     if (item) selectPlayer(item.dataset.name);
   });
 
