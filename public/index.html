@@ -1552,7 +1552,7 @@ function toggleAvoid(name) {
     input.value = '';
     dropdown.classList.remove('open');
     // Find the row in current table
-    const row = document.querySelector(`tr[data-player="${CSS.escape(name)}"]`);
+    const row = document.querySelector(`tr[data-player="${name.replace(/"/g,'\\"')}"]`);
     if (row) {
       scrollAndHighlight(row);
       return;
@@ -1566,7 +1566,7 @@ function toggleAvoid(name) {
           posTab.click();
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              const r = document.querySelector(`tr[data-player="${CSS.escape(name)}"]`);
+              const r = document.querySelector(`tr[data-player="${name.replace(/"/g,'\\"')}"]`);
               if (r) scrollAndHighlight(r);
             });
           });
