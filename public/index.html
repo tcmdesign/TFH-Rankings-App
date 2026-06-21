@@ -1553,6 +1553,7 @@ function toggleAvoid(name) {
     dropdown.classList.remove('open');
     // Find the row in current table
     const row = document.querySelector(`tr[data-player="${name.replace(/"/g,'\\"')}"]`);
+    console.log('SEARCH DEBUG:', { name, row, allTrs: document.querySelectorAll('tr[data-player]').length });
     if (row) {
       scrollAndHighlight(row);
       return;
@@ -1578,8 +1579,10 @@ function toggleAvoid(name) {
 
   function scrollAndHighlight(row) {
     const wrap = document.querySelector('.table-wrap');
+    console.log('HIGHLIGHT DEBUG:', { row, classList: row.className, wrap });
     row.scrollIntoView({ block: 'center', behavior: 'smooth' });
     row.classList.add('search-highlight');
+    console.log('AFTER ADD:', row.className, getComputedStyle(row.cells?.[0] || row).background);
 
     function clearHighlight() {
       row.classList.remove('search-highlight');
