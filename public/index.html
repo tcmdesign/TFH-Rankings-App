@@ -1578,47 +1578,20 @@ function toggleAvoid(name) {
 
   function scrollAndHighlight(row) {
     const wrap = document.querySelector('.table-wrap');
-    row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    // Use instant scroll to avoid scroll-event timing issues
+    row.scrollIntoView({ block: 'center' });
+    row.classList.add('search-highlight');
 
-    // Wait for smooth scroll to finish before adding highlight + dismiss listeners
-    let scrollTimer;
-    function onScrollEnd() {
-      clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(() => {
-        wrap.removeEventListener('scroll', onScrollEnd);
-        row.classList.add('search-highlight');
-
-        function clearHighlight() {
-          row.classList.remove('search-highlight');
-          wrap.removeEventListener('scroll', clearHighlight);
-          document.removeEventListener('click', clearHighlight);
-        }
-        // Small delay so the click/scroll that triggered this doesn't immediately dismiss
-        setTimeout(() => {
-          wrap.addEventListener('scroll', clearHighlight, { once: true });
-          document.addEventListener('click', clearHighlight, { once: true });
-        }, 50);
-      }, 100);
+    function clearHighlight() {
+      row.classList.remove('search-highlight');
+      wrap.removeEventListener('scroll', clearHighlight);
+      document.removeEventListener('click', clearHighlight);
     }
-
-    // If already in view (no scroll needed), fire immediately
-    wrap.addEventListener('scroll', onScrollEnd);
-    // Fallback: if no scroll event fires (already in view), apply highlight directly
+    // Delay attaching dismiss listeners so nothing fires prematurely
     setTimeout(() => {
-      wrap.removeEventListener('scroll', onScrollEnd);
-      if (!row.classList.contains('search-highlight')) {
-        row.classList.add('search-highlight');
-        function clearHighlight() {
-          row.classList.remove('search-highlight');
-          wrap.removeEventListener('scroll', clearHighlight);
-          document.removeEventListener('click', clearHighlight);
-        }
-        setTimeout(() => {
-          wrap.addEventListener('scroll', clearHighlight, { once: true });
-          document.addEventListener('click', clearHighlight, { once: true });
-        }, 50);
-      }
-    }, 800);
+      wrap.addEventListener('scroll', clearHighlight, { once: true });
+      document.addEventListener('click', clearHighlight, { once: true });
+    }, 300);
   }
 
   input.addEventListener('input', () => {
