@@ -196,6 +196,13 @@ async function fetchTableByName(name) {
   return fetchTable(id);
 }
 
+// Temporary debug: list Airtable table names
+app.get('/api/debug/tables', async (req, res) => {
+  await resolveAtTableId('_force_refresh_');
+  const names = Object.keys(atTableMeta || {}).filter(n => n.startsWith('CON-'));
+  res.json(names);
+});
+
 // Map frontend pos values → Airtable table suffix used by FantasyPro backend
 const POS_AT_SUFFIX = { QB: 'QB', RB: 'RB', WR: 'WR', TE: 'TE', Overall: 'OVERALL', SF: 'FLEX', FLEX: 'FLEX' };
 
