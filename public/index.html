@@ -704,9 +704,8 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
     <div class="sidebar-item active" data-tool="rookie">
       Rookie Rankings
     </div>
-    <div class="sidebar-item disabled" data-tool="bestball">
+    <div class="sidebar-item" data-tool="bestball">
       Best Ball
-      <span class="sidebar-soon">Soon</span>
     </div>
     <div class="sidebar-item" data-tool="redraft">
       Redraft Rankings
@@ -744,7 +743,6 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
     <button class="format-pill" data-format="redraft_ppr">PPR</button>
     <button class="format-pill" data-format="redraft_half">½ PPR</button>
     <button class="format-pill" data-format="redraft_std">Standard</button>
-    <button class="format-pill" data-format="bestball">Best Ball</button>
   </div>
 
   <!-- Position tabs -->
@@ -908,11 +906,17 @@ function restoreTabOrder() {
 }
 
 // ── URL state ────────────────────────────────────────────────────────────────
+function sectionForFormat(fmt) {
+  if (fmt === 'bestball') return 'bestball';
+  const mode = FORMAT_CONFIG[fmt]?.mode;
+  return mode === 'redraft' ? 'redraft' : 'rookie';
+}
+
 function applySharedState(d) {
   if (d.format && FORMAT_CONFIG[d.format]) state.format = d.format;
   if (d.pos)     state.pos = d.pos;
   state.mode = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
-  state.section = state.mode === 'redraft' ? 'redraft' : 'rookie';
+  state.section = sectionForFormat(state.format);
   if (d.order)     { state.order = d.order; state.custom = true; }
   if (d.checked)   state.checked   = new Set(d.checked);
   if (d.starred)   state.starred   = new Set(d.starred);
@@ -936,10 +940,10 @@ async function loadFromURL() {
   if (p.has('format') && FORMAT_CONFIG[p.get('format')]) state.format = p.get('format');
   if (p.has('pos'))     state.pos = p.get('pos');
   state.mode = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
-  if (p.has('section') && ['rookie', 'redraft'].includes(p.get('section'))) {
+  if (p.has('section') && ['rookie', 'redraft', 'bestball'].includes(p.get('section'))) {
     state.section = p.get('section');
   } else {
-    state.section = state.mode === 'redraft' ? 'redraft' : 'rookie';
+    state.section = sectionForFormat(state.format);
   }
   if (p.has('order'))   try { state.order   = JSON.parse(atob(p.get('order'))); state.custom = true; } catch {}
   if (p.has('checked')) try { state.checked = new Set(JSON.parse(atob(p.get('checked')))); } catch {}
@@ -964,7 +968,7 @@ function applyViewState(s) {
   state.checked = new Set();
   // Update UI to match
   document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-  const sb = document.querySelector(`.sidebar-item[data-tool="${state.section === 'redraft' ? 'redraft' : 'rookie'}"]`);
+  const sb = document.querySelector(`.sidebar-item[data-tool="${state.section}"]`);
   if (sb) sb.classList.add('active');
   document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
   const fp = document.querySelector(`.format-pill[data-format="${state.format}"]`);
@@ -998,6 +1002,19 @@ document.querySelectorAll('.sidebar-item:not(.disabled)').forEach(el => {
       state.custom  = false;
       state.checked = new Set();
       document.getElementById('topbarSub').textContent = FORMAT_CONFIG['redraft_half']?.label || '';
+      updateFormatBar();
+      updatePosTabs();
+      pushViewState();
+      loadRankings();
+    } else if (tool === 'bestball') {
+      document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
+      saveTabOrder();
+      state.section = 'bestball';
+      state.format  = 'bestball';
+      state.mode    = 'redraft';
+      state.custom  = false;
+      state.checked = new Set();
+      document.getElementById('topbarSub').textContent = FORMAT_CONFIG['bestball']?.label || '';
       updateFormatBar();
       updatePosTabs();
       pushViewState();
@@ -1053,12 +1070,15 @@ document.querySelectorAll('.pos-tab').forEach(el => {
 });
 
 function updateFormatBar() {
+  const formatBar   = document.querySelector('.format-bar');
   const dynastyPill = document.querySelector('.format-pill[data-format="dynasty_1qb"]');
   const formatSep   = document.querySelector('.format-sep');
-  const hideDynasty = state.section === 'redraft';
+  const hideDynasty = state.section === 'redraft' || state.section === 'bestball';
+  const hideAll     = state.section === 'bestball';
 
-  if (dynastyPill) dynastyPill.style.display = hideDynasty ? 'none' : '';
-  if (formatSep)   formatSep.style.display   = hideDynasty ? 'none' : '';
+  if (formatBar)    formatBar.style.display   = hideAll ? 'none' : '';
+  if (dynastyPill)  dynastyPill.style.display  = hideDynasty ? 'none' : '';
+  if (formatSep)    formatSep.style.display    = hideDynasty ? 'none' : '';
 
   document.querySelectorAll('.format-pill').forEach(p => {
     p.classList.remove('disabled');
@@ -1073,7 +1093,7 @@ function updatePosTabs() {
   const overallTab = document.querySelector('.pos-tab[data-pos="Overall"]');
   const flexTab    = document.querySelector('.pos-tab[data-pos="FLEX"]');
   const sfTab      = document.querySelector('.pos-tab[data-pos="SF"]');
-  const isRedraft  = state.mode === 'redraft' && state.section === 'redraft';
+  const isRedraft  = state.mode === 'redraft' && (state.section === 'redraft' || state.section === 'bestball');
   if (overallTab) overallTab.style.display = isRedraft ? '' : 'none';
   if (flexTab)    flexTab.style.display    = isRedraft ? '' : 'none';
   if (sfTab)      sfTab.style.display      = state.mode === 'dynasty' ? '' : 'none';
@@ -1131,7 +1151,7 @@ async function loadRankings() {
   }
   container.innerHTML = '<div class="coming-soon-msg">Loading...</div>';
   try {
-    if (state.mode === 'redraft' && state.section === 'redraft') {
+    if (state.mode === 'redraft' && (state.section === 'redraft' || state.section === 'bestball')) {
       // Full redraft consensus (all players)
       const res  = await fetch(`/api/rankings/redraft-consensus/${state.pos}?format=${state.format}`);
       const json = await res.json();
@@ -1203,7 +1223,7 @@ function renderTable() {
 
   const noDrag = state.draftMode;
   // Show tiers only for redraft consensus (data has Tier field from Airtable)
-  const showTiers = state.mode === 'redraft' && state.section === 'redraft' && !state.sortCol && displayRows.some(p => p.Tier);
+  const showTiers = state.mode === 'redraft' && (state.section === 'redraft' || state.section === 'bestball') && !state.sortCol && displayRows.some(p => p.Tier);
   let lastTier = null;
   const tbody = displayRows.map((p, displayIdx) => {
     let tierHtml = '';
@@ -1790,8 +1810,8 @@ async function generateCheatSheet(style) {
   const section     = state.section;
   const pKey        = populatedKey();
   const formatLabel = FORMAT_CONFIG[format]?.label || '';
-  const sheetTitle  = section === 'rookie' ? 'TFH 2026 Rookie Rankings' : mode === 'redraft' ? 'TFH 2026 Redraft Rankings' : 'TFH 2026 Dynasty Rankings';
-  const isRedraft = mode === 'redraft' && section === 'redraft';
+  const sheetTitle  = section === 'rookie' ? 'TFH 2026 Rookie Rankings' : section === 'bestball' ? 'TFH 2026 Best Ball Rankings' : mode === 'redraft' ? 'TFH 2026 Redraft Rankings' : 'TFH 2026 Dynasty Rankings';
+  const isRedraft = mode === 'redraft' && (section === 'redraft' || section === 'bestball');
 
   const fetchPos = async (pos) => {
     if (!POPULATED[pKey]?.[pos]) return [];
@@ -2627,7 +2647,7 @@ function renderAdpChart(history) {
 
   // Activate sidebar item based on section
   document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-  const activeSidebar = document.querySelector(`.sidebar-item[data-tool="${state.section === 'redraft' ? 'redraft' : 'rookie'}"]`);
+  const activeSidebar = document.querySelector(`.sidebar-item[data-tool="${state.section}"]`);
   if (activeSidebar) activeSidebar.classList.add('active');
 
   // Activate format pill
