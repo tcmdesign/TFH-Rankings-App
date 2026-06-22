@@ -198,8 +198,10 @@ async function fetchTableByName(name) {
 
 // Temporary debug: list Airtable table names
 app.get('/api/debug/tables', async (req, res) => {
+  atTableMeta = null; // force fresh fetch
   await resolveAtTableId('_force_refresh_');
-  const names = Object.keys(atTableMeta || {}).filter(n => n.startsWith('CON-'));
+  const q = (req.query.q || 'CON-').toLowerCase();
+  const names = Object.keys(atTableMeta || {}).filter(n => n.toLowerCase().includes(q));
   res.json(names);
 });
 
