@@ -2,6 +2,7 @@ const express = require('express');
 const fetch   = require('node-fetch');
 const path    = require('path');
 const fs      = require('fs');
+const crypto  = require('crypto');
 const { Pool } = require('pg');
 
 const app  = express();
@@ -168,6 +169,7 @@ async function fetchSleeperAdpMap() {
 }
 
 // ── Routes ────────────────────────────────────────────────────────────────────
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 // ── Airtable metadata: resolve table name → ID ───────────────────────────────
 let atTableMeta = null;
@@ -202,7 +204,6 @@ const POS_AT_SUFFIX = { QB: 'QB', RB: 'RB', WR: 'WR', TE: 'TE', Overall: 'OVERAL
 // Pulls from Airtable tables written by the FantasyPro rankings admin on publish.
 app.get('/api/rankings/redraft-consensus/:pos', async (req, res) => {
   const { pos } = req.params;
-  const scoring = req.query.scoring || 'HalfPPR';
   const suffix  = POS_AT_SUFFIX[pos];
   if (!suffix) return res.status(400).json({ error: 'Invalid position' });
 
@@ -223,8 +224,17 @@ app.get('/api/rankings/redraft-consensus/:pos', async (req, res) => {
       redraft_ppr:  'ppr',
       redraft_half: 'halfPpr',
       redraft_std:  'std',
+      bestball:     'halfPpr',
     };
     const sf = sleeperFieldMap[format] || 'halfPpr';
+
+    const scoringMap = {
+      redraft_ppr:  'PPR',
+      redraft_half: 'HalfPPR',
+      redraft_std:  'Std',
+      bestball:     'Bestball',
+    };
+    const scoring = scoringMap[format] || req.query.scoring || 'HalfPPR';
 
     const conName      = `CON-${scoring}-${suffix}`;
     const creatorNames = creators.map(c => `${c.label}-${scoring}-${suffix}`);
@@ -288,6 +298,7 @@ app.get('/api/rankings/rookie-redraft/:pos', async (req, res) => {
       redraft_ppr:  'ppr',
       redraft_half: 'halfPpr',
       redraft_std:  'std',
+      bestball:     'halfPpr',
     };
     const sf = sleeperFieldMap[format] || 'halfPpr';
     const [data, sleeperAdpMap] = await Promise.all([
@@ -436,6 +447,7 @@ app.get('/api/adp/history/:name', async (req, res) => {
     redraft_ppr:  'adp_ppr',
     redraft_half: 'adp_half_ppr',
     redraft_std:  'adp_std',
+    bestball:     'adp_half_ppr',
   };
   const adpCol = formatColMap[format] || 'adp';
 
@@ -506,6 +518,52 @@ async function syncPlayerAttrs() {
 app.post('/api/admin/sync-attrs', async (req, res) => {
   const result = await syncPlayerAttrs();
   res.json(result);
+});
+
+// ── Shared state (short share URLs) ──────────────────────────────────────────
+async function ensureSharedStatesTable() {
+  if (!db) return;
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS shared_states (
+        id         VARCHAR(10) PRIMARY KEY,
+        state_json TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      )
+    `);
+  } catch (e) { console.error('ensureSharedStatesTable:', e.message); }
+}
+
+app.post('/api/share', async (req, res) => {
+  if (!db) return res.status(503).json({ error: 'DB unavailable' });
+  try {
+    const json = JSON.stringify(req.body);
+    // Generate a short ID (8 chars of base64url)
+    const id = crypto.randomBytes(6).toString('base64url').slice(0, 8);
+    await db.query(
+      `INSERT INTO shared_states (id, state_json) VALUES ($1, $2)`,
+      [id, json]
+    );
+    res.json({ id });
+  } catch (e) {
+    console.error('POST /api/share error:', e.message);
+    res.status(500).json({ error: 'Failed to save' });
+  }
+});
+
+app.get('/api/share/:id', async (req, res) => {
+  if (!db) return res.status(503).json({ error: 'DB unavailable' });
+  try {
+    const { rows } = await db.query(
+      `SELECT state_json FROM shared_states WHERE id = $1`,
+      [req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json(JSON.parse(rows[0].state_json));
+  } catch (e) {
+    console.error('GET /api/share error:', e.message);
+    res.status(500).json({ error: 'Failed to load' });
+  }
 });
 
 // ── Sleeper player ID map (full roster, for photo fallback) ───────────────────
@@ -611,7 +669,7 @@ async function saveSleeperAdpSnapshots() {
 }
 
 
-Promise.all([ensureSourceColumn(), ensureSleeperHistoryTable(), ensurePublishedAt()]).then(() => {
+Promise.all([ensureSourceColumn(), ensureSleeperHistoryTable(), ensurePublishedAt(), ensureSharedStatesTable()]).then(() => {
   app.listen(PORT, () => {
     console.log(`Rankings app running on port ${PORT}`);
     initSleeperIdMap().then(() => {

@@ -744,6 +744,7 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
     <button class="format-pill" data-format="redraft_ppr">PPR</button>
     <button class="format-pill" data-format="redraft_half">½ PPR</button>
     <button class="format-pill" data-format="redraft_std">Standard</button>
+    <button class="format-pill" data-format="bestball">Best Ball</button>
   </div>
 
   <!-- Position tabs -->
@@ -863,6 +864,7 @@ const FORMAT_CONFIG = {
   redraft_ppr:  { mode: 'redraft',  label: '2026 Redraft · PPR'       },
   redraft_half: { mode: 'redraft',  label: '2026 Redraft · Half PPR'  },
   redraft_std:  { mode: 'redraft',  label: '2026 Redraft · Standard'  },
+  bestball:     { mode: 'redraft',  label: '2026 Best Ball'           },
 };
 
 let state = {
@@ -906,8 +908,31 @@ function restoreTabOrder() {
 }
 
 // ── URL state ────────────────────────────────────────────────────────────────
-function loadFromURL() {
+function applySharedState(d) {
+  if (d.format && FORMAT_CONFIG[d.format]) state.format = d.format;
+  if (d.pos)     state.pos = d.pos;
+  state.mode = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
+  state.section = state.mode === 'redraft' ? 'redraft' : 'rookie';
+  if (d.order)     { state.order = d.order; state.custom = true; }
+  if (d.checked)   state.checked   = new Set(d.checked);
+  if (d.starred)   state.starred   = new Set(d.starred);
+  if (d.avoided)   state.avoided   = new Set(d.avoided);
+  if (d.draftMine) state.draftMine = new Set(d.draftMine);
+  if (d.draftGone) state.draftGone = new Set(d.draftGone);
+}
+
+async function loadFromURL() {
   const p = new URLSearchParams(location.search);
+
+  // Server-side short link
+  if (p.has('s')) {
+    try {
+      const res = await fetch(`/api/share/${encodeURIComponent(p.get('s'))}`);
+      if (res.ok) { applySharedState(await res.json()); return; }
+    } catch (e) { console.error('Failed to load shared state:', e); }
+  }
+
+  // Legacy inline params (backward compat)
   if (p.has('format') && FORMAT_CONFIG[p.get('format')]) state.format = p.get('format');
   if (p.has('pos'))     state.pos = p.get('pos');
   state.mode = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
@@ -1036,12 +1061,7 @@ function updateFormatBar() {
   if (formatSep)   formatSep.style.display   = hideDynasty ? 'none' : '';
 
   document.querySelectorAll('.format-pill').forEach(p => {
-    const fmt = p.dataset.format;
-    if (state.mode === 'redraft' && (fmt === 'redraft_ppr' || fmt === 'redraft_std')) {
-      p.classList.add('disabled');
-    } else {
-      p.classList.remove('disabled');
-    }
+    p.classList.remove('disabled');
   });
 }
 
@@ -1694,25 +1714,45 @@ function resetOrder() {
   renderTable();
 }
 
-function buildShareUrl() {
-  const p = new URLSearchParams();
-  p.set('format', state.format);
-  p.set('pos',    state.pos);
-  if (state.custom)           p.set('order',   btoa(JSON.stringify(state.order)));
-  if (state.checked.size > 0) p.set('checked', btoa(JSON.stringify([...state.checked])));
-  if (state.starred.size > 0)   p.set('starred',   btoa(JSON.stringify([...state.starred])));
-  if (state.avoided.size > 0)   p.set('avoided',   btoa(JSON.stringify([...state.avoided])));
-  if (state.draftMine.size > 0) p.set('draftMine', btoa(JSON.stringify([...state.draftMine])));
-  if (state.draftGone.size > 0) p.set('draftGone', btoa(JSON.stringify([...state.draftGone])));
-  return `${location.origin}${location.pathname}?${p.toString()}`;
+async function buildShareUrl() {
+  const payload = { format: state.format, pos: state.pos };
+  if (state.custom)             payload.order     = state.order;
+  if (state.checked.size > 0)   payload.checked   = [...state.checked];
+  if (state.starred.size > 0)   payload.starred   = [...state.starred];
+  if (state.avoided.size > 0)   payload.avoided   = [...state.avoided];
+  if (state.draftMine.size > 0) payload.draftMine = [...state.draftMine];
+  if (state.draftGone.size > 0) payload.draftGone = [...state.draftGone];
+  try {
+    const res = await fetch('/api/share', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const { id } = await res.json();
+    return `${location.origin}${location.pathname}?s=${id}`;
+  } catch (e) {
+    // Fallback to query-param URL if server is unavailable
+    const p = new URLSearchParams();
+    p.set('format', state.format);
+    p.set('pos',    state.pos);
+    if (state.custom)             p.set('order',     btoa(JSON.stringify(state.order)));
+    if (state.checked.size > 0)   p.set('checked',   btoa(JSON.stringify([...state.checked])));
+    if (state.starred.size > 0)   p.set('starred',   btoa(JSON.stringify([...state.starred])));
+    if (state.avoided.size > 0)   p.set('avoided',   btoa(JSON.stringify([...state.avoided])));
+    if (state.draftMine.size > 0) p.set('draftMine', btoa(JSON.stringify([...state.draftMine])));
+    if (state.draftGone.size > 0) p.set('draftGone', btoa(JSON.stringify([...state.draftGone])));
+    return `${location.origin}${location.pathname}?${p.toString()}`;
+  }
 }
 
-function openSaveModal() {
-  document.getElementById('saveModalUrl').value = buildShareUrl();
+async function openSaveModal() {
+  const urlInput = document.getElementById('saveModalUrl');
   const btn = document.getElementById('saveModalCopyBtn');
+  urlInput.value = 'Generating link...';
   btn.textContent = 'Copy Link';
   btn.classList.remove('copied');
   document.getElementById('saveModal').classList.add('open');
+  urlInput.value = await buildShareUrl();
 }
 
 function closeSaveModal() {
@@ -2580,39 +2620,41 @@ function renderAdpChart(history) {
 
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
-loadFromURL();
-updateFormatBar();
-updatePosTabs();
+(async function boot() {
+  await loadFromURL();
+  updateFormatBar();
+  updatePosTabs();
 
-// Activate sidebar item based on section
-document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-const activeSidebar = document.querySelector(`.sidebar-item[data-tool="${state.section === 'redraft' ? 'redraft' : 'rookie'}"]`);
-if (activeSidebar) activeSidebar.classList.add('active');
+  // Activate sidebar item based on section
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  const activeSidebar = document.querySelector(`.sidebar-item[data-tool="${state.section === 'redraft' ? 'redraft' : 'rookie'}"]`);
+  if (activeSidebar) activeSidebar.classList.add('active');
 
-// Activate format pill
-document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
-const activeFmt = document.querySelector(`.format-pill[data-format="${state.format}"]`);
-if (activeFmt) activeFmt.classList.add('active');
-document.getElementById('topbarSub').textContent = FORMAT_CONFIG[state.format]?.label || '';
+  // Activate format pill
+  document.querySelectorAll('.format-pill').forEach(p => p.classList.remove('active'));
+  const activeFmt = document.querySelector(`.format-pill[data-format="${state.format}"]`);
+  if (activeFmt) activeFmt.classList.add('active');
+  document.getElementById('topbarSub').textContent = FORMAT_CONFIG[state.format]?.label || '';
 
-const activePosEl = document.querySelector(`.pos-tab[data-pos="${state.pos}"]`);
-if (activePosEl) {
-  document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
-  activePosEl.classList.add('active');
-}
+  const activePosEl = document.querySelector(`.pos-tab[data-pos="${state.pos}"]`);
+  if (activePosEl) {
+    document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
+    activePosEl.classList.add('active');
+  }
 
-// Auto-enable draft mode if shared link has draft marks
-if (state.draftMine.size > 0 || state.draftGone.size > 0) {
-  state.draftMode = true;
-  document.getElementById('draftToggle').classList.add('active');
-  document.getElementById('draftLegend').classList.add('visible');
-  document.querySelector('.table-wrap').classList.add('draft-active');
-}
+  // Auto-enable draft mode if shared link has draft marks
+  if (state.draftMine.size > 0 || state.draftGone.size > 0) {
+    state.draftMode = true;
+    document.getElementById('draftToggle').classList.add('active');
+    document.getElementById('draftLegend').classList.add('visible');
+    document.querySelector('.table-wrap').classList.add('draft-active');
+  }
 
-// Set initial history state so back button works from the first view
-history.replaceState({ format: state.format, pos: state.pos, section: state.section }, '');
+  // Set initial history state so back button works from the first view
+  history.replaceState({ format: state.format, pos: state.pos, section: state.section }, '');
 
-loadRankings();
+  loadRankings();
+})();
 </script>
 
 <!-- Save Rankings Modal -->
