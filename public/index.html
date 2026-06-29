@@ -99,6 +99,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .pos-tab[data-pos="RB"]     {--pc:0,217,122;  --ph:var(--green)}
 .pos-tab[data-pos="WR"]     {--pc:74,158,255; --ph:var(--blue)}
 .pos-tab[data-pos="TE"]     {--pc:255,140,0;  --ph:#ff8c00}
+.pos-tab[data-pos="K"]       {--pc:236,72,153; --ph:#ec4899}
+.pos-tab[data-pos="DEF"]     {--pc:139,92,246; --ph:#8b5cf6}
 .pos-tab[data-pos="FLEX"]    {--pc:168,85,247; --ph:#a855f7}
 .pos-tab[data-pos="Overall"] {--pc:0,191,165;  --ph:#00e5c8}
 .pos-tab[data-pos="SF"]      {--pc:0,191,165;  --ph:#00e5c8}
@@ -368,6 +370,8 @@ td{padding:7px 8px;vertical-align:middle}
 .pos-rb{background:rgba(0,217,122,0.15);color:var(--green)}
 .pos-wr{background:rgba(74,158,255,0.15);color:var(--blue)}
 .pos-te{background:rgba(255,140,0,0.15);color:#ff8c00}
+.pos-k{background:rgba(236,72,153,0.15);color:#ec4899}
+.pos-def{background:rgba(139,92,246,0.15);color:#8b5cf6}
 .pos-k {background:rgba(255,140,0,0.15);color:var(--orange)}
 .adp-cell{width:80px;text-align:center}
 .tier-divider td{padding:0!important;border:none!important;background:transparent!important}
@@ -751,6 +755,8 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
     <div class="pos-tab" data-pos="RB">RB</div>
     <div class="pos-tab" data-pos="WR">WR</div>
     <div class="pos-tab" data-pos="TE">TE</div>
+    <div class="pos-tab" data-pos="K" style="display:none">K</div>
+    <div class="pos-tab" data-pos="DEF" style="display:none">DEF</div>
     <div class="pos-tab" data-pos="FLEX" style="display:none">Flex</div>
     <div class="pos-tab" data-pos="Overall" style="display:none">Overall</div>
     <div class="pos-tab" data-pos="SF">Overall</div>
@@ -828,12 +834,12 @@ td.creator-rank-col{text-align:center;width:52px;font-family:'Bebas Neue',sans-s
 
 <script>
 const POPULATED = {
-  redraft:        { QB: true, RB: true, WR: true, TE: true, FLEX: true, Overall: true, SF: false },
+  redraft:        { QB: true, RB: true, WR: true, TE: true, K: true, DEF: true, FLEX: true, Overall: true, SF: false },
   dynasty:        { QB: true, RB: true, WR: true, TE: true, Overall: false, SF: true },
   rookie_redraft: { QB: true, RB: true, WR: true, TE: true, Overall: false, SF: false },
 };
 
-const POS_COLORS = { QB: '#E52222', RB: '#00cc66', WR: '#00bfff', TE: '#ff8c00' };
+const POS_COLORS = { QB: '#E52222', RB: '#00cc66', WR: '#00bfff', TE: '#ff8c00', K: '#ec4899', DEF: '#8b5cf6' };
 
 const TIER_STYLE = {
   1: { color: '#4ADE80', bg: 'rgba(74,222,128,0.08)',  border: 'rgba(74,222,128,0.25)', label: 'Elite' },
@@ -1094,9 +1100,14 @@ function updatePosTabs() {
   const flexTab    = document.querySelector('.pos-tab[data-pos="FLEX"]');
   const sfTab      = document.querySelector('.pos-tab[data-pos="SF"]');
   const isRedraft  = state.mode === 'redraft' && (state.section === 'redraft' || state.section === 'bestball');
+  const isRedraftOnly = state.mode === 'redraft' && state.section === 'redraft';
   if (overallTab) overallTab.style.display = isRedraft ? '' : 'none';
   if (flexTab)    flexTab.style.display    = isRedraft ? '' : 'none';
   if (sfTab)      sfTab.style.display      = state.mode === 'dynasty' ? '' : 'none';
+  const kTab   = document.querySelector('.pos-tab[data-pos="K"]');
+  const defTab = document.querySelector('.pos-tab[data-pos="DEF"]');
+  if (kTab)   kTab.style.display   = isRedraftOnly ? '' : 'none';
+  if (defTab) defTab.style.display = isRedraftOnly ? '' : 'none';
 
   document.querySelectorAll('.pos-tab').forEach(el => {
     const pos = el.dataset.pos;
@@ -1250,7 +1261,7 @@ function renderTable() {
     const coreParts = nameParts.filter((w, i) => i === 0 || !suffixes.has(w.toLowerCase()));
     const shortName = coreParts.length > 1 ? `${coreParts[0][0]}. ${coreParts.slice(1).join(' ')}` : (p.Player || '—');
 
-    const posClassMap = {QB:'pos-qb',RB:'pos-rb',WR:'pos-wr',TE:'pos-te'};
+    const posClassMap = {QB:'pos-qb',RB:'pos-rb',WR:'pos-wr',TE:'pos-te',K:'pos-k',DEF:'pos-def'};
     const posClass = posClassMap[pos] || '';
     const posBadge = `<span class="pos-badge ${posClass}">${pos}</span>`;
 
@@ -1804,7 +1815,8 @@ async function generateCheatSheet(style) {
   const showTiers = document.getElementById('printShowTiers').checked;
   const showBye   = document.getElementById('printShowBye').checked;
 
-  const positions = ['QB', 'RB', 'WR', 'TE'];
+  const isRedraftOnly = state.mode === 'redraft' && state.section === 'redraft';
+  const positions = isRedraftOnly ? ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'] : ['QB', 'RB', 'WR', 'TE'];
   const format      = state.format;
   const mode        = state.mode;
   const section     = state.section;
@@ -1844,7 +1856,7 @@ async function generateCheatSheet(style) {
 
   if (btn) btn.innerHTML = origText;
 
-  const posColors = { QB: '#b91c1c', RB: '#166534', WR: '#1d4ed8', TE: '#b45309' };
+  const posColors = { QB: '#b91c1c', RB: '#166534', WR: '#1d4ed8', TE: '#b45309', K: '#ec4899', DEF: '#8b5cf6' };
   const tierNames = { 1:'Elite',2:'Solid',3:'Flex',4:'Depth',5:'Streamer',6:'Handcuff' };
   const byeCol = showBye ? '<th class="tc">Bye</th>' : '';
 
@@ -1951,7 +1963,7 @@ async function generateCheatSheet(style) {
 
   let gridContent;
   if (style === 'full') {
-    const fullCols = { QB:2, RB:3, WR:3, TE:2 };
+    const fullCols = { QB:2, RB:3, WR:3, TE:2, K:1, DEF:1 };
     gridContent = results.map((r, idx) =>
       `<div class="full-pos full-cols-${fullCols[r.pos]}" style="${idx < results.length - 1 ? 'page-break-after:always' : ''}">${buildSection(r)}</div>`
     ).join('');
@@ -2219,7 +2231,7 @@ function renderPanel(name, scout, injury, attrs, rank, adp, history, containerId
   const slug = name.trim().replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
 
   const posColor = {'quarterback':'#E52222','running back':'#00cc66','wide receiver':'#00bfff','tight end':'#ff8c00'}[pos.toLowerCase()] || '#aaa';
-  const posAbbr  = {'quarterback':'QB','running back':'RB','wide receiver':'WR','tight end':'TE'}[pos.toLowerCase()] || pos.toUpperCase().slice(0,2);
+  const posAbbr  = {'quarterback':'QB','running back':'RB','wide receiver':'WR','tight end':'TE','kicker':'K','defense':'DEF'}[pos.toLowerCase()] || pos.toUpperCase().slice(0,2);
 
   const draftBanner = scout?.round
     ? `<div class="panel-draft-banner">DRAFTED: ROUND ${scout.round} · PICK ${scout.pick}</div>`

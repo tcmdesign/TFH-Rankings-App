@@ -198,7 +198,7 @@ async function fetchTableByName(name) {
 
 
 // Map frontend pos values → Airtable table suffix used by FantasyPro backend
-const POS_AT_SUFFIX = { QB: 'QB', RB: 'RB', WR: 'WR', TE: 'TE', Overall: 'OVERALL', SF: 'FLEX', FLEX: 'FLEX' };
+const POS_AT_SUFFIX = { QB: 'QB', RB: 'RB', WR: 'WR', TE: 'TE', K: 'K', DEF: 'DEF', Overall: 'OVERALL', SF: 'FLEX', FLEX: 'FLEX' };
 
 // ── GET /api/rankings/redraft-consensus/:pos ──────────────────────────────────
 // Returns consensus rankings for a position with per-creator rank columns.
