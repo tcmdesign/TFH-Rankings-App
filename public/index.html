@@ -923,7 +923,7 @@ function applySharedState(d) {
   if (d.pos)     state.pos = d.pos;
   state.mode = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
   state.section = sectionForFormat(state.format);
-  if (d.order)     { state.order = d.order; state.custom = true; }
+  if (d.order)     { state.order = d.order; state.custom = true; tabOrders[tabKey()] = { order: [...d.order], custom: true }; }
   if (d.checked)   state.checked   = new Set(d.checked);
   if (d.starred)   state.starred   = new Set(d.starred);
   if (d.avoided)   state.avoided   = new Set(d.avoided);
@@ -951,7 +951,7 @@ async function loadFromURL() {
   } else {
     state.section = sectionForFormat(state.format);
   }
-  if (p.has('order'))   try { state.order   = JSON.parse(atob(p.get('order'))); state.custom = true; } catch {}
+  if (p.has('order'))   try { state.order = JSON.parse(atob(p.get('order'))); state.custom = true; tabOrders[tabKey()] = { order: [...state.order], custom: true }; } catch {}
   if (p.has('checked')) try { state.checked = new Set(JSON.parse(atob(p.get('checked')))); } catch {}
   if (p.has('starred'))   try { state.starred   = new Set(JSON.parse(atob(p.get('starred'))));   } catch {}
   if (p.has('avoided'))   try { state.avoided   = new Set(JSON.parse(atob(p.get('avoided'))));   } catch {}
