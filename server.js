@@ -8,6 +8,27 @@ const { Pool } = require('pg');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+// ── Discord webhook for alerts ────────────────────────────────────────────────
+async function discordAlert(message, isError = false) {
+  const url = process.env.DISCORD_WEBHOOK_URL;
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: null,
+        embeds: [{
+          title: isError ? '🚨 Rankings App Alert' : '✅ Rankings App',
+          description: message,
+          color: isError ? 0xEF4444 : 0x22C55E,
+          timestamp: new Date().toISOString(),
+        }],
+      }),
+    });
+  } catch (e) { console.error('Discord alert failed:', e.message); }
+}
+
 // ── Referer blocking ──────────────────────────────────────────────────────────
 const BLOCKED_REFERERS = ['reddit.com', 'discord.com', 'discord.gg', 'redd.it'];
 app.use((req, res, next) => {
@@ -634,17 +655,25 @@ async function ensureSleeperHistoryTable() {
 }
 
 async function saveSleeperAdpSnapshots() {
-  if (!db) return;
+  if (!db) {
+    await discordAlert('Sleeper ADP sync skipped — no database connection', true);
+    return;
+  }
   try {
     delete cache.__sleeperAdp; // force fresh fetch so each snapshot reflects current Sleeper data
     const sleeperMap = await fetchSleeperAdpMap(); // also populates cache.__sleeperIds
     const idMap = cache.__sleeperIds || {};
+
+    if (!Object.keys(sleeperMap).length) {
+      await discordAlert('Sleeper ADP sync failed — API returned 0 players', true);
+      return;
+    }
+
     const now = new Date();
     let saved = 0;
     for (const [name, vals] of Object.entries(sleeperMap)) {
       const sleeperId = idMap[name];
       if (!sleeperId) continue;
-      // Require at least one ADP value to be present
       if (!vals.dynastyPpr && !vals.ppr && !vals.halfPpr && !vals.std && !vals.dynasty2qb) continue;
 
       const newAdp        = vals.dynastyPpr ? parseFloat(vals.dynastyPpr) : null;
@@ -666,22 +695,35 @@ async function saveSleeperAdpSnapshots() {
       }
     }
     console.log(`Sleeper ADP snapshots: ${saved} saved`);
-  } catch (e) { console.error('saveSleeperAdpSnapshots failed:', e.message); }
+    if (saved > 0) {
+      await discordAlert(`Sleeper ADP sync complete — ${saved} players saved`);
+    } else {
+      await discordAlert('Sleeper ADP sync ran but saved 0 players — check ID mapping', true);
+    }
+  } catch (e) {
+    console.error('saveSleeperAdpSnapshots failed:', e.message);
+    await discordAlert(`Sleeper ADP sync FAILED: ${e.message}`, true);
+  }
 }
 
 
 Promise.all([ensureSourceColumn(), ensureSleeperHistoryTable(), ensurePublishedAt(), ensureSharedStatesTable()]).then(() => {
   app.listen(PORT, () => {
     console.log(`Rankings app running on port ${PORT}`);
+    discordAlert('Rankings app started — initializing Sleeper ADP sync');
     initSleeperIdMap().then(() => {
       saveSleeperAdpSnapshots();
       setInterval(saveSleeperAdpSnapshots, 12 * 60 * 60 * 1000);
+    }).catch(e => {
+      console.error('initSleeperIdMap failed on startup:', e.message);
+      discordAlert(`Startup error — initSleeperIdMap failed: ${e.message}`, true);
     });
   });
 }).catch(e => {
   console.error('DB migration failed, starting anyway:', e.message);
+  discordAlert(`DB migration failed on startup: ${e.message}`, true);
   app.listen(PORT, () => {
     console.log(`Rankings app running on port ${PORT}`);
-    initSleeperIdMap();
+    initSleeperIdMap().catch(() => {});
   });
 });
