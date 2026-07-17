@@ -1240,15 +1240,16 @@ function renderTable() {
   let lastTier = null;
   const tbody = displayRows.map((p, displayIdx) => {
     let tierHtml = '';
-    if (showTiers && p.Tier && p.Tier !== lastTier) {
-      const ts = TIER_STYLE[p.Tier] || TIER_STYLE[6];
+    const effectiveTier = (state.custom && tierOverrides[p._orig] != null) ? tierOverrides[p._orig] : p.Tier;
+    if (showTiers && effectiveTier && effectiveTier !== lastTier) {
+      const ts = TIER_STYLE[effectiveTier] || TIER_STYLE[6];
       const colCount = 8 + (state.custom ? 1 : 0) + (state.creators?.length || 0);
       tierHtml = `<tr class="tier-divider"><td colspan="${colCount}"><div class="tier-divider-inner">
         <div class="tier-divider-line" style="background:${ts.color}40"></div>
-        <span class="tier-divider-label" style="color:${ts.color};border:1px solid ${ts.border};background:${ts.bg}">Tier ${p.Tier} · ${ts.label}</span>
+        <span class="tier-divider-label" style="color:${ts.color};border:1px solid ${ts.border};background:${ts.bg}">Tier ${effectiveTier} · ${ts.label}</span>
         <div class="tier-divider-line" style="background:${ts.color}40"></div>
       </div></td></tr>`;
-      lastTier = p.Tier;
+      lastTier = effectiveTier;
     }
     const orig      = p._orig;
     const rank      = displayIdx + 1;
@@ -1482,12 +1483,15 @@ async function loadPhotos() {
 }
 
 // ── Drag to reorder ──────────────────────────────────────────────────────────
+const tierOverrides = {};
 function updateMovedPlayerTier(movedIdx, newOrder) {
   const pos = newOrder.indexOf(movedIdx);
   if (pos < 0) return;
   const neighbor = pos > 0 ? newOrder[pos - 1] : (newOrder[pos + 1] ?? null);
-  if (neighbor != null && state.data[neighbor] && state.data[neighbor].Tier) {
-    state.data[movedIdx].Tier = state.data[neighbor].Tier;
+  if (neighbor == null) return;
+  const neighborTier = tierOverrides[neighbor] ?? state.data[neighbor]?.Tier;
+  if (neighborTier) {
+    tierOverrides[movedIdx] = neighborTier;
   }
 }
 
@@ -1754,6 +1758,7 @@ function toggleAvoid(name) {
 function resetOrder() {
   state.order  = state.data.map((_, i) => i);
   state.custom = false;
+  Object.keys(tierOverrides).forEach(k => delete tierOverrides[k]);
   delete tabOrders[tabKey()];
   renderTable();
 }
