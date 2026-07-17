@@ -1518,6 +1518,7 @@ function initDragDrop() {
       if (dragSrc === row) return;
       const srcIdx = parseInt(dragSrc.dataset.idx);
       const tgtIdx = parseInt(row.dataset.idx);
+      if (isNaN(srcIdx) || isNaN(tgtIdx)) return;
       const from   = state.order.indexOf(srcIdx);
       const to     = state.order.indexOf(tgtIdx);
       const newOrder = [...state.order];
@@ -1560,7 +1561,7 @@ document.addEventListener('touchmove', e => {
   if (!tbody) return;
   _touchDragRow.style.transform = `translateY(${_touchDragCurrentY - _touchDragStartY}px)`;
 
-  const rows = [...tbody.querySelectorAll('tr:not(.dragging)')];
+  const rows = [...tbody.querySelectorAll('tr:not(.dragging):not(.tier-divider)')];
   rows.forEach(r => r.classList.remove('drag-over'));
   for (const r of rows) {
     const rect = r.getBoundingClientRect();
@@ -1571,7 +1572,7 @@ document.addEventListener('touchmove', e => {
 document.addEventListener('touchend', () => {
   if (!_touchDragRow) return;
   const tbody = document.getElementById('rankingsTbody');
-  const rows = tbody ? [...tbody.querySelectorAll('tr:not(.dragging)')] : [];
+  const rows = tbody ? [...tbody.querySelectorAll('tr:not(.dragging):not(.tier-divider)')] : [];
 
   let dropTarget = null;
   for (const r of rows) {
@@ -1589,18 +1590,20 @@ document.addEventListener('touchend', () => {
   if (dropTarget) {
     const srcIdx = parseInt(_touchDragRow.dataset.idx);
     const tgtIdx = parseInt(dropTarget.dataset.idx);
-    const from = state.order.indexOf(srcIdx);
-    const to   = state.order.indexOf(tgtIdx);
-    if (from !== to) {
-      const newOrder = [...state.order];
-      const [moved] = newOrder.splice(from, 1);
-      newOrder.splice(to, 0, moved);
-      updateMovedPlayerTier(moved, newOrder);
-      state.order   = newOrder;
-      state.custom  = true;
-      state.sortCol = null;
-      tabOrders[tabKey()] = { order: [...state.order], custom: true };
-      renderTable();
+    if (!isNaN(srcIdx) && !isNaN(tgtIdx)) {
+      const from = state.order.indexOf(srcIdx);
+      const to   = state.order.indexOf(tgtIdx);
+      if (from !== to) {
+        const newOrder = [...state.order];
+        const [moved] = newOrder.splice(from, 1);
+        newOrder.splice(to, 0, moved);
+        updateMovedPlayerTier(moved, newOrder);
+        state.order   = newOrder;
+        state.custom  = true;
+        state.sortCol = null;
+        tabOrders[tabKey()] = { order: [...state.order], custom: true };
+        renderTable();
+      }
     }
   }
   _touchDragRow = null;
