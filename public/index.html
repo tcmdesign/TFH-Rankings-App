@@ -1482,6 +1482,15 @@ async function loadPhotos() {
 }
 
 // ── Drag to reorder ──────────────────────────────────────────────────────────
+function updateMovedPlayerTier(movedIdx, newOrder) {
+  const pos = newOrder.indexOf(movedIdx);
+  if (pos < 0) return;
+  const neighbor = pos > 0 ? newOrder[pos - 1] : (newOrder[pos + 1] ?? null);
+  if (neighbor != null && state.data[neighbor] && state.data[neighbor].Tier) {
+    state.data[movedIdx].Tier = state.data[neighbor].Tier;
+  }
+}
+
 let dragSrc = null;
 
 function initDragDrop() {
@@ -1510,6 +1519,7 @@ function initDragDrop() {
       const newOrder = [...state.order];
       const [moved] = newOrder.splice(from, 1);
       newOrder.splice(to, 0, moved);
+      updateMovedPlayerTier(moved, newOrder);
       state.order   = newOrder;
       state.custom  = true;
       state.sortCol = null;
@@ -1581,6 +1591,7 @@ document.addEventListener('touchend', () => {
       const newOrder = [...state.order];
       const [moved] = newOrder.splice(from, 1);
       newOrder.splice(to, 0, moved);
+      updateMovedPlayerTier(moved, newOrder);
       state.order   = newOrder;
       state.custom  = true;
       state.sortCol = null;
