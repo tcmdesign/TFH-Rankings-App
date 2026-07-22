@@ -900,16 +900,19 @@ function populatedKey() {
   return (state.section === 'rookie' && state.mode === 'redraft') ? 'rookie_redraft' : state.mode;
 }
 function saveTabOrder() {
-  if (state.custom) tabOrders[tabKey()] = { order: [...state.order], custom: true };
+  if (state.custom) tabOrders[tabKey()] = { order: [...state.order], custom: true, tierOverrides: { ...tierOverrides } };
 }
 function restoreTabOrder() {
   const saved = tabOrders[tabKey()];
   if (saved && saved.order.length === state.data.length) {
     state.order  = saved.order;
     state.custom = true;
+    Object.keys(tierOverrides).forEach(k => delete tierOverrides[k]);
+    if (saved.tierOverrides) Object.assign(tierOverrides, saved.tierOverrides);
   } else {
     state.order  = state.data.map((_, i) => i);
     state.custom = false;
+    Object.keys(tierOverrides).forEach(k => delete tierOverrides[k]);
   }
 }
 
@@ -925,7 +928,8 @@ function applySharedState(d) {
   if (d.pos)     state.pos = d.pos;
   state.mode = FORMAT_CONFIG[state.format]?.mode || 'dynasty';
   state.section = sectionForFormat(state.format);
-  if (d.order)     { state.order = d.order; state.custom = true; tabOrders[tabKey()] = { order: [...d.order], custom: true }; }
+  if (d.tierOverrides) { Object.keys(tierOverrides).forEach(k => delete tierOverrides[k]); Object.assign(tierOverrides, d.tierOverrides); }
+  if (d.order)     { state.order = d.order; state.custom = true; tabOrders[tabKey()] = { order: [...d.order], custom: true, tierOverrides: { ...tierOverrides } }; }
   if (d.checked)   state.checked   = new Set(d.checked);
   if (d.starred)   state.starred   = new Set(d.starred);
   if (d.avoided)   state.avoided   = new Set(d.avoided);
@@ -953,7 +957,8 @@ async function loadFromURL() {
   } else {
     state.section = sectionForFormat(state.format);
   }
-  if (p.has('order'))   try { state.order = JSON.parse(atob(p.get('order'))); state.custom = true; tabOrders[tabKey()] = { order: [...state.order], custom: true }; } catch {}
+  if (p.has('tierOverrides')) try { const to = JSON.parse(atob(p.get('tierOverrides'))); Object.keys(tierOverrides).forEach(k => delete tierOverrides[k]); Object.assign(tierOverrides, to); } catch {}
+  if (p.has('order'))   try { state.order = JSON.parse(atob(p.get('order'))); state.custom = true; tabOrders[tabKey()] = { order: [...state.order], custom: true, tierOverrides: { ...tierOverrides } }; } catch {}
   if (p.has('checked')) try { state.checked = new Set(JSON.parse(atob(p.get('checked')))); } catch {}
   if (p.has('starred'))   try { state.starred   = new Set(JSON.parse(atob(p.get('starred'))));   } catch {}
   if (p.has('avoided'))   try { state.avoided   = new Set(JSON.parse(atob(p.get('avoided'))));   } catch {}
@@ -1528,7 +1533,7 @@ function initDragDrop() {
       state.order   = newOrder;
       state.custom  = true;
       state.sortCol = null;
-      tabOrders[tabKey()] = { order: [...state.order], custom: true };
+      tabOrders[tabKey()] = { order: [...state.order], custom: true, tierOverrides: { ...tierOverrides } };
       renderTable();
     });
   });
@@ -1601,7 +1606,7 @@ document.addEventListener('touchend', () => {
         state.order   = newOrder;
         state.custom  = true;
         state.sortCol = null;
-        tabOrders[tabKey()] = { order: [...state.order], custom: true };
+        tabOrders[tabKey()] = { order: [...state.order], custom: true, tierOverrides: { ...tierOverrides } };
         renderTable();
       }
     }
@@ -1769,6 +1774,7 @@ function resetOrder() {
 async function buildShareUrl() {
   const payload = { format: state.format, pos: state.pos };
   if (state.custom)             payload.order     = state.order;
+  if (state.custom && Object.keys(tierOverrides).length > 0) payload.tierOverrides = { ...tierOverrides };
   if (state.checked.size > 0)   payload.checked   = [...state.checked];
   if (state.starred.size > 0)   payload.starred   = [...state.starred];
   if (state.avoided.size > 0)   payload.avoided   = [...state.avoided];
@@ -1788,6 +1794,7 @@ async function buildShareUrl() {
     p.set('format', state.format);
     p.set('pos',    state.pos);
     if (state.custom)             p.set('order',     btoa(JSON.stringify(state.order)));
+    if (state.custom && Object.keys(tierOverrides).length > 0) p.set('tierOverrides', btoa(JSON.stringify(tierOverrides)));
     if (state.checked.size > 0)   p.set('checked',   btoa(JSON.stringify([...state.checked])));
     if (state.starred.size > 0)   p.set('starred',   btoa(JSON.stringify([...state.starred])));
     if (state.avoided.size > 0)   p.set('avoided',   btoa(JSON.stringify([...state.avoided])));
