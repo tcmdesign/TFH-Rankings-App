@@ -1500,6 +1500,72 @@ function updateMovedPlayerTier(movedIdx, newOrder) {
   }
 }
 
+function syncReorderAcrossTabs() {
+  const format = state.format;
+  const currentPos = state.pos;
+  const isMultiPos = ['Overall', 'SF', 'FLEX'].includes(currentPos);
+
+  if (isMultiPos) {
+    // Multi-pos tab reordered → sync to single-position tabs
+    const posPlayerOrder = {};
+    state.order.forEach(i => {
+      const p = state.data[i];
+      if (!p || !p.Pos) return;
+      if (!posPlayerOrder[p.Pos]) posPlayerOrder[p.Pos] = [];
+      posPlayerOrder[p.Pos].push(p.Player);
+    });
+
+    for (const [pos, names] of Object.entries(posPlayerOrder)) {
+      const key = `${format}_${pos}`;
+      const cachedData = tabData[key];
+      if (!cachedData) continue;
+
+      const nameToIdx = {};
+      cachedData.forEach((p, i) => { nameToIdx[p.Player] = i; });
+
+      const newOrder = [];
+      const used = new Set();
+      names.forEach(name => {
+        const idx = nameToIdx[name];
+        if (idx != null && !used.has(idx)) { newOrder.push(idx); used.add(idx); }
+      });
+      cachedData.forEach((_, i) => { if (!used.has(i)) newOrder.push(i); });
+
+      if (newOrder.length === cachedData.length) {
+        tabOrders[key] = { order: newOrder, custom: true, tierOverrides: tabOrders[key]?.tierOverrides || {} };
+      }
+    }
+  } else {
+    // Single-pos tab reordered → sync to multi-position tabs (Overall, SF, FLEX)
+    const newPosNames = state.order.map(i => state.data[i]?.Player).filter(Boolean);
+
+    for (const multiPos of ['Overall', 'SF', 'FLEX']) {
+      const key = `${format}_${multiPos}`;
+      const cachedData = tabData[key];
+      if (!cachedData) continue;
+
+      const existingOrder = tabOrders[key]?.order || cachedData.map((_, i) => i);
+
+      const posSlots = [];
+      existingOrder.forEach((dataIdx, orderIdx) => {
+        if (cachedData[dataIdx]?.Pos === currentPos) posSlots.push(orderIdx);
+      });
+
+      const nameToIdx = {};
+      cachedData.forEach((p, i) => { nameToIdx[p.Player] = i; });
+
+      const newOverallOrder = [...existingOrder];
+      newPosNames.forEach((name, i) => {
+        if (i < posSlots.length && nameToIdx[name] != null) {
+          newOverallOrder[posSlots[i]] = nameToIdx[name];
+        }
+      });
+
+      tabOrders[key] = { order: newOverallOrder, custom: true, tierOverrides: tabOrders[key]?.tierOverrides || {} };
+    }
+  }
+}
+
 let dragSrc = null;
 
 function initDragDrop() {
@@ -1534,6 +1600,7 @@ function initDragDrop() {
       state.custom  = true;
       state.sortCol = null;
       tabOrders[tabKey()] = { order: [...state.order], custom: true, tierOverrides: { ...tierOverrides } };
+      syncReorderAcrossTabs();
       renderTable();
     });
   });
@@ -1607,6 +1674,7 @@ document.addEventListener('touchend', () => {
         state.custom  = true;
         state.sortCol = null;
         tabOrders[tabKey()] = { order: [...state.order], custom: true, tierOverrides: { ...tierOverrides } };
+        syncReorderAcrossTabs();
         renderTable();
       }
     }
